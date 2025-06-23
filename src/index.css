@@ -1,0 +1,42 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card-animate { 
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+.animated-link {
+  position: relative;
+}
+
+.animated-link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #F97316; 
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease-out;
+}
+
+.animated-link:hover::after,
+.animated-link.active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
