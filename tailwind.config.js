@@ -1,3 +1,5 @@
+import defaultTheme from 'tailwindcss/defaultTheme';
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -7,11 +9,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        'brand-orange': {
-          DEFAULT: '#F97316', 
-          dark: '#EA580C',  
-        },
-      }
+        'brand-orange': '#F97316',
+        'brand-black': '#1a1a1a',
+      },
+      fontFamily: {
+        sans: ['Poppins', ...defaultTheme.fontFamily.sans],
+      },
     },
   },
   plugins: [],

@@ -1,0 +1,82 @@
+{
+  "common_data": {
+    "requirements": [
+      { "item": "Identity card or Valid Passport", "icon": "id-card" },
+      { "item": "Driving license: category A1 or B if driver is 25+ years old", "icon": "license" },
+      { "item": "Credit or debit card for security deposit", "icon": "credit-card" },
+      { "item": "Adequate riding experience" }
+    ],
+    "included": [
+      { "item": "All taxes (VAT 23%)", "checked": true },
+      { "item": "CDW & TP - Damages and theft insurance", "checked": true },
+      { "item": "Third party insurance", "checked": true },
+      { "item": "Road assistance", "checked": true },
+      { "item": "Unlimited mileage (Portugal only)", "checked": true },
+      { "item": "Driver helmet - Jet Type", "checked": true },
+      { "item": "Locker", "checked": true }
+    ],
+    "extras": [
+      { "item": "Passenger helmet", "price": "5€/day (max 15€/contract)" },
+      { "item": "Full face helmet", "price": "9€/day (max 27€/contract)" },
+      { "item": "Gloves", "price": "6€/day (max 18€/contract)" },
+      { "item": "Jacket", "price": "9€/day (max 27€/contract)" },
+      { "item": "Trousers", "price": "9€/day (max 36€/contract)" },
+      { "item": "Boots", "price": "9€/day (max 36€/contract)" },
+      { "item": "Via Verde (Electronic Tolls)", "price": "5.85€/Day" },
+      { "item": "Delivery/Drop off up to 10kms", "price": "40€" },
+      { "item": "Delivery/Drop off at Lisbon Airport", "price": "50€" },
+      { "item": "Delivery/Drop off up to 30kms", "price": "60€" }
+    ]
+  },
+  "motorcycles": [
+    {
+      "id": 1,
+      "slug": "yamaha-nmax-125",
+      "name": "Yamaha NMAX 125 (2025)",
+      "price_per_day": 44.50,
+      "image_url": "/images/nmax-125.jpeg",
+      "status": "available",
+      "description": "The NMAX 125 is Yamaha’s premium urban commuter, combining sporty performance with excellent agility and easy-to-use technology like CarPlay integration.",
+      "security_deposit": 450,
+      "extras_specific": {
+        "item": "SCDW & STP (deductible reduction to 100€)",
+        "price": "9.80€/day + VAT"
+      },
+      "technical_features": [
+        { "label": "Special Feature", "value": "CarPlay - GPS on Dashboard" },
+        { "label": "Engine size", "value": "125 cc" },
+        { "label": "Max. power", "value": "9 kW (12.2 HP) / 8000 rpm" },
+        { "label": "Fuel", "value": "Petrol 95" },
+        { "label": "Tank capacity", "value": "7.1 L" },
+        { "label": "Est. range", "value": "~250kms" },
+        { "label": "Seat height", "value": "770mm" },
+        { "label": "Gearbox", "value": "Automatic" },
+        { "label": "Kerb weight", "value": "132 kg" }
+      ]
+    },
+    {
+      "id": 2,
+      "slug": "yamaha-rayzr-125",
+      "name": "Yamaha RayZR 125 (2025)",
+      "price_per_day": 38.50,
+      "image_url": "/images/rayzr-125.jpeg",
+      "status": "available",
+      "description": "With its dynamic bodywork and lightweight chassis, the RayZR is a stylish and sporty scooter that offers a fun and economical way to explore the city.",
+      "security_deposit": 300,
+      "extras_specific": {
+        "item": "SCDW & STP (deductible reduction to 100€)",
+        "price": "7.80€/day + VAT"
+      },
+      "technical_features": [
+        { "label": "Engine size", "value": "125 cc" },
+        { "label": "Max. power", "value": "6 kW @ 6500 rpm" },
+        { "label": "Fuel", "value": "Petrol 95" },
+        { "label": "Tank capacity", "value": "5.2 L" },
+        { "label": "Est. range", "value": "~200kms" },
+        { "label": "Seat height", "value": "785mm" },
+        { "label": "Gearbox", "value": "Automatic" },
+        { "label": "Kerb weight", "value": "99 kg" }
+      ]
+    }
+  ]
+}
