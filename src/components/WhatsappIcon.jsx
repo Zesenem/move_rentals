@@ -1,4 +1,3 @@
-// src/components/WhatsappIcon.jsx
 function WhatsappIcon() {
   return (
     <svg 

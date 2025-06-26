@@ -3,7 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "homepage": "https://zesenem.github.io/move_rentals/",
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "dev": "vite",
     "build": "vite build",
@@ -12,6 +15,8 @@
     "server": "json-server --watch db.json --port 3000"
   },
   "dependencies": {
+    "firebase": "^11.9.1",
+    "gh-pages": "^6.3.0",
     "json-server": "^1.0.0-beta.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

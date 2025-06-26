@@ -1,18 +1,91 @@
 {
+  "common_data": {
+    "requirements": [
+      { "item": "Identity card or Valid Passport" },
+      { "item": "Driving License category A1, or B if driver is 25 years old", "icon": "license" },
+      { "item": "Credit or debit card for deductible amount blocking" },
+      { "item": "Adequate riding experience on motorbikes" }
+    ],
+    "included": [
+      { "item": "All taxes (VAT 23%)", "checked": true },
+      { "item": "CDW & TP - Damages and theft", "checked": true },
+      { "item": "Third party insurance", "checked": true },
+      { "item": "Road assistance", "checked": true },
+      { "item": "Unlimited mileage in national territory", "checked": true },
+      { "item": "Driver Helmet (jet type)", "icon": "helmet", "checked": true },
+      { "item": "Lock", "checked": true }
+    ],
+    "extras": [
+      { "item": "Passenger Helmet", "price": "5€/day (max 15€)" },
+      { "item": "Full Face Helmet", "price": "9€/day (max 27€)" },
+      { "item": "Gloves", "price": "6€/day (max 18€)" },
+      { "item": "Jacket", "price": "9€/day (max 27€)" },
+      { "item": "Trousers", "price": "9€/day (max 36€)" },
+      { "item": "Boots", "price": "9€/day (max 36€)" },
+      { "item": "Delivery or drop off up to 10kms", "price": "40€" },
+      { "item": "Delivery or drop off at Lisbon Airport", "price": "50€" },
+      { "item": "Delivery or drop off up to 30kms", "price": "60€" }
+    ]
+  },
   "motorcycles": [
     {
-      "id": "1",
+      "id": 1,
+      "slug": "yamaha-nmax-125",
       "name": "Yamaha NMAX 125 (2025)",
-      "price_per_day": 44.5,
+      "price_per_day": 44.50,
       "image_url": "/images/nmax-125.jpg",
-      "status": "rented"
+      "status": "available",
+      "description": "The NMAX 125 is Yamaha’s premium urban commuter, combining sporty performance with excellent agility and easy-to-use technology like CarPlay integration.",
+      "security_deposit": 450,
+      "quick_glance": [
+        { "label": "125cc", "icon": "engine" },
+        { "label": "A1/B", "icon": "license" },
+        { "label": "7.1L", "icon": "gas" }
+      ],
+      "extras_specific": {
+        "item": "SCDW & STP (deductible reduction from 450€ to 100€)",
+        "price": "9.80€/day + VAT"
+      },
+      "technical_features": [
+        { "label": "Special Feature", "value": "CarPlay - GPS on Dashboard" },
+        { "label": "Engine size", "value": "125 cc" },
+        { "label": "Max. power output", "value": "9 kW (12.2 CV) / 8000 r/min" },
+        { "label": "Fuel", "value": "Petrol 95 octanes" },
+        { "label": "Fuel tank capacity", "value": "7.1 L" },
+        { "label": "Distance range", "value": "+- 250kms" },
+        { "label": "Seat height", "value": "770mm" },
+        { "label": "Gearbox", "value": "Automatic transmission" },
+        { "label": "Kerb weight", "value": "132 kg" }
+      ]
     },
     {
-      "id": "2",
+      "id": 2,
+      "slug": "yamaha-rayzr-125",
       "name": "Yamaha RayZR 125 (2025)",
-      "price_per_day": 38.5,
+      "price_per_day": 38.50,
       "image_url": "/images/rayzr-125.jpg",
-      "status": "available"
+      "status": "available",
+      "description": "With its dynamic bodywork and lightweight chassis, the RayZR is a stylish and sporty scooter that offers a fun and economical way to explore the city.",
+      "security_deposit": 300,
+      "quick_glance": [
+        { "label": "125cc", "icon": "engine" },
+        { "label": "A1/B", "icon": "license" },
+        { "label": "5.2L", "icon": "gas" }
+      ],
+      "extras_specific": {
+        "item": "SCDW & STP (deductible reduction from 300€ to 100€)",
+        "price": "7.80€/day + VAT"
+      },
+      "technical_features": [
+        { "label": "Engine size", "value": "125 cc" },
+        { "label": "Max. power output", "value": "6 kW @ 6500 rpm" },
+        { "label": "Fuel", "value": "Petrol 95 octanes" },
+        { "label": "Fuel tank capacity", "value": "5.2 L" },
+        { "label": "Distance range", "value": "+- 200kms" },
+        { "label": "Seat height", "value": "785mm" },
+        { "label": "Gearbox", "value": "Automatic transmission" },
+        { "label": "Kerb weight", "value": "99 kg" }
+      ]
     }
   ]
 }
