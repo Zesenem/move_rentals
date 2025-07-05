@@ -9,8 +9,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        'brand-orange': '#F97316',
-        'brand-black': '#1a1a1a',
+        'cloud': '#EDEFF7',
+        'smoke': '#D3D6E0',
+        'steel': '#BCBFCC',
+        'space': '#9DA2B3',
+        'graphite': '#6E7180',
+        'arsenic': '#40424D',
+        'phantom': '#1E1E24',
+        'brand-black': '#000000',
       },
       fontFamily: {
         sans: ['Poppins', ...defaultTheme.fontFamily.sans],
