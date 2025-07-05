@@ -15,7 +15,7 @@ function MotorcycleList() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("/move_rentals/db.json")
+    fetch("/db.json")
       .then((response) => {
         if (!response.ok) throw new Error("Network response was not ok");
         return response.json();
@@ -46,7 +46,7 @@ function MotorcycleList() {
           <div className="w-full max-w-md bg-brand-black border border-white/10 rounded-lg shadow-lg flex flex-col overflow-hidden transition-all duration-300 hover:shadow-brand-orange/20 hover:border-brand-orange/50 h-full">
             <div className="aspect-video bg-black/20">
               <img
-                src={`/move_rentals${bike.image_url}`}
+                src={`${bike.image_url}`}
                 alt={bike.name}
                 className="w-full h-full object-cover transition-opacity duration-500 opacity-0"
                 onLoad={(e) => (e.target.style.opacity = 1)}

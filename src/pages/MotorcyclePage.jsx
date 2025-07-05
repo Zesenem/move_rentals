@@ -22,7 +22,7 @@ function MotorcyclePage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/move_rentals/db.json");
+        const response = await fetch("/db.json");
         if (!response.ok) throw new Error("Could not fetch the data file.");
         const data = await response.json();
         const currentBike = data.motorcycles.find((m) => m.slug === slug);
