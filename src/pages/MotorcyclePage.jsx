@@ -53,7 +53,7 @@ function MotorcyclePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
         <div className="w-full">
           <img
-            src={`/move_rentals${bike.image_url}`}
+            src={`${bike.image_url}`}
             alt={bike.name}
             className="w-full rounded-lg shadow-xl"
           />
