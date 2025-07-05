@@ -1,40 +1,48 @@
 {
-  "common_data": {
+"common_data": {
     "requirements": [
       { "item": "Identity card or Valid Passport", "icon": "id-card" },
       { "item": "Driving license: category A1 or B if driver is 25+ years old", "icon": "license" },
       { "item": "Credit or debit card for security deposit", "icon": "credit-card" },
-      { "item": "Adequate riding experience" }
+      { "item": "Adequate riding experience", "icon": "experience" }
     ],
     "included": [
-      { "item": "All taxes (VAT 23%)", "checked": true },
-      { "item": "CDW & TP - Damages and theft insurance", "checked": true },
-      { "item": "Third party insurance", "checked": true },
-      { "item": "Road assistance", "checked": true },
-      { "item": "Unlimited mileage (Portugal only)", "checked": true },
-      { "item": "Driver helmet - Jet Type", "checked": true },
-      { "item": "Locker", "checked": true }
+      { "item": "All taxes (VAT 23%)", "icon": "tax" },
+      { "item": "CDW & TP - Damages and theft insurance", "icon": "shield" },
+      { "item": "Third party insurance", "icon": "users" },
+      { "item": "Road assistance", "icon": "road" },
+      { "item": "Unlimited mileage", "icon": "infinity" },
+      { "item": "Driver helmet - Jet Type", "icon": "helmet" },
+      { "item": "Locker", "icon": "lock" }
     ],
     "extras": [
-      { "item": "Passenger helmet", "price": "5€/day (max 15€/contract)" },
-      { "item": "Full face helmet", "price": "9€/day (max 27€/contract)" },
-      { "item": "Gloves", "price": "6€/day (max 18€/contract)" },
-      { "item": "Jacket", "price": "9€/day (max 27€/contract)" },
-      { "item": "Trousers", "price": "9€/day (max 36€/contract)" },
-      { "item": "Boots", "price": "9€/day (max 36€/contract)" },
-      { "item": "Via Verde (Electronic Tolls)", "price": "5.85€/Day" },
-      { "item": "Delivery/Drop off up to 10kms", "price": "40€" },
-      { "item": "Delivery/Drop off at Lisbon Airport", "price": "50€" },
-      { "item": "Delivery/Drop off up to 30kms", "price": "60€" }
+      { "item": "Passenger helmet", "price": "5€/day (max 15€/contract)", "icon": "helmet" },
+      { "item": "Full face helmet", "price": "9€/day (max 27€/contract)", "icon": "helmet" },
+      { "item": "Gloves", "price": "6€/day (max 18€/contract)", "icon": "gloves" },
+      { "item": "Jacket", "price": "9€/day (max 27€/contract)", "icon": "jacket" },
+      { "item": "Trousers", "price": "9€/day (max 36€/contract)", "icon": "trousers" },
+      { "item": "Boots", "price": "9€/day (max 36€/contract)", "icon": "boots" },
+      { "item": "Via Verde (Electronic Tolls)", "price": "5.85€/Day", "icon": "toll" },
+      { "item": "Delivery/Drop off up to 10kms", "price": "40€", "icon": "delivery" },
+      { "item": "Delivery/Drop off at Lisbon Airport", "price": "50€", "icon": "airport" },
+      { "item": "Delivery/Drop off up to 30kms", "price": "60€", "icon": "delivery" }
     ]
   },
   "motorcycles": [
     {
       "id": 1,
       "slug": "yamaha-nmax-125",
-      "name": "Yamaha NMAX 125 (2025)",
+      "name": "Yamaha NMAX 125 (2023)",
+      "booking_url": "https://twice.shop/move-gpos/product/Rt7CgmbXQoMEfIwdsE8G?lang=en",
       "price_per_day": 44.50,
-      "image_url": "/images/nmax-125.jpeg",
+      "image_urls": [
+        "/images/nmax_2023/nmax_2023.jpg",
+        "/images/nmax_2023/nmax_2023_1.jpg",
+        "/images/nmax_2023/nmax_2023_2.jpg",
+        "/images/nmax_2023/nmax_2023_3.jpg",
+        "/images/nmax_2023/nmax_2023_4.jpg",
+        "/images/nmax_2023/nmax_2023_5.jpg"
+      ],
       "status": "available",
       "description": "The NMAX 125 is Yamaha’s premium urban commuter, combining sporty performance with excellent agility and easy-to-use technology like CarPlay integration.",
       "security_deposit": 450,
@@ -58,8 +66,15 @@
       "id": 2,
       "slug": "yamaha-rayzr-125",
       "name": "Yamaha RayZR 125 (2025)",
+      "booking_url": "https://twice.shop/move-gpos/product/mcQ69eD3JllbMrC8FriN?lang=en",
       "price_per_day": 38.50,
-      "image_url": "/images/rayzr-125.jpeg",
+      "image_urls": [
+        "/images/rayzr_2025/rayzr_2025_1.jpg",
+        "/images/rayzr_2025/rayzr_2025_2.jpg",
+        "/images/rayzr_2025/rayzr_2025_3.jpg",
+        "/images/rayzr_2025/rayzr_2025_4.jpg",
+        "/images/rayzr_2025/rayzr_2025_5.jpg"
+      ],
       "status": "available",
       "description": "With its dynamic bodywork and lightweight chassis, the RayZR is a stylish and sporty scooter that offers a fun and economical way to explore the city.",
       "security_deposit": 300,
