@@ -22,12 +22,15 @@ const router = createBrowserRouter(
           path: "admin",
           element: <AdminPage />,
         },
-        { path: "motorcycle/:slug", element: <MotorcyclePage /> },
+        {
+          path: "motorcycle/:slug",
+          element: <MotorcyclePage />,
+        },
       ],
     },
   ],
   {
-    basename: "/move_rentals",
+    basename: "/move_rentals/",
   }
 );
 
