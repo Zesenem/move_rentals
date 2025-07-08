@@ -1,47 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+@layer base {
+    body {
+        @apply bg-phantom text-steel;
+    }
+}
+
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .card-animate {
-  opacity: 0;
-  animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+    animation: fadeInUp 0.5s ease-out forwards;
 }
 
-.animated-link {
-  position: relative;
-}
-
-.animated-link::after {
-  content: "";
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: #f97316;
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.3s ease-out;
-}
-
-.animated-link:hover::after,
-.animated-link.active::after {
-  transform: scaleX(1);
-  transform-origin: left;
-}
-
-body {
-  background-color: #000000; 
-  background-image: linear-gradient(to bottom right, #1E1E24, #000000);
+.smoke-blob-effect {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
 }

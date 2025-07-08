@@ -1,63 +1,140 @@
-import React, { useState, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { FaWhatsapp } from 'react-icons/fa';
-import Logo from './Logo'; // Assuming you still have the Logo.jsx component
+import { useState, useEffect } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { FaWhatsapp, FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
+import { useCartStore } from "../store/cartStore";
+import Logo from "./Logo";
+import Button from "./Button";
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const phoneNumber = '351920016794';
-  const whatsappURL = `https://wa.me/${phoneNumber}?text=Hello!%20I'd%20like%20to%20know%20more%20about%20the%20motorcycle%20rentals.`;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const scrollToFooter = () => {
-    const footerSection = document.getElementById('footer-section');
-    if (footerSection) {
-      footerSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const itemCount = useCartStore((state) => state.getItemCount());
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll, { passive: true });
   }, []);
 
-  const navLinkStyle = "font-semibold py-2 px-4 rounded-md transition-all duration-300 border";
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => (document.body.style.overflow = "unset");
+  }, [isMenuOpen]);
+
+  const handleLinkClick = (action) => {
+    if (action) action();
+    setIsMenuOpen(false);
+  };
+
+  const navLinkClasses = "font-semibold py-2 px-3 transition-colors duration-300 rounded-md";
+  const getNavLinkStyle = ({ isActive }) =>
+    `${navLinkClasses} ${isActive ? "bg-cloud text-phantom" : "text-steel hover:bg-arsenic"}`;
+
+  const navItems = [
+    { name: "Our Fleet", to: "/" },
+    {
+      name: "About Us",
+      type: "button",
+      action: () =>
+        document.getElementById("footer-section")?.scrollIntoView({ behavior: "smooth" }),
+    },
+    {
+      name: "Cart",
+      to: "/checkout",
+      icon: FaShoppingCart,
+      badge: itemCount > 0 ? itemCount : null,
+    },
+    {
+      name: "Contact Us",
+      href: "https://wa.me/351920016794",
+      type: "primary-button",
+      icon: FaWhatsapp,
+    },
+  ];
+
+  const navLinks = navItems.map((item) => {
+    if (item.type === "primary-button") {
+      return (
+        <Button
+          key={item.name}
+          as="a"
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="primary"
+          icon={item.icon}
+        >
+          {item.name}
+        </Button>
+      );
+    }
+    if (item.type === "button") {
+      return (
+        <button
+          key={item.name}
+          onClick={() => handleLinkClick(item.action)}
+          className={`${navLinkClasses} text-steel hover:bg-arsenic`}
+        >
+          {item.name}
+        </button>
+      );
+    }
+    return (
+      <NavLink
+        key={item.name}
+        to={item.to}
+        className={getNavLinkStyle}
+        onClick={() => handleLinkClick()}
+      >
+        <span className="flex items-center gap-2">
+          {item.icon && <item.icon />}
+          {item.name}
+          {item.badge && (
+            <span className="bg-cloud text-phantom text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {item.badge}
+            </span>
+          )}
+        </span>
+      </NavLink>
+    );
+  });
 
   return (
-    <header className={`sticky top-0 z-50 transition-colors duration-300 ${isScrolled ? 'bg-gradient-to-r from-phantom to-brand-black shadow-lg' : 'bg-transparent'}`}>
-      <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link to="/">
-          {/* Using your custom Logo component is cleaner, assuming it's up to date */}
-          <Logo className="h-12 w-auto text-cloud" />
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled || isMenuOpen ? "bg-phantom shadow-lg" : "bg-transparent"
+      }`}
+    >
+      <nav className="container mx-auto px-4 sm:px-6 flex justify-between items-center h-20">
+        <Link to="/" className="h-full flex items-center" onClick={() => setIsMenuOpen(false)}>
+          <Logo className="h-10 text-cloud" />
         </Link>
-        <div className="flex items-center space-x-2">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `${navLinkStyle} ${isActive ? 'bg-cloud text-phantom border-cloud' : 'text-steel border-transparent hover:text-cloud hover:border-cloud'}`
-            }
-          >
-            Our Fleet
-          </NavLink>
+        <div className="hidden md:flex items-center space-x-2">{navLinks}</div>
+        <div className="md:hidden">
           <button
-            onClick={scrollToFooter}
-            className={`${navLinkStyle} text-steel border-transparent hover:text-cloud hover:border-cloud`}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="text-cloud p-2"
+            aria-controls="mobile-menu"
+            aria-expanded={isMenuOpen}
           >
-            About Us
+            <span className="sr-only">Open main menu</span>
+            {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
           </button>
-          <a
-            href={whatsappURL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center space-x-2 bg-cloud text-phantom font-bold py-2 px-4 rounded-md transition-all duration-300 hover:scale-105 hover:brightness-95"
-          >
-            <FaWhatsapp size={18} />
-            <span className="hidden sm:inline">Contact Us</span>
-          </a>
         </div>
       </nav>
+      <div
+        id="mobile-menu"
+        className={`transition-all duration-500 ease-in-out md:hidden bg-phantom overflow-hidden ${
+          isMenuOpen ? "max-h-screen" : "max-h-0"
+        }`}
+      >
+        <div className="px-4 pt-2 pb-8 space-y-2 flex flex-col items-center">{navLinks}</div>
+      </div>
     </header>
   );
 }

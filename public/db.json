@@ -1,5 +1,5 @@
 {
-"common_data": {
+  "common_data": {
     "requirements": [
       { "item": "Identity card or Valid Passport", "icon": "id-card" },
       { "item": "Driving license: category A1 or B if driver is 25+ years old", "icon": "license" },
@@ -12,85 +12,36 @@
       { "item": "Third party insurance", "icon": "users" },
       { "item": "Road assistance", "icon": "road" },
       { "item": "Unlimited mileage", "icon": "infinity" },
-      { "item": "Driver helmet - Jet Type", "icon": "helmet" },
+      { "item": "Driver helmet - Jet Type", "icon": "helmetinc" },
       { "item": "Locker", "icon": "lock" }
-    ],
-    "extras": [
-      { "item": "Passenger helmet", "price": "5€/day (max 15€/contract)", "icon": "helmet" },
-      { "item": "Full face helmet", "price": "9€/day (max 27€/contract)", "icon": "helmet" },
-      { "item": "Gloves", "price": "6€/day (max 18€/contract)", "icon": "gloves" },
-      { "item": "Jacket", "price": "9€/day (max 27€/contract)", "icon": "jacket" },
-      { "item": "Trousers", "price": "9€/day (max 36€/contract)", "icon": "trousers" },
-      { "item": "Boots", "price": "9€/day (max 36€/contract)", "icon": "boots" },
-      { "item": "Via Verde (Electronic Tolls)", "price": "5.85€/Day", "icon": "toll" },
-      { "item": "Delivery/Drop off up to 10kms", "price": "40€", "icon": "delivery" },
-      { "item": "Delivery/Drop off at Lisbon Airport", "price": "50€", "icon": "airport" },
-      { "item": "Delivery/Drop off up to 30kms", "price": "60€", "icon": "delivery" }
     ]
   },
-  "motorcycles": [
+  "motorcycles_static_data": [
     {
-      "id": 1,
-      "slug": "yamaha-nmax-125",
-      "name": "Yamaha NMAX 125 (2023)",
-      "booking_url": "https://twice.shop/move-gpos/product/Rt7CgmbXQoMEfIwdsE8G?lang=en",
-      "price_per_day": 44.50,
-      "image_urls": [
-        "/images/nmax_2023/nmax_2023.jpg",
-        "/images/nmax_2023/nmax_2023_1.jpg",
-        "/images/nmax_2023/nmax_2023_2.jpg",
-        "/images/nmax_2023/nmax_2023_3.jpg",
-        "/images/nmax_2023/nmax_2023_4.jpg",
-        "/images/nmax_2023/nmax_2023_5.jpg"
-      ],
-      "status": "available",
-      "description": "The NMAX 125 is Yamaha’s premium urban commuter, combining sporty performance with excellent agility and easy-to-use technology like CarPlay integration.",
-      "security_deposit": 450,
-      "extras_specific": {
-        "item": "SCDW & STP (deductible reduction to 100€)",
-        "price": "9.80€/day + VAT"
-      },
-      "technical_features": [
-        { "label": "Special Feature", "value": "CarPlay - GPS on Dashboard" },
-        { "label": "Engine size", "value": "125 cc" },
-        { "label": "Max. power", "value": "9 kW (12.2 HP) / 8000 rpm" },
-        { "label": "Fuel", "value": "Petrol 95" },
-        { "label": "Tank capacity", "value": "7.1 L" },
-        { "label": "Est. range", "value": "~250kms" },
-        { "label": "Seat height", "value": "770mm" },
-        { "label": "Gearbox", "value": "Automatic" },
-        { "label": "Kerb weight", "value": "132 kg" }
+      "id": "Rt7CgmbXQoMEfIwdsE8G",
+      "badges": ["Best Seller", "Premium"],
+      "quick_glance": [
+        { "label": "125 cc", "icon": "engine" },
+        { "label": "A1 / B", "icon": "license" },
+        { "label": "7.1 L", "icon": "gas" }
       ]
     },
     {
-      "id": 2,
-      "slug": "yamaha-rayzr-125",
-      "name": "Yamaha RayZR 125 (2025)",
-      "booking_url": "https://twice.shop/move-gpos/product/mcQ69eD3JllbMrC8FriN?lang=en",
-      "price_per_day": 38.50,
-      "image_urls": [
-        "/images/rayzr_2025/rayzr_2025_1.jpg",
-        "/images/rayzr_2025/rayzr_2025_2.jpg",
-        "/images/rayzr_2025/rayzr_2025_3.jpg",
-        "/images/rayzr_2025/rayzr_2025_4.jpg",
-        "/images/rayzr_2025/rayzr_2025_5.jpg"
-      ],
-      "status": "available",
-      "description": "With its dynamic bodywork and lightweight chassis, the RayZR is a stylish and sporty scooter that offers a fun and economical way to explore the city.",
-      "security_deposit": 300,
-      "extras_specific": {
-        "item": "SCDW & STP (deductible reduction to 100€)",
-        "price": "7.80€/day + VAT"
-      },
-      "technical_features": [
-        { "label": "Engine size", "value": "125 cc" },
-        { "label": "Max. power", "value": "6 kW @ 6500 rpm" },
-        { "label": "Fuel", "value": "Petrol 95" },
-        { "label": "Tank capacity", "value": "5.2 L" },
-        { "label": "Est. range", "value": "~200kms" },
-        { "label": "Seat height", "value": "785mm" },
-        { "label": "Gearbox", "value": "Automatic" },
-        { "label": "Kerb weight", "value": "99 kg" }
+      "id": "mcQ69eD3JllbMrC8FriN",
+      "badges": ["ECO", "Best Value"],
+      "quick_glance": [
+        { "label": "125 cc", "icon": "engine" },
+        { "label": "A1 / B", "icon": "license" },
+        { "label": "5.2 L", "icon": "gas" }
+      ]
+    },
+    {
+      "id": "c0cxAwwBOEjg0R8PYsiy",
+      "badges": ["Premium"],
+      "quick_glance": [
+        { "label": "125 cc", "icon": "engine" },
+        { "label": "A1 / B", "icon": "license" },
+        { "label": "7.1 L", "icon": "gas" }
       ]
     }
   ]
