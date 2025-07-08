@@ -38,7 +38,7 @@ function MotorcycleList() {
     <div className="flex flex-wrap justify-center gap-6">
       {motorcycles.map((bike, index) => (
         <Link to={`/motorcycle/${bike.slug}`} key={bike.id} className="block card-animate" style={{ animationDelay: `${index * 150}ms` }}>
-          <div className="w-full max-w-lg bg-arsenic border border-graphite/50 rounded-lg shadow-lg flex flex-col overflow-hidden h-full transition-all duration-300 hover:border-cloud/50 hover:shadow-lg hover:shadow-cloud/10">
+          <div className="w-full max-w-lg bg-arsenic border border-graphite/50 rounded-lg shadow-lg flex flex-col overflow-hidden h-full transition-all duration-300 hover:border-cloud/50 hover:shadow-lg hover:shadow-cloud/20">
             <div className="aspect-video bg-phantom">
               <img 
                 src={bike.image_urls[0]} 

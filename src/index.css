@@ -42,7 +42,6 @@
 }
 
 body {
-
   background-color: #000000; 
-  background-image: linear-gradient(to bottom right, #1E1E24, #000000); 
+  background-image: linear-gradient(to bottom right, #1E1E24, #000000);
 }

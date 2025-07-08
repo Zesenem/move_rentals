@@ -33,6 +33,7 @@
       "id": 1,
       "slug": "yamaha-nmax-125",
       "name": "Yamaha NMAX 125 (2023)",
+      "booking_url": "https://twice.shop/move-gpos/product/Rt7CgmbXQoMEfIwdsE8G?lang=en",
       "price_per_day": 44.50,
       "image_urls": [
         "/images/nmax_2023/nmax_2023.jpg",
@@ -65,6 +66,7 @@
       "id": 2,
       "slug": "yamaha-rayzr-125",
       "name": "Yamaha RayZR 125 (2025)",
+      "booking_url": "https://twice.shop/move-gpos/product/mcQ69eD3JllbMrC8FriN?lang=en",
       "price_per_day": 38.50,
       "image_urls": [
         "/images/rayzr_2025/rayzr_2025_1.jpg",

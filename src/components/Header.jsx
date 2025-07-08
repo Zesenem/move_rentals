@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { FaWhatsapp } from 'react-icons/fa';
-import Logo from './Logo';
+import Logo from './Logo'; // Assuming you still have the Logo.jsx component
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -29,6 +29,7 @@ function Header() {
     <header className={`sticky top-0 z-50 transition-colors duration-300 ${isScrolled ? 'bg-gradient-to-r from-phantom to-brand-black shadow-lg' : 'bg-transparent'}`}>
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
         <Link to="/">
+          {/* Using your custom Logo component is cleaner, assuming it's up to date */}
           <Logo className="h-12 w-auto text-cloud" />
         </Link>
         <div className="flex items-center space-x-2">
