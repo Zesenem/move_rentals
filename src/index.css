@@ -1,6 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
+@layer base {
+  body {
+    @apply bg-cloud text-arsenic;
+  }
+}
 
 @keyframes fadeInUp {
   from {
@@ -41,7 +48,24 @@
   transform-origin: left;
 }
 
-body {
-  background-color: #000000; 
-  background-image: linear-gradient(to bottom right, #1E1E24, #000000);
+.parallax-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -10; 
+  overflow: hidden;
 }
+
+.smoke-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px); 
+  opacity: 0.5; 
+}
+
+/* body {
+  background-color: --color-bg-cloud; 
+  background-image: linear-gradient(to bottom right, #1E1E24, #000000);
+} */

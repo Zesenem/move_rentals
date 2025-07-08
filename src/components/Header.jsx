@@ -1,63 +1,86 @@
-import React, { useState, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { FaWhatsapp } from 'react-icons/fa';
-import Logo from './Logo'; // Assuming you still have the Logo.jsx component
+import { useState, useEffect } from "react";
+import { Link, NavLink } from "react-router-dom";
+import { FaWhatsapp, FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
+import { useCartStore } from '../store/cartStore';
+import Logo from "./Logo";
+import Button from "./Button";
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const phoneNumber = '351920016794';
-  const whatsappURL = `https://wa.me/${phoneNumber}?text=Hello!%20I'd%20like%20to%20know%20more%20about%20the%20motorcycle%20rentals.`;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  const itemCount = useCartStore((state) => state.getItemCount());
 
   const scrollToFooter = () => {
-    const footerSection = document.getElementById('footer-section');
-    if (footerSection) {
-      footerSection.scrollIntoView({ behavior: 'smooth' });
-    }
+    document.getElementById("footer-section")?.scrollIntoView({ behavior: "smooth" });
+    setIsMenuOpen(false);
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinkStyle = "font-semibold py-2 px-4 rounded-md transition-all duration-300 border";
+  const navLinkClasses = "font-semibold py-2 px-3 transition-colors duration-300 rounded-md";
+
+  const getNavLinkStyle = ({ isActive }) =>
+    `${navLinkClasses} ${isActive ? "bg-cloud text-phantom" : "text-steel hover:bg-arsenic"}`;
+  
+  const navLinks = (
+    <>
+      <NavLink to="/" className={getNavLinkStyle} onClick={() => setIsMenuOpen(false)}>
+        Our Fleet
+      </NavLink>
+      <button onClick={scrollToFooter} className={`${navLinkClasses} text-steel hover:bg-arsenic`}>
+        About Us
+      </button>
+      <NavLink 
+        to="/checkout" 
+        className={`${navLinkClasses} text-steel hover:bg-arsenic flex items-center gap-2`}
+        onClick={() => setIsMenuOpen(false)}
+      >
+        <FaShoppingCart />
+        Cart
+        {itemCount > 0 && (
+          <span className="bg-cloud text-phantom text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            {itemCount}
+          </span>
+        )}
+      </NavLink>
+      <Button 
+        as="a"
+        href="https://wa.me/351920016794"
+        target="_blank" 
+        rel="noopener noreferrer"
+        variant="primary" 
+        icon={FaWhatsapp}
+      >
+        Contact Us
+      </Button>
+    </>
+  );
 
   return (
-    <header className={`sticky top-0 z-50 transition-colors duration-300 ${isScrolled ? 'bg-gradient-to-r from-phantom to-brand-black shadow-lg' : 'bg-transparent'}`}>
-      <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link to="/">
-          {/* Using your custom Logo component is cleaner, assuming it's up to date */}
+    <header className={`sticky top-0 z-50 transition-colors duration-300 ${isScrolled || isMenuOpen ? "bg-phantom shadow-lg" : "bg-transparent"}`}>
+      <nav className="container mx-auto px-4 sm:px-6 py-4 flex justify-between items-center">
+        <Link to="/" onClick={() => setIsMenuOpen(false)}>
           <Logo className="h-12 w-auto text-cloud" />
         </Link>
-        <div className="flex items-center space-x-2">
-          <NavLink
-            to="/"
-            className={({ isActive }) =>
-              `${navLinkStyle} ${isActive ? 'bg-cloud text-phantom border-cloud' : 'text-steel border-transparent hover:text-cloud hover:border-cloud'}`
-            }
-          >
-            Our Fleet
-          </NavLink>
-          <button
-            onClick={scrollToFooter}
-            className={`${navLinkStyle} text-steel border-transparent hover:text-cloud hover:border-cloud`}
-          >
-            About Us
+        <div className="hidden md:flex items-center space-x-2">{navLinks}</div>
+        <div className="md:hidden">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-cloud p-2">
+            {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
           </button>
-          <a
-            href={whatsappURL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center space-x-2 bg-cloud text-phantom font-bold py-2 px-4 rounded-md transition-all duration-300 hover:scale-105 hover:brightness-95"
-          >
-            <FaWhatsapp size={18} />
-            <span className="hidden sm:inline">Contact Us</span>
-          </a>
         </div>
       </nav>
+      {isMenuOpen && (
+        <div className="md:hidden bg-phantom">
+          <div className="px-4 pt-2 pb-4 space-y-2 flex flex-col items-center">
+            {navLinks}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

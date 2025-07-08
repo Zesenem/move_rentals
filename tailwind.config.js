@@ -14,6 +14,23 @@ export default {
         arsenic: "#40424D",
         phantom: "#1E1E24",
         "brand-black": "#000000",
+        status: {
+          available: '#6EE7B7', 
+          booked: '#FCD34D',     
+        },
+        'status-bg': {
+          available: 'rgba(110, 231, 183, 0.2)',
+          booked: 'rgba(252, 211, 77, 0.2)',
+        }
+      },
+      animation: {
+        'fade-scale-in': 'fade-scale-in 0.3s ease-out forwards',
+      },
+      keyframes: {
+        'fade-scale-in': {
+          '0%': { transform: 'scale(0.95)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
       },
       fontFamily: {
         sans: ["Manrope", ...defaultTheme.fontFamily.sans],
