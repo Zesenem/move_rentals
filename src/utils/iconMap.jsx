@@ -26,7 +26,7 @@ export const iconMap = {
   license: <PiSteeringWheelFill className={`${iconBaseClass} text-steel`} />,
   "credit-card": <FaCreditCard className={`${iconBaseClass} text-steel`} />,
   experience: <PiMotorcycleFill className={`${iconBaseClass} text-steel`} />,
-  helmet: <GiFullMotorcycleHelmet className={`${iconBaseClass} text-steel`} />,
+  helmet: <GiFullMotorcycleHelmet className={`${iconBaseClass} text-status-available`} />,
   gloves: <GiGloves className={`${iconBaseClass} text-steel`} />,
   jacket: <PiCoatHangerBold className={`${iconBaseClass} text-steel`} />,
   trousers: <PiPantsFill className={`${iconBaseClass} text-steel`} />,
@@ -40,5 +40,6 @@ export const iconMap = {
   road: <FaRoad className={`${iconBaseClass} text-status-available`} />,
   infinity: <FaInfinity className={`${iconBaseClass} text-status-available`} />,
   lock: <FaLock className={`${iconBaseClass} text-status-available`} />,
+  
   "default-check": <FaCheckCircle className={`${iconBaseClass} text-status-available`} />,
 };

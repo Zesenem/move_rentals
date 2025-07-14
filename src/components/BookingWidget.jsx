@@ -140,23 +140,23 @@ function BookingWidget({ bike, selectedExtras }) {
                     fromDate={today}
                     footer={<p className="text-center pt-4 text-steel font-semibold text-sm">{footerText}</p>}
                     classNames={{
-                        root: `${defaultClassNames.root} p-5 bg-arsenic`,
+                        root: `${defaultClassNames.root} shadow-lg p-5 bg-zinc-100`,
                         caption: 'flex justify-between items-center h-12 px-1',
-                        caption_label: 'text-lg font-bold text-cloud',
-                        nav_button: 'h-9 w-9 flex items-center justify-center hover:bg-graphite rounded-full',
+                        caption_label: 'text-lg font-bold text-gray-700',
+                        nav_button: 'h-9 w-9 flex items-center justify-center hover:bg-gray-200 rounded-full',
                         table: 'border-collapse w-full mt-2',
-                        head_row: 'flex text-steel mb-2',
+                        head_row: 'flex text-gray-500 mb-2',
                         head_cell: 'w-full h-10 flex items-center justify-center font-semibold text-sm',
                         row: 'flex w-full mt-1',
                         cell: 'w-full h-12 flex items-center justify-center text-base relative',
                         day: 'group w-10 h-10 m-1 rounded-full transition-colors',
-                        day_today: 'text-emerald-400 font-bold',
-                        day_selected: 'bg-emerald-500 text-phantom',
-                        day_range_middle: 'bg-emerald-500/20 rounded-none',
+                        day_today: 'text-orange-600 font-bold',
+                        day_selected: 'bg-orange-700 text-white',
+                        day_range_middle: 'bg-orange-700/20 rounded-none',
                         day_range_start: 'rounded-r-none',
                         day_range_end: 'rounded-l-none',
-                        day_outside: 'text-gray-600',
-                        day_disabled: 'text-gray-500 cursor-not-allowed line-through',
+                        day_outside: 'text-gray-400',
+                        day_disabled: 'text-gray-300 cursor-not-allowed',
                     }}
                     components={{
                         DayButton: (props) => {
@@ -167,11 +167,11 @@ function BookingWidget({ bike, selectedExtras }) {
                                     type="button"
                                     className={`
                                         ${className}
-                                        text-cloud
-                                        hover:bg-graphite
+                                        text-zinc-950
+                                        bg-zinc-200
                                         w-10 h-10
-                                        group-aria-selected:bg-emerald-500
-                                        group-aria-selected:text-phantom
+                                        group-aria-selected:bg-orange-700
+                                        group-aria-selected:text-white
                                         rounded-full
                                     `}
                                 />
