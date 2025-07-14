@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { useCartStore } from '../store/cartStore';
 import { useMutation } from '@tanstack/react-query';
 import { createOrder } from '../services/twice.js';
@@ -7,6 +7,7 @@ import { FaTrash, FaCreditCard } from 'react-icons/fa';
 import MbWayIcon from '../components/icons/MbWayIcon';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import RevolutCardField from '../components/RevolutCardField';
 
 const CartItem = ({ item, onRemove }) => (
     <li className="flex flex-col sm:items-center justify-between bg-arsenic p-4 rounded-lg sm:flex-row gap-4">
@@ -41,25 +42,6 @@ const CartItem = ({ item, onRemove }) => (
 
 const inputStyles = "w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud";
 
-const RevolutPayment = () => (
-    <div className="space-y-4">
-        <div>
-            <label htmlFor="card-number" className="block text-sm font-medium text-space mb-1">Card Number</label>
-            <input type="text" id="card-number" placeholder="•••• •••• •••• ••••" className={inputStyles} />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-            <div>
-                <label htmlFor="expiry-date" className="block text-sm font-medium text-space mb-1">Expiry Date</label>
-                <input type="text" id="expiry-date" placeholder="MM / YY" className={inputStyles} />
-            </div>
-            <div>
-                <label htmlFor="cvc" className="block text-sm font-medium text-space mb-1">CVC</label>
-                <input type="text" id="cvc" placeholder="•••" className={inputStyles} />
-            </div>
-        </div>
-    </div>
-);
-
 const MbWayPayment = () => (
     <div>
         <p className="text-center text-sm text-space mb-4">
@@ -76,6 +58,7 @@ function CheckoutPage() {
     const { items, removeItem, clearCart, getCartTotal } = useCartStore();
     const total = getCartTotal();
     const navigate = useNavigate();
+    const revolutCardRef = useRef();
     const [paymentMethod, setPaymentMethod] = useState('revolut');
     const [customerDetails, setCustomerDetails] = useState({
         firstName: '',
@@ -84,24 +67,33 @@ function CheckoutPage() {
         phone: '',
     });
 
-    const { mutate: processOrder, isPending, error } = useMutation({
+    const { mutate: processOrder, isPending: isCreatingOrder, error: orderError } = useMutation({
         mutationFn: createOrder,
         onSuccess: (order) => {
             clearCart();
-            // Redirect to a success page after the order is logged in Twice
             navigate(`/booking-success/${order.id}`);
         },
     });
 
-    const handlePayment = (e) => {
-        e.preventDefault();
-        // Step 1: Simulate Payment Processing
-        // In a real app, you would integrate Revolut/MB WAY SDKs here.
-        // For now, we'll assume the payment is successful.
-        console.log(`Processing ${paymentMethod} payment...`);
-        
-        // Step 2: On successful payment, create the order in Twice
+    const handlePaymentSuccess = useCallback(() => {
+        console.log("Payment successful! Creating order in Twice...");
         processOrder({ cartItems: items, customerDetails });
+    }, [processOrder, items, customerDetails]);
+
+    const handlePaymentError = useCallback((errorMessage) => {
+        console.error("Payment failed:", errorMessage);
+    }, []);
+
+    const handleFormSubmit = (e) => {
+        e.preventDefault();
+        if (paymentMethod === 'revolut') {
+            if (revolutCardRef.current) {
+                revolutCardRef.current.submit(customerDetails);
+            }
+        } else {
+            console.log('Submitting MB WAY payment...');
+            handlePaymentSuccess();
+        }
     };
 
     const paymentSelectorClasses = (method) => 
@@ -121,7 +113,7 @@ function CheckoutPage() {
     return (
         <div className="container mx-auto px-4 py-12">
             <h1 className="text-4xl font-extrabold text-steel mb-8">Review Your Rental</h1>
-            <form onSubmit={handlePayment}>
+            <form onSubmit={handleFormSubmit}>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     <div className="lg:col-span-2 space-y-6">
                         <div>
@@ -137,20 +129,20 @@ function CheckoutPage() {
                             <div className="space-y-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label htmlFor="firstName" className="block text-sm font-medium text-space mb-1">First Name</label>
+                                        <label htmlFor="firstName" className="block text-sm font-medium text-space mb-1">First Name <span className="text-red-500">*</span></label>
                                         <input type="text" name="firstName" value={customerDetails.firstName} onChange={(e) => setCustomerDetails({...customerDetails, firstName: e.target.value})} className={inputStyles} required />
                                     </div>
                                     <div>
-                                        <label htmlFor="lastName" className="block text-sm font-medium text-space mb-1">Last Name</label>
+                                        <label htmlFor="lastName" className="block text-sm font-medium text-space mb-1">Last Name <span className="text-red-500">*</span></label>
                                         <input type="text" name="lastName" value={customerDetails.lastName} onChange={(e) => setCustomerDetails({...customerDetails, lastName: e.target.value})} className={inputStyles} required />
                                     </div>
                                 </div>
                                 <div>
-                                    <label htmlFor="email" className="block text-sm font-medium text-space mb-1">Email Address</label>
+                                    <label htmlFor="email" className="block text-sm font-medium text-space mb-1">Email Address <span className="text-red-500">*</span></label>
                                     <input type="email" name="email" value={customerDetails.email} onChange={(e) => setCustomerDetails({...customerDetails, email: e.target.value})} className={inputStyles} required />
                                 </div>
                                 <div>
-                                    <label htmlFor="phone" className="block text-sm font-medium text-space mb-1">Phone Number</label>
+                                    <label htmlFor="phone" className="block text-sm font-medium text-space mb-1">Phone Number <span className="text-red-500">*</span></label>
                                     <input type="tel" name="phone" value={customerDetails.phone} onChange={(e) => setCustomerDetails({...customerDetails, phone: e.target.value})} className={inputStyles} required />
                                 </div>
                             </div>
@@ -174,15 +166,23 @@ function CheckoutPage() {
                                     </button>
                                 </div>
                                 <div className="pt-4">
-                                    {paymentMethod === 'revolut' && <RevolutPayment />}
+                                    {paymentMethod === 'revolut' && (
+                                        <RevolutCardField
+                                            ref={revolutCardRef}
+                                            amount={total}
+                                            currency="EUR"
+                                            onPaymentSuccess={handlePaymentSuccess}
+                                            onPaymentError={handlePaymentError}
+                                        />
+                                    )}
                                     {paymentMethod === 'mbway' && <MbWayPayment />}
                                 </div>
                             </div>
-                            <Button type="submit" disabled={isPending} className="w-full mt-8 py-3 text-lg">
-                                {isPending ? 'Processing...' : `Pay & Confirm Booking`}
+                            <Button type="submit" disabled={isCreatingOrder} className="w-full mt-8 py-3 text-lg">
+                                {isCreatingOrder ? 'Processing...' : `Pay & Confirm Booking`}
                             </Button>
-                            {error && (
-                                <p className="text-red-400 text-center mt-4">{error.message}</p>
+                            {orderError && (
+                                <p className="text-red-400 text-center mt-4">{orderError.message}</p>
                             )}
                         </div>
                     </div>

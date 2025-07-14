@@ -36,9 +36,9 @@ function Footer() {
           <div>
             <h3 className="font-bold text-lg text-steel mb-4">About Us</h3>
             <p className="text-space max-w-xs mx-auto md:mx-0">
-              The easiest way to rent a scooter in the heart of Portugal. Simple, fast, and ready
-              for the road.
+              MOVE is Lisbon's go-to scooter rental company - combining unbeatable prices, friendly service, and the freedom to ride your way
             </p>
+            <p><b>Your Lisbon, Your Ride Your Way.</b></p>
           </div>
           <div>
             <h3 className="font-bold text-lg text-steel mb-4">Quick Links</h3>
