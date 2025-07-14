@@ -4,68 +4,29 @@
 @import "tailwindcss/utilities";
 
 @layer base {
-  body {
-    @apply bg-cloud text-arsenic;
-  }
+    body {
+        @apply bg-phantom text-steel;
+    }
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .card-animate {
-  opacity: 0;
-  animation: fadeInUp 0.5s ease-out forwards;
+    opacity: 0;
+    animation: fadeInUp 0.5s ease-out forwards;
 }
 
-.animated-link {
-  position: relative;
+.smoke-blob-effect {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
 }
-
-.animated-link::after {
-  content: "";
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: #f97316;
-  transform: scaleX(0);
-  transform-origin: right;
-  transition: transform 0.3s ease-out;
-}
-
-.animated-link:hover::after,
-.animated-link.active::after {
-  transform: scaleX(1);
-  transform-origin: left;
-}
-
-.parallax-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -10; 
-  overflow: hidden;
-}
-
-.smoke-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px); 
-  opacity: 0.5; 
-}
-
-/* body {
-  background-color: --color-bg-cloud; 
-  background-image: linear-gradient(to bottom right, #1E1E24, #000000);
-} */

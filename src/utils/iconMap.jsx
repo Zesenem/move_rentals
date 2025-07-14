@@ -19,27 +19,26 @@ import {
 import { GiFullMotorcycleHelmet, GiGloves, GiLeatherBoot } from "react-icons/gi";
 import { GrTag } from "react-icons/gr";
 
-const iconClassName = "text-steel mr-3 flex-shrink-0 text-lg";
-const includedIconClassName = "text-status-available mr-3 flex-shrink-0";
+const iconBaseClass = "mr-3 flex-shrink-0 text-lg";
 
 export const iconMap = {
-  "id-card": <FaIdCard className={iconClassName} />,
-  license: <PiSteeringWheelFill className={iconClassName} />,
-  "credit-card": <FaCreditCard className={iconClassName} />,
-  experience: <PiMotorcycleFill className={iconClassName} />,
-  helmet: <GiFullMotorcycleHelmet className={iconClassName} />,
-  gloves: <GiGloves className={iconClassName} />,
-  jacket: <PiCoatHangerBold className={iconClassName} />,
-  trousers: <PiPantsFill className={iconClassName} />,
-  boots: <GiLeatherBoot className={iconClassName} />,
-  toll: <GrTag className={iconClassName} />,
-  delivery: <PiMotorcycleFill className={iconClassName} />,
-  airport: <FaPlaneDeparture className={iconClassName} />,
-  tax: <PiPercentFill className={includedIconClassName} />,
-  shield: <FaShieldAlt className={includedIconClassName} />,
-  users: <FaUsers className={includedIconClassName} />,
-  road: <FaRoad className={includedIconClassName} />,
-  infinity: <FaInfinity className={includedIconClassName} />,
-  lock: <FaLock className={includedIconClassName} />,
-  "default-check": <FaCheckCircle className={includedIconClassName} />,
+  "id-card": <FaIdCard className={`${iconBaseClass} text-steel`} />,
+  license: <PiSteeringWheelFill className={`${iconBaseClass} text-steel`} />,
+  "credit-card": <FaCreditCard className={`${iconBaseClass} text-steel`} />,
+  experience: <PiMotorcycleFill className={`${iconBaseClass} text-steel`} />,
+  helmet: <GiFullMotorcycleHelmet className={`${iconBaseClass} text-steel`} />,
+  gloves: <GiGloves className={`${iconBaseClass} text-steel`} />,
+  jacket: <PiCoatHangerBold className={`${iconBaseClass} text-steel`} />,
+  trousers: <PiPantsFill className={`${iconBaseClass} text-steel`} />,
+  boots: <GiLeatherBoot className={`${iconBaseClass} text-steel`} />,
+  toll: <GrTag className={`${iconBaseClass} text-steel`} />,
+  delivery: <PiMotorcycleFill className={`${iconBaseClass} text-steel`} />,
+  airport: <FaPlaneDeparture className={`${iconBaseClass} text-steel`} />,
+  tax: <PiPercentFill className={`${iconBaseClass} text-status-available`} />,
+  shield: <FaShieldAlt className={`${iconBaseClass} text-status-available`} />,
+  users: <FaUsers className={`${iconBaseClass} text-status-available`} />,
+  road: <FaRoad className={`${iconBaseClass} text-status-available`} />,
+  infinity: <FaInfinity className={`${iconBaseClass} text-status-available`} />,
+  lock: <FaLock className={`${iconBaseClass} text-status-available`} />,
+  "default-check": <FaCheckCircle className={`${iconBaseClass} text-status-available`} />,
 };

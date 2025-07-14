@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, ScrollRestoration } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 
@@ -7,42 +7,42 @@ function App() {
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      const smokeLayers = document.querySelectorAll('.smoke-blob');
-      
+      const smokeLayers = document.querySelectorAll(".smoke-blob-effect");
+
       smokeLayers.forEach((layer) => {
-        const speed = parseFloat(layer.getAttribute('data-speed'));
-        layer.style.transform = `translateY(${scrollY * speed}px)`;
+        const speed = parseFloat(layer.getAttribute("data-speed"));
+        const element = layer;
+        element.style.transform = `translateY(${scrollY * speed}px)`;
       });
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const smokeBlobBase = "absolute rounded-full filter blur-3xl opacity-30 smoke-blob-effect";
 
   return (
     <>
-      <div className="parallax-bg bg-phantom">
-        <div 
-          className="smoke-blob" 
+      <ScrollRestoration />
+      <div className="fixed inset-0 bg-phantom -z-10">
+        <div
+          className={`${smokeBlobBase} w-[400px] h-[400px] md:w-[800px] md:h-[800px] bg-arsenic top-[10vh] left-[-30vw] md:left-[-20vw]`}
           data-speed="0.2"
-          style={{ width: '800px', height: '800px', top: '10vh', left: '-20vw', backgroundColor: '#40424D' }} // Arsenic
         ></div>
-        <div 
-          className="smoke-blob"
+        <div
+          className={`${smokeBlobBase} w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-graphite top-[5vh] right-[-35vw] md:right-[-15vw]`}
           data-speed="0.35"
-          style={{ width: '600px', height: '600px', top: '5vh', right: '-15vw', backgroundColor: '#6E7180' }} // Graphite
         ></div>
-        <div 
-          className="smoke-blob"
+        <div
+          className={`${smokeBlobBase} w-[350px] h-[350px] md:w-[700px] md:h-[700px] bg-cloud/40 top-[40vh] left-[10vw]`}
           data-speed="0.5"
-          style={{ width: '700px', height: '700px', top: '40vh', left: '10vw', backgroundColor: '#D3D6E0', opacity: 0.2 }} // Smoke
         ></div>
       </div>
 
-      {/* Main App Layout */}
-      <div className="flex flex-col min-h-screen font-sans">
+      <div className="flex flex-col min-h-screen font-sans isolate">
         <Header />
-        <main className="flex-grow container mx-auto px-6 relative z-10">
+        <main className="flex-grow">
           <Outlet />
         </main>
         <Footer />

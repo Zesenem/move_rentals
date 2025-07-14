@@ -1,5 +1,5 @@
 {
-"common_data": {
+  "common_data": {
     "requirements": [
       { "item": "Identity card or Valid Passport", "icon": "id-card" },
       { "item": "Driving license: category A1 or B if driver is 25+ years old", "icon": "license" },
@@ -35,31 +35,23 @@
       "name": "Yamaha NMAX 125 (2023)",
       "booking_url": "https://twice.shop/move-gpos/product/Rt7CgmbXQoMEfIwdsE8G?lang=en",
       "price_per_day": 44.50,
-      "image_urls": [
-        "/images/nmax_2023/nmax_2023.jpg",
-        "/images/nmax_2023/nmax_2023_1.jpg",
-        "/images/nmax_2023/nmax_2023_2.jpg",
-        "/images/nmax_2023/nmax_2023_3.jpg",
-        "/images/nmax_2023/nmax_2023_4.jpg",
-        "/images/nmax_2023/nmax_2023_5.jpg"
-      ],
+      "image_urls": ["/images/nmax_2023/nmax_2023.jpg", "/images/nmax_2023/nmax_2023_1.jpg"],
       "status": "available",
       "description": "The NMAX 125 is Yamaha’s premium urban commuter, combining sporty performance with excellent agility and easy-to-use technology like CarPlay integration.",
       "security_deposit": 450,
-      "extras_specific": {
-        "item": "SCDW & STP (deductible reduction to 100€)",
-        "price": "9.80€/day + VAT"
-      },
+      "quick_glance": [
+        { "label": "125 cc", "icon": "engine" },
+        { "label": "A1 / B", "icon": "license" },
+        { "label": "7.1 L", "icon": "gas" }
+      ],
+      "extras_specific": { "item": "SCDW & STP (deductible reduction to 100€)", "price": "9.80€/day + VAT" },
       "technical_features": [
         { "label": "Special Feature", "value": "CarPlay - GPS on Dashboard" },
         { "label": "Engine size", "value": "125 cc" },
         { "label": "Max. power", "value": "9 kW (12.2 HP) / 8000 rpm" },
         { "label": "Fuel", "value": "Petrol 95" },
         { "label": "Tank capacity", "value": "7.1 L" },
-        { "label": "Est. range", "value": "~250kms" },
-        { "label": "Seat height", "value": "770mm" },
-        { "label": "Gearbox", "value": "Automatic" },
-        { "label": "Kerb weight", "value": "132 kg" }
+        { "label": "Seat height", "value": "770mm" }
       ]
     },
     {
@@ -68,30 +60,56 @@
       "name": "Yamaha RayZR 125 (2025)",
       "booking_url": "https://twice.shop/move-gpos/product/mcQ69eD3JllbMrC8FriN?lang=en",
       "price_per_day": 38.50,
-      "image_urls": [
-        "/images/rayzr_2025/rayzr_2025_1.jpg",
-        "/images/rayzr_2025/rayzr_2025_2.jpg",
-        "/images/rayzr_2025/rayzr_2025_3.jpg",
-        "/images/rayzr_2025/rayzr_2025_4.jpg",
-        "/images/rayzr_2025/rayzr_2025_5.jpg"
-      ],
+      "image_urls": ["/images/rayzr_2025/rayzr_2025_1.jpg", "/images/rayzr_2025/rayzr_2025_2.jpg"],
       "status": "available",
       "description": "With its dynamic bodywork and lightweight chassis, the RayZR is a stylish and sporty scooter that offers a fun and economical way to explore the city.",
       "security_deposit": 300,
-      "extras_specific": {
-        "item": "SCDW & STP (deductible reduction to 100€)",
-        "price": "7.80€/day + VAT"
-      },
+       "quick_glance": [
+        { "label": "125 cc", "icon": "engine" },
+        { "label": "A1 / B", "icon": "license" },
+        { "label": "5.2 L", "icon": "gas" }
+      ],
+      "extras_specific": { "item": "SCDW & STP (deductible reduction to 100€)", "price": "7.80€/day + VAT" },
       "technical_features": [
         { "label": "Engine size", "value": "125 cc" },
         { "label": "Max. power", "value": "6 kW @ 6500 rpm" },
         { "label": "Fuel", "value": "Petrol 95" },
         { "label": "Tank capacity", "value": "5.2 L" },
-        { "label": "Est. range", "value": "~200kms" },
-        { "label": "Seat height", "value": "785mm" },
-        { "label": "Gearbox", "value": "Automatic" },
-        { "label": "Kerb weight", "value": "99 kg" }
+        { "label": "Seat height", "value": "785mm" }
       ]
+    },
+    {
+      "id": 3,
+      "slug": "yamaha-nmax-techmax-125",
+      "name": "Yamaha NMAX TechMAX 125 (2025)",
+      "booking_url": "https://twice.shop/move-gpos/product/placeholder-for-new-bike?lang=en",
+      "price_per_day": 49.50,
+      "image_urls": ["/images/nmax_techmax_2025/nmax_techmax_2025.jpg", "/images/nmax_techmax_2025/nmax_techmax_2025_1.jpg"],
+      "status": "available",
+      "description": "The top-of-the-line NMAX with exclusive TechMAX finishing, a premium seat, and advanced connectivity features for the ultimate urban riding experience.",
+      "security_deposit": 500,
+      "quick_glance": [
+        { "label": "125 cc", "icon": "engine" },
+        { "label": "A1 / B", "icon": "license" },
+        { "label": "7.1 L", "icon": "gas" }
+      ],
+      "extras_specific": { "item": "SCDW & STP (deductible reduction to 100€)", "price": "10.80€/day + VAT" },
+      "technical_features": [
+        { "label": "Special Feature", "value": "TFT Dashboard & Keyless Ignition" },
+        { "label": "Engine size", "value": "125 cc" },
+        { "label": "Max. power", "value": "9 kW (12.2 HP) / 8000 rpm" },
+        { "label": "Fuel", "value": "Petrol 95" },
+        { "label": "Tank capacity", "value": "7.1 L" },
+        { "label": "Seat height", "value": "770mm" }
+      ]
+    }
+  ],
+  "bookings": [
+    {
+      "id": 1,
+      "bikeId": 1,
+      "startDate": "2025-07-20T12:00:00.000Z",
+      "endDate": "2025-07-22T12:00:00.000Z"
     }
   ]
 }
