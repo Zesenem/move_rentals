@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
 import { fetchProductBySlug, fetchExtras } from "../services/twice.js";
 
 import AccordionItem from "../components/AccordionItem";
@@ -114,49 +115,63 @@ function MotorcyclePage() {
   const { bike, commonData } = data || {};
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <Link to="/" className="text-steel hover:text-cloud mb-8 inline-block font-semibold">
-        &larr; Back to Our Fleet
-      </Link>
+    <>
+      <Helmet>
+        <title>
+          {bike?.name ? `${bike.name} | Move Rentals` : "Motorcycle Details | Move Rentals"}
+        </title>
+        <meta
+          name="description"
+          content={bike?.description || "Find details and book your motorcycle rental in Lisbon."}
+        />
+      </Helmet>
+      <div className="container mx-auto px-4 py-12">
+        <Link to="/" className="text-steel hover:text-cloud mb-8 inline-block font-semibold">
+          &larr; Back to Our Fleet
+        </Link>
 
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-x-12 gap-y-10">
-        <div className="md:col-span-3">
-          <div className="w-full aspect-video mb-12">
-            <ImageCarousel images={bike?.image_urls} />
-          </div>
-          <div className="space-y-2">
-            {bike?.technical_features?.length > 0 && (
-              <AccordionItem title="Technical Features">
-                <TechnicalFeaturesList features={bike.technical_features} />
-              </AccordionItem>
-            )}
-            <AccordionItem title="Included in Rental">
-              <IncludedInRentalList items={commonData?.included} deposit={bike?.security_deposit} />
-            </AccordionItem>
-            <AccordionItem title="Requirements">
-              <RequirementsList items={commonData?.requirements} />
-            </AccordionItem>
-          </div>
-        </div>
-
-        <div className="md:col-span-2">
-          <div className="sticky top-24 space-y-6">
-            <div>
-              <h1 className="text-4xl font-extrabold text-cloud tracking-tight">{bike?.name}</h1>
-              <p className="mt-4 text-space">{bike?.description}</p>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-x-12 gap-y-10">
+          <div className="md:col-span-3">
+            <div className="w-full aspect-video mb-12">
+              <ImageCarousel images={bike?.image_urls} />
             </div>
+            <div className="space-y-2">
+              {bike?.technical_features?.length > 0 && (
+                <AccordionItem title="Technical Features">
+                  <TechnicalFeaturesList features={bike.technical_features} />
+                </AccordionItem>
+              )}
+              <AccordionItem title="Included in Rental">
+                <IncludedInRentalList
+                  items={commonData?.included}
+                  deposit={bike?.security_deposit}
+                />
+              </AccordionItem>
+              <AccordionItem title="Requirements">
+                <RequirementsList items={commonData?.requirements} />
+              </AccordionItem>
+            </div>
+          </div>
 
-            <ExtrasSelector
-              extras={extras || []}
-              selectedExtras={selectedExtras}
-              onExtrasChange={setSelectedExtras}
-            />
+          <div className="md:col-span-2">
+            <div className="sticky top-24 space-y-6">
+              <div>
+                <h1 className="text-4xl font-extrabold text-cloud tracking-tight">{bike?.name}</h1>
+                <p className="mt-4 text-space">{bike?.description}</p>
+              </div>
 
-            {bike && <BookingWidget bike={bike} selectedExtras={selectedExtras} />}
+              <ExtrasSelector
+                extras={extras || []}
+                selectedExtras={selectedExtras}
+                onExtrasChange={setSelectedExtras}
+              />
+
+              {bike && <BookingWidget bike={bike} selectedExtras={selectedExtras} />}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

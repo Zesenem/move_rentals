@@ -1,32 +1,71 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap");
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
 @layer base {
-    body {
-        @apply bg-phantom text-steel;
-    }
+  body {
+    @apply bg-phantom text-steel;
+  }
 }
 
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .card-animate {
-    opacity: 0;
-    animation: fadeInUp 0.5s ease-out forwards;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
 }
 
 .smoke-blob-effect {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.phone-input-container {
+  @apply flex items-stretch w-full;
+}
+
+.phone-input-container .PhoneInputCountry {
+  @apply bg-arsenic border border-graphite rounded-l-md p-3 flex items-center cursor-pointer transition-colors hover:bg-graphite/50;
+  border-right: none;
+}
+
+.phone-input-container .PhoneInputInput {
+  @apply bg-phantom border border-graphite rounded-r-md p-3 text-cloud w-full focus:ring-cloud focus:border-cloud focus:z-10 relative;
+  border-left: 0;
+}
+
+.PhoneInputCountrySelect {
+  @apply bg-arsenic border border-graphite rounded-md shadow-lg max-h-60 overflow-y-auto p-2;
+}
+
+.PhoneInputCountrySelect-search {
+  @apply w-full bg-phantom border border-graphite rounded-md p-2 mb-2 text-cloud placeholder-gray-500 focus:ring-cloud focus:border-cloud;
+}
+
+.PhoneInputCountryOption {
+  @apply flex items-center p-2 rounded-md cursor-pointer hover:bg-graphite text-steel;
+}
+
+.PhoneInputCountryOption--selected {
+  @apply bg-graphite text-cloud;
+}
+
+.PhoneInputCountryIcon {
+  @apply mr-3;
+  box-shadow: none;
+}
+
+.PhoneInputCountrySelectArrow {
+  @apply opacity-70 ml-2;
 }

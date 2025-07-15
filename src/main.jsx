@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { HelmetProvider } from "react-helmet-async";
 
 import App from "./App.jsx";
 import HomePage from "./pages/HomePage.jsx";
@@ -9,6 +10,9 @@ import MotorcyclePage from "./pages/MotorcyclePage.jsx";
 import CheckoutPage from "./pages/CheckoutPage.jsx";
 import BookingSuccessPage from "./pages/BookingSuccessPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
+import TermsPage from "./pages/TermsPage.jsx";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage.jsx";
+import ContactPage from "./pages/ContactPage.jsx";
 
 import "./index.css";
 
@@ -23,7 +27,6 @@ const router = createBrowserRouter([
         index: true,
         element: <HomePage />,
       },
-
       {
         path: "motorcycle/:slug",
         element: <MotorcyclePage />,
@@ -37,6 +40,18 @@ const router = createBrowserRouter([
         element: <BookingSuccessPage />,
       },
       {
+        path: "terms-and-conditions",
+        element: <TermsPage />,
+      },
+      {
+        path: "privacy-policy",
+        element: <PrivacyPolicyPage />,
+      },
+      {
+        path: "contact",
+        element: <ContactPage />,
+      },
+      {
         path: "*",
         element: <NotFoundPage />,
       },
@@ -46,8 +61,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </HelmetProvider>
   </React.StrictMode>
 );

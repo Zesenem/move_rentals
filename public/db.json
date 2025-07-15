@@ -19,7 +19,7 @@
   "motorcycles_static_data": [
     {
       "id": "Rt7CgmbXQoMEfIwdsE8G",
-      "badges": ["Best Seller", "Premium"],
+      "badges": ["Best Seller"],
       "quick_glance": [
         { "label": "125 cc", "icon": "engine" },
         { "label": "A1 / B", "icon": "license" },
@@ -28,7 +28,7 @@
     },
     {
       "id": "mcQ69eD3JllbMrC8FriN",
-      "badges": ["ECO", "Best Value"],
+      "badges": ["ECO"],
       "quick_glance": [
         { "label": "125 cc", "icon": "engine" },
         { "label": "A1 / B", "icon": "license" },

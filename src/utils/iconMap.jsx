@@ -40,6 +40,6 @@ export const iconMap = {
   road: <FaRoad className={`${iconBaseClass} text-status-available`} />,
   infinity: <FaInfinity className={`${iconBaseClass} text-status-available`} />,
   lock: <FaLock className={`${iconBaseClass} text-status-available`} />,
-  
+
   "default-check": <FaCheckCircle className={`${iconBaseClass} text-status-available`} />,
 };

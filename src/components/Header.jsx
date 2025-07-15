@@ -11,6 +11,17 @@ function Header() {
 
   const itemCount = useCartStore((state) => state.getItemCount());
 
+  const navItems = [
+    { name: "Our Fleet", to: "/" },
+    {
+      name: "About Us",
+      type: "button",
+      action: () =>
+        document.getElementById("footer-section")?.scrollIntoView({ behavior: "smooth" }),
+    },
+    { name: "Contact", to: "/contact" },
+  ];
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -35,74 +46,53 @@ function Header() {
   const getNavLinkStyle = ({ isActive }) =>
     `${navLinkClasses} ${isActive ? "bg-cloud text-phantom" : "text-steel hover:bg-arsenic"}`;
 
-  const navItems = [
-    { name: "Our Fleet", to: "/" },
-    {
-      name: "About Us",
-      type: "button",
-      action: () =>
-        document.getElementById("footer-section")?.scrollIntoView({ behavior: "smooth" }),
-    },
-    {
-      name: "Cart",
-      to: "/checkout",
-      icon: FaShoppingCart,
-      badge: itemCount > 0 ? itemCount : null,
-    },
-    {
-      name: "Contact Us",
-      href: "https://wa.me/351920016794",
-      type: "primary-button",
-      icon: FaWhatsapp,
-    },
-  ];
-
-  const navLinks = navItems.map((item) => {
-    if (item.type === "primary-button") {
-      return (
-        <Button
-          key={item.name}
-          as="a"
-          href={item.href}
-          target="_blank"
-          rel="noopener noreferrer"
-          variant="primary"
-          icon={item.icon}
-        >
-          {item.name}
-        </Button>
-      );
-    }
-    if (item.type === "button") {
-      return (
-        <button
-          key={item.name}
-          onClick={() => handleLinkClick(item.action)}
-          className={`${navLinkClasses} text-steel hover:bg-arsenic`}
-        >
-          {item.name}
-        </button>
-      );
-    }
-    return (
+  const navLinks = (
+    <>
+      {navItems.map((item) =>
+        item.type === "button" ? (
+          <button
+            key={item.name}
+            onClick={() => handleLinkClick(item.action)}
+            className={`${navLinkClasses} text-steel hover:bg-arsenic`}
+          >
+            {item.name}
+          </button>
+        ) : (
+          <NavLink
+            key={item.name}
+            to={item.to}
+            className={getNavLinkStyle}
+            onClick={() => handleLinkClick()}
+          >
+            {item.name}
+          </NavLink>
+        )
+      )}
       <NavLink
-        key={item.name}
-        to={item.to}
-        className={getNavLinkStyle}
+        to="/checkout"
+        className={`${getNavLinkStyle({ isActive: false })} flex items-center gap-2`}
         onClick={() => handleLinkClick()}
       >
-        <span className="flex items-center gap-2">
-          {item.icon && <item.icon />}
-          {item.name}
-          {item.badge && (
-            <span className="bg-cloud text-phantom text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-              {item.badge}
-            </span>
-          )}
-        </span>
+        <FaShoppingCart />
+        Cart
+        {itemCount > 0 && (
+          <span className="bg-cloud text-phantom text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            {itemCount}
+          </span>
+        )}
       </NavLink>
-    );
-  });
+      <Button
+        as="a"
+        href="https://wa.me/351920016794"
+        target="_blank"
+        rel="noopener noreferrer"
+        variant="primary"
+        icon={FaWhatsapp}
+      >
+        Contact Us
+      </Button>
+    </>
+  );
 
   return (
     <header
