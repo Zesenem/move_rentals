@@ -9,10 +9,14 @@ const RevolutCardField = forwardRef(
     const cardInstanceRef = useRef(null);
 
     useEffect(() => {
-      const initializeCardField = async () => {
-        if (!cardFieldRef.current) return;
+      // Ensure we don't re-initialize if not needed
+      if (!cardFieldRef.current || cardInstanceRef.current) return;
 
+      let isMounted = true; // Track if the component is mounted
+
+      const initializeCardField = async () => {
         try {
+          // Fetch the payment token from your Netlify function
           const response = await fetch("/.netlify/functions/create-revolut-order", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -20,16 +24,19 @@ const RevolutCardField = forwardRef(
           });
 
           if (!response.ok) {
-            throw new Error("Failed to retrieve payment token from server.");
+            const errBody = await response.text();
+            throw new Error(`Failed to retrieve payment token: ${errBody}`);
           }
 
           const { token } = await response.json();
-
           if (!token) {
             throw new Error("Server did not return a valid payment token.");
           }
 
-          const RC = await RevolutCheckout(token)
+          // Wait for the RevolutCheckout library to be ready
+          const RC = await RevolutCheckout(token);
+
+          if (!isMounted) return; // Don't proceed if component unmounted
 
           const cardField = RC.createCardField({
             target: cardFieldRef.current,
@@ -38,9 +45,11 @@ const RevolutCardField = forwardRef(
               onPaymentSuccess("Payment successful!");
             },
             onError(message) {
-              setError(`Payment failed: ${message}`);
+              const errorMessage = `Payment failed: ${message}`;
+              setError(errorMessage);
               onPaymentError(message);
             },
+            // It's good practice to style the card field
             styles: {
               base: {
                 color: "#EDEFF7",
@@ -52,28 +61,39 @@ const RevolutCardField = forwardRef(
           });
 
           cardInstanceRef.current = cardField;
+
         } catch (err) {
           console.error("Revolut initialization failed:", err);
+          // Provide a user-friendly error message
           setError(
-            "Could not load the payment form. This may be due to a browser extension (like an ad blocker). Please try disabling it or use a different browser."
+            "Could not load the payment form. This may be due to an ad blocker. Please try disabling it or use a different browser."
           );
           onPaymentError(err.message);
         } finally {
-          setIsLoading(false);
+          if (isMounted) {
+            setIsLoading(false);
+          }
         }
       };
 
+      // Only initialize if there's an amount to pay
       if (amount > 0) {
         initializeCardField();
+      } else {
+        setIsLoading(false);
       }
 
+      // Cleanup function to run when the component unmounts
       return () => {
+        isMounted = false;
         if (cardInstanceRef.current && typeof cardInstanceRef.current.destroy === "function") {
           cardInstanceRef.current.destroy();
+          cardInstanceRef.current = null;
         }
       };
-    }, [amount, currency, onPaymentSuccess, onPaymentError]);
+    }, [amount, currency, onPaymentSuccess, onPaymentError]); // Dependencies for the useEffect hook
 
+    // Expose a `submit` method via the ref
     useImperativeHandle(ref, () => ({
       submit: (customerDetails) => {
         if (cardInstanceRef.current) {
@@ -86,6 +106,7 @@ const RevolutCardField = forwardRef(
       },
     }));
 
+    // Render loading/error states
     return (
       <div>
         {isLoading && <p className="text-center text-space">Loading payment form...</p>}

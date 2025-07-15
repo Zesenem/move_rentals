@@ -1,19 +1,19 @@
 export const handler = async (event) => {
-  if (event.httpMethod !== "POST") {
+  if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      body: JSON.stringify({ error: "Method Not Allowed" }),
+      body: JSON.stringify({ error: 'Method Not Allowed' }),
     };
   }
 
   const REVOLUT_API_KEY = process.env.REVOLUT_SECRET_KEY;
-  const REVOLUT_API_URL = "https://merchant.revolut.com/api/orders";
+  const REVOLUT_API_URL = 'https://merchant.revolut.com/api/orders';
 
   if (!REVOLUT_API_KEY) {
-    console.error("Revolut API key is not set.");
+    console.error('Revolut API key is not set in the environment.');
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Server configuration error." }),
+      body: JSON.stringify({ error: 'Server configuration error.' }),
     };
   }
 
@@ -21,11 +21,11 @@ export const handler = async (event) => {
     const { amount, currency } = JSON.parse(event.body);
 
     const response = await fetch(REVOLUT_API_URL, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        Authorization: `Bearer ${REVOLUT_API_KEY}`,
-        "Content-Type": "application/json",
-        "Revolut-Api-Version": "2024-02-15",
+        'Authorization': `Bearer ${REVOLUT_API_KEY}`,
+        'Content-Type': 'application/json',
+        'Revolut-Api-Version': '2024-02-15',
       },
       body: JSON.stringify({
         amount: Math.round(amount * 100),
@@ -35,24 +35,26 @@ export const handler = async (event) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("Failed to create Revolut order:", errorData);
+      console.error('Failed to create Revolut order:', errorData);
       return {
         statusCode: response.status,
-        body: JSON.stringify({ error: "Failed to create payment order.", details: errorData }),
+        body: JSON.stringify({ error: 'Failed to create payment order.', details: errorData }),
       };
     }
 
     const orderData = await response.json();
-
+    
     return {
       statusCode: 200,
       body: JSON.stringify({ token: orderData.token }),
     };
+
   } catch (error) {
-    console.error("An unexpected error occurred:", error);
+    console.error('An unexpected error occurred:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "An internal server error occurred." }),
+      body: JSON.stringify({ error: 'An internal server error occurred.' }),
     };
   }
 };
+

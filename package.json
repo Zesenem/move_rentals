@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@revolut/checkout": "^1.1.21",
+    "@sentry/react": "^9.39.0",
     "@tanstack/react-query": "^5.81.5",
     "date-fns": "^4.1.0",
     "react": "^19.1.0",

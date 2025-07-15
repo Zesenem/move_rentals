@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  useLocation,
+  useNavigationType,
+  createRoutesFromChildren,
+  matchRoutes,
+} from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
+import * as Sentry from "@sentry/react";
 
 import App from "./App.jsx";
 import HomePage from "./pages/HomePage.jsx";
@@ -15,6 +23,24 @@ import PrivacyPolicyPage from "./pages/PrivacyPolicyPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
 
 import "./index.css";
+
+Sentry.init({
+  dsn: "https://63e09e83dc19c7365dd42385009bc409@o4509673502736384.ingest.de.sentry.io/4509673504505936",
+  integrations: [
+    Sentry.reactRouterV6BrowserTracingIntegration({
+      useEffect: useEffect,
+      useLocation: useLocation,
+      useNavigationType: useNavigationType,
+      createRoutesFromChildren: createRoutesFromChildren,
+      matchRoutes: matchRoutes,
+    }),
+    Sentry.replayIntegration(),
+  ],
+  tunnel: "/.netlify/functions/sentry-proxy",
+  tracesSampleRate: 1.0,
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1.0,
+});
 
 const queryClient = new QueryClient();
 
