@@ -3,7 +3,6 @@ import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 
 const ContactInfoCard = ({ title, children }) => (
   <div className="bg-arsenic p-6 rounded-lg flex items-start gap-4">
-    <Icon className="text-cloud text-2xl mt-1 flex-shrink-0" />
     <div>
       <h3 className="text-xl font-bold text-cloud">{title}</h3>
       <div className="text-space mt-1">{children}</div>
