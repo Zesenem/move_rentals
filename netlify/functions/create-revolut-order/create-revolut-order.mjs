@@ -7,7 +7,7 @@ export const handler = async (event) => {
   }
 
   const REVOLUT_API_KEY = process.env.REVOLUT_SECRET_KEY;
-  const REVOLUT_API_URL = "https://sandbox-merchant.revolut.com/api/orders";
+  const REVOLUT_API_URL = "https://merchant.revolut.com/api/orders";
 
   if (!REVOLUT_API_KEY) {
     console.error("Revolut API key is not set.");

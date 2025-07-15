@@ -29,7 +29,7 @@ const RevolutCardField = forwardRef(
             throw new Error("Server did not return a valid payment token.");
           }
 
-          const RC = await RevolutCheckout(token, "sandbox");
+          const RC = await RevolutCheckout(token)
 
           const cardField = RC.createCardField({
             target: cardFieldRef.current,

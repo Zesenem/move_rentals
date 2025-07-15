@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useMutation } from "@tanstack/react-query";
 import { createOrder } from "../services/twice.js";
@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import MbWayIcon from "../components/icons/MbWayIcon";
+import RevolutCardField from "../components/RevolutCardField";
 
 const CartItem = ({ item, onRemove }) => (
   <li className="flex flex-col sm:items-center justify-between bg-arsenic p-6 rounded-lg sm:flex-row gap-6">
@@ -75,6 +76,7 @@ function CheckoutPage() {
   const { items, removeItem, clearCart, getCartTotal } = useCartStore();
   const total = getCartTotal();
   const navigate = useNavigate();
+  const revolutCardRef = useRef();
   const [paymentMethod, setPaymentMethod] = useState("revolut");
   const [formErrors, setFormErrors] = useState({});
   const [customerDetails, setCustomerDetails] = useState({
@@ -96,38 +98,39 @@ function CheckoutPage() {
     },
   });
 
-  const validateField = (name, value) => {
-    let error = "";
-    if (name === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      error = "Please enter a valid email address.";
-    }
-    if (name === "phone" && value && !isPossiblePhoneNumber(value)) {
-      error = "Please enter a valid phone number.";
-    }
-    setFormErrors((prev) => ({ ...prev, [name]: error }));
-  };
+  const handlePaymentSuccess = useCallback(() => {
+    console.log("Payment successful! Creating order in Twice...");
+    processOrder({ cartItems: items, customerDetails });
+  }, [processOrder, items, customerDetails]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCustomerDetails((prev) => ({ ...prev, [name]: value }));
-    validateField(name, value);
-  };
+  const handlePaymentError = useCallback((errorMessage) => {
+    console.error("Payment failed:", errorMessage);
+  }, []);
 
-  const handlePhoneChange = (phone) => {
-    setCustomerDetails((prev) => ({ ...prev, phone }));
-    validateField("phone", phone);
+  const validateForm = () => {
+    const errors = {};
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerDetails.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+    if (!customerDetails.phone || !isPossiblePhoneNumber(customerDetails.phone)) {
+      errors.phone = "Please enter a valid phone number.";
+    }
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-    const emailIsValid = !validateField("email", customerDetails.email) && !formErrors.email;
-    const phoneIsValid = !validateField("phone", customerDetails.phone) && !formErrors.phone;
+    if (!validateForm()) return;
 
-    if (emailIsValid && phoneIsValid && customerDetails.firstName && customerDetails.lastName) {
-      console.log(`Processing ${paymentMethod} payment...`);
-      processOrder({ cartItems: items, customerDetails });
+    if (paymentMethod === "revolut") {
+      if (revolutCardRef.current) {
+        revolutCardRef.current.submit(customerDetails);
+      }
     } else {
-      console.log("Form has errors, submission blocked.");
+      console.log("Submitting MB WAY payment...");
+      // In a real app, you would integrate the MB WAY SDK here.
+      handlePaymentSuccess();
     }
   };
 
@@ -150,7 +153,7 @@ function CheckoutPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-extrabold text-steel mb-8">Review Your Rental</h1>
-      <form onSubmit={handleFormSubmit} noValidate>
+      <form onSubmit={handleFormSubmit}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-arsenic p-6 rounded-lg">
@@ -176,7 +179,9 @@ function CheckoutPage() {
                       type="text"
                       name="firstName"
                       value={customerDetails.firstName}
-                      onChange={handleInputChange}
+                      onChange={(e) =>
+                        setCustomerDetails({ ...customerDetails, firstName: e.target.value })
+                      }
                       className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
                       required
                     />
@@ -189,7 +194,9 @@ function CheckoutPage() {
                       type="text"
                       name="lastName"
                       value={customerDetails.lastName}
-                      onChange={handleInputChange}
+                      onChange={(e) =>
+                        setCustomerDetails({ ...customerDetails, lastName: e.target.value })
+                      }
                       className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
                       required
                     />
@@ -203,7 +210,9 @@ function CheckoutPage() {
                     type="email"
                     name="email"
                     value={customerDetails.email}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                      setCustomerDetails({ ...customerDetails, email: e.target.value })
+                    }
                     className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
                     required
                   />
@@ -220,7 +229,7 @@ function CheckoutPage() {
                       id="phone"
                       placeholder="Enter phone number"
                       value={customerDetails.phone}
-                      onChange={handlePhoneChange}
+                      onChange={(phone) => setCustomerDetails({ ...customerDetails, phone })}
                       defaultCountry="PT"
                       international
                       countryCallingCodeEditable={true}
@@ -279,12 +288,18 @@ function CheckoutPage() {
                 </div>
                 <div className="pt-4">
                   {paymentMethod === "revolut" && (
-                    <p className="text-center text-space">Card payment form will appear here.</p>
+                    <RevolutCardField
+                      ref={revolutCardRef}
+                      amount={total}
+                      currency="EUR"
+                      onPaymentSuccess={handlePaymentSuccess}
+                      onPaymentError={handlePaymentError}
+                    />
                   )}
                   {paymentMethod === "mbway" && (
                     <MbWayPayment
                       phone={customerDetails.phone}
-                      setPhone={handlePhoneChange}
+                      setPhone={(phone) => setCustomerDetails({ ...customerDetails, phone })}
                       error={formErrors.phone}
                     />
                   )}
