@@ -1,7 +1,9 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useMutation } from "@tanstack/react-query";
-import { createOrder } from "../services/twice.js";
+// Import both new service functions
+import { createRevolutOrderToken } from "../services/twice.js";
+import { processRevolutPaymentAndOrder } from "../services/payments.js"; // Ensure this import is correct based on your file structure
 import Button from "../components/Button";
 import { FaTrash, FaCreditCard, FaApple, FaGoogle } from "react-icons/fa";
 import { format } from "date-fns";
@@ -80,7 +82,6 @@ function CheckoutPage() {
   const revolutCardRef = useRef();
   const [paymentMethod, setPaymentMethod] = useState("revolut");
   const [formErrors, setFormErrors] = useState({});
-  const [revolutReady, setRevolutReady] = useState(false);
   const [customerDetails, setCustomerDetails] = useState({
     firstName: "",
     lastName: "",
@@ -88,33 +89,66 @@ function CheckoutPage() {
     phone: "",
   });
 
-  // Check if Revolut SDK is loaded
-  useEffect(() => {
-    const checkRevolut = setInterval(() => {
-      if (window.Revolut) {
-        setRevolutReady(true);
-        clearInterval(checkRevolut);
-      }
-    }, 100);
+  // NEW STATE FOR REVOLUT ORDER TOKEN
+  const [revolutOrderToken, setRevolutOrderToken] = useState(null);
 
-    return () => clearInterval(checkRevolut);
-  }, []);
+  // MUTATION TO CREATE REVOLUT ORDER TOKEN
+  const {
+    mutate: fetchRevolutOrderToken,
+    isPending: isFetchingRevolutToken,
+    error: fetchRevolutTokenError,
+    data: revolutTokenData, // This will contain { orderToken, orderId }
+  } = useMutation({
+    mutationFn: createRevolutOrderToken,
+    onSuccess: (data) => {
+      setRevolutOrderToken(data.orderToken);
+    },
+    onError: (error) => {
+      console.error("Error fetching Revolut order token:", error);
+      alert(`Failed to prepare Revolut payment: ${error.message || "Please try again."}`);
+    },
+  });
+
+  // EFFECT TO FETCH REVOLUT ORDER TOKEN WHEN PAYMENT METHOD IS REVOLUT AND TOKEN IS MISSING
+  useEffect(() => {
+    // Only attempt to fetch if Revolut is selected, token isn't already there,
+    // not currently fetching, and total amount is valid.
+    if (paymentMethod === "revolut" && !revolutOrderToken && !isFetchingRevolutToken && total > 0) {
+      fetchRevolutOrderToken({ amount: total, currency: "EUR" }); // Assuming EUR, adjust if dynamic
+    }
+  }, [paymentMethod, revolutOrderToken, isFetchingRevolutToken, total, fetchRevolutOrderToken]);
+
 
   const {
-    mutate: processOrder,
-    isPending: isCreatingOrder,
-    error: orderError,
+    mutate: submitOrderAndPayment,
+    isPending: isProcessingPaymentAndOrder,
+    error: paymentAndOrderError,
   } = useMutation({
-    mutationFn: createOrder,
+    mutationFn: (payload) => processRevolutPaymentAndOrder(payload),
     onSuccess: (order) => {
       clearCart();
       navigate(`/booking-success/${order.id}`);
     },
+    onError: (error) => {
+      console.error("Order or Payment failed:", error);
+      alert(`Booking failed: ${error.message || "Please try again."}`);
+    },
   });
 
-  const handlePaymentSuccess = useCallback(() => {
-    processOrder({ cartItems: items, customerDetails });
-  }, [processOrder, items, customerDetails]);
+  // handlePaymentSuccess now receives revolutPaymentResult (from RevolutCardField)
+  const handlePaymentSuccess = useCallback(async (revolutPaymentResult) => {
+    submitOrderAndPayment({
+      cartItems: items,
+      customerDetails,
+      revolutPaymentId: revolutPaymentResult.id,
+      revolutPaymentStatus: revolutPaymentResult.status,
+      totalAmount: total,
+      currency: "EUR",
+      // Pass the Revolut Order ID if needed by your backend for reconciliation
+      revolutOrderId: revolutTokenData?.orderId,
+    });
+  }, [submitOrderAndPayment, items, customerDetails, total, revolutTokenData]);
+
 
   const handlePaymentError = useCallback((error) => {
     console.error("Payment failed:", error);
@@ -145,19 +179,20 @@ function CheckoutPage() {
     if (!validateForm()) return;
 
     if (paymentMethod === "mbway") {
-      handlePaymentSuccess();
+      submitOrderAndPayment({
+        cartItems: items,
+        customerDetails,
+        paymentMethod: "mbway",
+        totalAmount: total,
+        currency: "EUR",
+      });
       return;
     }
 
-    // Only proceed with Revolut if SDK is ready
     if (paymentMethod === "revolut") {
-      if (!revolutReady) {
-        alert("Payment system is still loading. Please wait a moment.");
-        return;
-      }
-
-      if (!revolutCardRef.current) {
-        alert("Payment form not properly initialized");
+      // Ensure Revolut order token is available and SDK is ready before submission
+      if (!revolutOrderToken || isFetchingRevolutToken || !revolutCardRef.current?.isReady) {
+        alert("Revolut payment is not ready. Please wait a moment or check your internet connection.");
         return;
       }
 
@@ -184,8 +219,6 @@ function CheckoutPage() {
       </div>
     );
   }
-
-  console.log("paymentMethod:", paymentMethod);
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -330,11 +363,10 @@ function CheckoutPage() {
                   </button>
                 </div>
                 <div className="pt-4">
-                  {paymentMethod === "revolut" && revolutReady && (
+                  {paymentMethod === "revolut" && (
                     <RevolutCardField
                       ref={revolutCardRef}
-                      amount={stableAmount}
-                      currency="EUR"
+                      orderToken={revolutOrderToken} // NEW PROP: Pass orderToken
                       onPaymentSuccess={handlePaymentSuccess}
                       onPaymentError={handlePaymentError}
                     />
@@ -350,12 +382,14 @@ function CheckoutPage() {
               </div>
               <Button
                 type="submit"
-                disabled={isCreatingOrder || (paymentMethod === "revolut" && !revolutReady)}
+                // Adjusted disabled condition for Revolut payment: now checks orderToken and its fetching state
+                disabled={isProcessingPaymentAndOrder || (paymentMethod === "revolut" && (!revolutOrderToken || isFetchingRevolutToken || !revolutCardRef.current?.isReady))}
                 className="w-full mt-8 py-3 text-lg"
               >
-                {isCreatingOrder ? "Processing..." : `Pay & Confirm Booking`}
+                {isProcessingPaymentAndOrder || isFetchingRevolutToken ? "Processing..." : `Pay & Confirm Booking`}
               </Button>
-              {orderError && <p className="text-red-400 text-center mt-4">{orderError.message}</p>}
+              {paymentAndOrderError && <p className="text-red-400 text-center mt-4">{paymentAndOrderError.message}</p>}
+              {fetchRevolutTokenError && paymentMethod === "revolut" && <p className="text-rogueRed text-center mt-4">{fetchRevolutTokenError.message}</p>}
             </div>
           </div>
         </div>
