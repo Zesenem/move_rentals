@@ -1,18 +1,10 @@
-const API_BASE_URL = "https://api.twicecommerce.com/admin";
-const API_SECRET_KEY = import.meta.env.VITE_TWICE_API_SECRET;
-const API_ID = import.meta.env.VITE_TWICE_API_ID;
+// src/services/twice.js
 
-const MOTORCYCLE_CATEGORY_ID = "Enlv0F1KBYYbOb5HdzJH";
-const EXTRAS_CATEGORY_ID = "GH1Hm7Cz2fsProT5dkRR";
-
-const encodedCredentials = btoa(`${API_ID}:${API_SECRET_KEY}`);
-
-const twiceHeaders = {
-  "Content-Type": "application/json",
-  Authorization: `Basic ${encodedCredentials}`,
-  "x-rentle-version": "2023-02-01",
-};
-
+/**
+ * Maps a product object from the backend API to the application's product format.
+ * @param {object} apiProduct - The product object from the API.
+ * @returns {object} The product object in the application's format.
+ */
 function mapApiProductToAppProduct(apiProduct) {
   return {
     id: apiProduct.id,
@@ -27,6 +19,10 @@ function mapApiProductToAppProduct(apiProduct) {
   };
 }
 
+/**
+ * Fetches static data from the local db.json file.
+ * @returns {Promise<object>} A promise that resolves to the parsed JSON data.
+ */
 const fetchStaticData = async () => {
   try {
     const response = await fetch("/db.json");
@@ -38,19 +34,14 @@ const fetchStaticData = async () => {
   }
 };
 
+/**
+ * Fetches all products, combining live API data with local static data.
+ * @returns {Promise<Array<object>>} A promise that resolves to an array of products.
+ */
 export const fetchProducts = async () => {
   try {
-    if (
-      !MOTORCYCLE_CATEGORY_ID ||
-      MOTORCYCLE_CATEGORY_ID === "replace-with-your-motorcycle-category-id"
-    ) {
-      throw new Error("Motorcycle Category ID is not set in twice.js");
-    }
-
     const [apiResponse, staticData] = await Promise.all([
-      fetch(`${API_BASE_URL}/products?categories=${MOTORCYCLE_CATEGORY_ID}`, {
-        headers: twiceHeaders,
-      }),
+      fetch(`/.netlify/functions/fetch-products`),
       fetchStaticData(),
     ]);
 
@@ -61,7 +52,6 @@ export const fetchProducts = async () => {
 
     const paginatedResponse = await apiResponse.json();
     const liveProducts = paginatedResponse.data.map(mapApiProductToAppProduct);
-
     const staticMotorcycles = staticData.motorcycles_static_data;
 
     return liveProducts.map((liveProduct) => {
@@ -78,11 +68,13 @@ export const fetchProducts = async () => {
   }
 };
 
+/**
+ * Fetches extra products/services from the backend.
+ * @returns {Promise<Array<object>>} A promise that resolves to an array of extras.
+ */
 export const fetchExtras = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/products?categories=${EXTRAS_CATEGORY_ID}`, {
-      headers: twiceHeaders,
-    });
+    const response = await fetch(`/.netlify/functions/fetch-extras`);
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error?.message || "Failed to fetch extras.");
@@ -95,28 +87,21 @@ export const fetchExtras = async () => {
   }
 };
 
+/**
+ * Fetches a single product by its slug.
+ * @param {string} slug - The slug of the product to fetch.
+ * @returns {Promise<object>} A promise resolving to the bike and common static data.
+ */
 export const fetchProductBySlug = async (slug) => {
-  if (!slug) throw new Error("A product slug must be provided.");
   try {
-    const [productResponse, staticData] = await Promise.all([
-      fetch(`${API_BASE_URL}/products/${slug}`, { headers: twiceHeaders }),
-      fetchStaticData(),
-    ]);
-
-    if (!productResponse.ok) {
-      throw new Error("Motorcycle not found by slug or ID");
+    const allProducts = await fetchProducts();
+    const bike = allProducts.find((p) => p.slug === slug);
+    if (!bike) {
+      throw new Error("Motorcycle not found by slug");
     }
-    const productData = await productResponse.json();
-    const bike = mapApiProductToAppProduct(productData);
-
-    const staticInfo = staticData.motorcycles_static_data.find((p) => p.id === bike.id);
-
+    const staticData = await fetchStaticData();
     return {
-      bike: {
-        ...bike,
-        badges: staticInfo?.badges || [],
-        quick_glance: staticInfo?.quick_glance || [],
-      },
+      bike: bike,
       commonData: staticData.common_data,
     };
   } catch (error) {
@@ -125,31 +110,20 @@ export const fetchProductBySlug = async (slug) => {
   }
 };
 
+/**
+ * Fetches unavailable dates for a specific bike.
+ * @param {string} bikeId - The ID of the bike.
+ * @returns {Promise<Array<Date>>} A promise resolving to an array of disabled dates.
+ */
 export const getUnavailableDates = async (bikeId) => {
   if (!bikeId) return [];
   try {
-    let allOrders = [];
-    let nextPageToken = null;
-    do {
-      const url = new URL(`${API_BASE_URL}/orders`);
-      if (nextPageToken) url.searchParams.append("pageToken", nextPageToken);
-      const response = await fetch(url.toString(), { headers: twiceHeaders });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || "Failed to fetch orders.");
-      }
-      const paginatedResponse = await response.json();
-      allOrders = allOrders.concat(paginatedResponse.data);
-      nextPageToken = paginatedResponse.nextPageToken;
-    } while (nextPageToken);
-
-    const bookingsForBike = allOrders.filter((order) => {
-      const isNotCancelled = order.state !== "cancelled";
-      const hasMatchingProduct = order.items.some((item) => item.productId === bikeId);
-      return isNotCancelled && hasMatchingProduct;
-    });
-
+    const response = await fetch(`/.netlify/functions/get-unavailable-dates?bikeId=${bikeId}`);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || "Failed to fetch bookings.");
+    }
+    const bookingsForBike = await response.json();
     const disabledDates = [];
     bookingsForBike.forEach((booking) => {
       let currentDate = new Date(booking.startDate);
@@ -166,39 +140,18 @@ export const getUnavailableDates = async (bikeId) => {
   }
 };
 
+/**
+ * Creates an order in your system before payment.
+ * @param {object} payload - The order details.
+ * @param {Array} payload.cartItems - The items in the cart.
+ * @param {object} payload.customerDetails - The customer's information.
+ * @returns {Promise<object>} The created order data.
+ */
 export const createOrder = async ({ cartItems, customerDetails }) => {
-  const storesResponse = await fetch(`${API_BASE_URL}/stores`, { headers: twiceHeaders });
-  if (!storesResponse.ok) throw new Error("Could not fetch store details.");
-  const storesData = await storesResponse.json();
-  const storeId = storesData.data?.[0]?.id;
-  if (!storeId) throw new Error("Default store ID not found.");
-
-  const orderPayload = {
-    storeId: storeId,
-    customer: {
-      ...customerDetails,
-      marketingConsent: true,
-    },
-    items: cartItems.flatMap((item) => {
-      const mainItem = { productId: item.id.split("-")[0], quantity: 1 };
-      const extraItems = Object.values(item.extras).map((extra) => ({
-        productId: extra.id,
-        quantity: extra.quantity,
-      }));
-      return [mainItem, ...extraItems];
-    }),
-    startDate: cartItems[0].range.from.toISOString(),
-    duration: {
-      period: "days",
-      value: cartItems[0].days,
-    },
-    paid: false,
-  };
-
-  const response = await fetch(`${API_BASE_URL}/orders`, {
+  const response = await fetch(`/.netlify/functions/create-order`, {
     method: "POST",
-    headers: twiceHeaders,
-    body: JSON.stringify(orderPayload),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ cartItems, customerDetails }),
   });
 
   if (!response.ok) {
@@ -206,6 +159,47 @@ export const createOrder = async ({ cartItems, customerDetails }) => {
     console.error("Error creating order:", errorData);
     throw new Error(errorData.error?.message || "Failed to create order.");
   }
+  return await response.json();
+};
 
+/**
+ * Creates a Revolut order to get a payment token.
+ * @param {object} payload - The payment details.
+ * @param {number} payload.amount - The amount to charge.
+ * @param {string} payload.currency - The currency code (e.g., 'EUR').
+ * @returns {Promise<object>} The Revolut order data containing the orderToken.
+ */
+export const createRevolutOrderToken = async ({ amount, currency }) => {
+  const response = await fetch(`/.netlify/functions/create-revolut-order-token`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount, currency }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("Error creating Revolut order token:", errorData);
+    throw new Error(errorData.error?.message || "Failed to create Revolut order token.");
+  }
+  return await response.json();
+};
+
+/**
+ * Processes the final payment and order after Revolut confirmation.
+ * @param {object} payload - The payload containing payment and order details.
+ * @returns {Promise<object>} The final confirmation data.
+ */
+export const processRevolutPaymentAndOrder = async (payload) => {
+  const response = await fetch(`/.netlify/functions/process-revolut-payment-and-order`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("Error processing Revolut payment and order:", errorData);
+    throw new Error(errorData.error?.message || 'Failed to complete booking and payment.');
+  }
   return await response.json();
 };

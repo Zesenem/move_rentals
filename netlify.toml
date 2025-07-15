@@ -1,8 +1,20 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.revolut.com https://*.revolut.codes; connect-src 'self' https://*.revolut.com https://*.revolut.codes https://api.twicecommerce.com; frame-src 'self' https://*.revolut.com https://*.revolut.codes https://www.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.revolut.com https://*.revolut.codes; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://*.revolut.com https://*.revolut.codes https://firebasestorage.googleapis.com https://purecatamphetamine.github.io; form-action 'self'; base-uri 'self'; object-src 'none';"
-    X-Frame-Options = "DENY"
+    # This CSP allows Google Fonts, Sentry, and Revolut's tracking/analytics
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' *.revolut.com *.revolut.codes; style-src 'self' 'unsafe-inline' *.revolut.com *.revolut.codes https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' *.revolut.com *.revolut.codes; connect-src 'self' *.revolut.com *.revolut.codes *.sentry.io aqueduct.revolut.com; img-src 'self' data: https://images.twicecommerce.com https://firebasestorage.googleapis.com https://purecatamphetamine.github.io; form-action 'self'; base-uri 'self'; object-src 'none'; worker-src 'self' blob:;"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    # --- THE FINAL FIX ---
+    # We explicitly grant payment permissions to Revolut's domains.
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(*)"

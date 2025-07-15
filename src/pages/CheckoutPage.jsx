@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useMutation } from "@tanstack/react-query";
-import { createOrder } from "../services/twice.js";
+import { createRevolutOrderToken, processRevolutPaymentAndOrder } from "../services/twice.js";
 import Button from "../components/Button";
 import { FaTrash, FaCreditCard, FaApple, FaGoogle } from "react-icons/fa";
 import { format } from "date-fns";
@@ -9,6 +9,10 @@ import { useNavigate } from "react-router-dom";
 import PhoneInput, { isPossiblePhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import MbWayIcon from "../components/icons/MbWayIcon";
+import RevolutCardField from "../components/RevolutCardField";
+
+// Sub-components (CartItem, MbWayPayment) are assumed to be in separate files or defined here.
+// They are included for completeness and context.
 
 const CartItem = ({ item, onRemove }) => (
   <li className="flex flex-col sm:items-center justify-between bg-arsenic p-6 rounded-lg sm:flex-row gap-6">
@@ -21,16 +25,6 @@ const CartItem = ({ item, onRemove }) => (
           {format(new Date(item.range.to), "MMM d, yyyy")}
         </p>
         <p className="text-sm font-semibold text-steel">{item.days} days</p>
-        {item.extras && Object.keys(item.extras).length > 0 && (
-          <div className="mt-3 border-t border-graphite/20 pt-3">
-            <h3 className="text-xs font-bold text-steel uppercase tracking-wider">Extras:</h3>
-            <ul className="text-sm text-space list-inside mt-1">
-              {Object.values(item.extras).map((extra) => (
-                <li key={extra.id}>- {extra.name}</li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
     </div>
     <div className="text-right sm:text-right w-full sm:w-auto self-end sm:self-center">
@@ -38,6 +32,7 @@ const CartItem = ({ item, onRemove }) => (
       <button
         onClick={() => onRemove(item.id)}
         className="text-space hover:text-red-500 transition-colors"
+        aria-label={`Remove ${item.name} from cart`}
       >
         <FaTrash />
       </button>
@@ -75,6 +70,8 @@ function CheckoutPage() {
   const { items, removeItem, clearCart, getCartTotal } = useCartStore();
   const total = getCartTotal();
   const navigate = useNavigate();
+  const revolutCardRef = useRef(null);
+
   const [paymentMethod, setPaymentMethod] = useState("revolut");
   const [formErrors, setFormErrors] = useState({});
   const [customerDetails, setCustomerDetails] = useState({
@@ -84,68 +81,143 @@ function CheckoutPage() {
     phone: "",
   });
 
+  // --- MODIFICATION START ---
+  // States to hold either the embedded payment token or the fallback URL
+  const [revolutOrderToken, setRevolutOrderToken] = useState(null);
+  const [checkoutUrl, setCheckoutUrl] = useState(null);
+  // --- MODIFICATION END ---
+
   const {
-    mutate: processOrder,
-    isPending: isCreatingOrder,
-    error: orderError,
+    mutate: fetchRevolutOrder,
+    isPending: isFetchingOrder,
+    error: fetchOrderError,
+    data: revolutOrderData,
   } = useMutation({
-    mutationFn: createOrder,
+    mutationFn: createRevolutOrderToken,
+    // --- MODIFICATION START ---
+    // Update onSuccess to handle both token and checkoutUrl responses
+    onSuccess: (data) => {
+      console.log("✅ Received revolut order token response:", data);
+      if (data.token) {
+        setRevolutOrderToken(data.token);
+        setCheckoutUrl(null); // Ensure fallback URL is cleared
+      } else if (data.checkoutUrl) {
+        setCheckoutUrl(data.checkoutUrl);
+        setRevolutOrderToken(null); // Ensure token is cleared
+      } else {
+        console.warn("⚠️ Neither token nor checkoutUrl was returned from the API.");
+      }
+    },
+    // --- MODIFICATION END ---
+    onError: (error) => {
+      console.error("❌ Error fetching Revolut order:", error);
+    },
+  });
+
+  const orderRequestedRef = useRef(false);
+
+  useEffect(() => {
+    // This effect triggers the API call to get a payment token/URL
+    if (
+      paymentMethod === "revolut" &&
+      total > 0 &&
+      !revolutOrderToken &&
+      !checkoutUrl && // Also check for checkoutUrl
+      !isFetchingOrder &&
+      !orderRequestedRef.current
+    ) {
+      orderRequestedRef.current = true;
+      fetchRevolutOrder({ amount: total, currency: "EUR" });
+    }
+  }, [paymentMethod, total, revolutOrderToken, checkoutUrl, isFetchingOrder, fetchRevolutOrder]);
+
+  useEffect(() => {
+    // This effect resets the payment details if the method or total changes
+    if (paymentMethod !== "revolut" || total === 0) {
+      orderRequestedRef.current = false;
+      setRevolutOrderToken(null);
+      setCheckoutUrl(null); // Also reset the checkoutUrl
+    }
+  }, [paymentMethod, total]);
+
+  const { mutate: submitOrderAndPayment, isPending: isProcessingPaymentAndOrder } = useMutation({
+    mutationFn: processRevolutPaymentAndOrder,
     onSuccess: (order) => {
       clearCart();
       navigate(`/booking-success/${order.id}`);
     },
   });
 
-  const validateField = (name, value) => {
-    let error = "";
-    if (name === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      error = "Please enter a valid email address.";
-    }
-    if (name === "phone" && value && !isPossiblePhoneNumber(value)) {
-      error = "Please enter a valid phone number.";
-    }
-    setFormErrors((prev) => ({ ...prev, [name]: error }));
+  const handlePaymentSuccess = useCallback(
+    (paymentResult) => {
+      submitOrderAndPayment({
+        cartItems: items,
+        customerDetails,
+        revolutPaymentId: paymentResult.id,
+        totalAmount: total,
+        currency: "EUR",
+        revolutOrderId: revolutOrderData?.orderId,
+      });
+    },
+    [submitOrderAndPayment, items, customerDetails, total, revolutOrderData]
+  );
+
+  const handlePaymentError = useCallback((error) => {
+    // Using a more robust way to show errors is recommended, but alert works for now
+    alert(`Payment failed: ${error.message || "Please check your card details"}`);
+  }, []);
+
+  const validateForm = () => {
+    const errors = {};
+    if (!customerDetails.firstName.trim()) errors.firstName = "First name is required";
+    if (!customerDetails.lastName.trim()) errors.lastName = "Last name is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerDetails.email))
+      errors.email = "Please enter a valid email address";
+    if (!customerDetails.phone || !isPossiblePhoneNumber(customerDetails.phone))
+      errors.phone = "Please enter a valid phone number";
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setCustomerDetails((prev) => ({ ...prev, [name]: value }));
-    validateField(name, value);
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+    localStorage.setItem("customerDetails", JSON.stringify(customerDetails));
+
+    // This form submission is only for the embedded card field flow
+    if (paymentMethod === "revolut" && revolutCardRef.current && revolutOrderToken) {
+      const revolutPayload = {
+        name: `${customerDetails.firstName} ${customerDetails.lastName}`,
+        email: customerDetails.email,
+        phone: customerDetails.phone,
+      };
+      revolutCardRef.current.submit(revolutPayload);
+    }
+    // Note: The redirect flow is handled by its own button, not the main form submit
   };
 
+  // --- MODIFICATION START ---
+  // Handler for the redirect fallback button
+  const handleRedirectToRevolut = () => {
+    if (checkoutUrl) {
+      window.location.href = checkoutUrl;
+    }
+  };
+  // --- MODIFICATION END ---
+
+  const handleCustomerDetailsChange = (e) => {
+    const { id, value } = e.target;
+    setCustomerDetails((prev) => ({ ...prev, [id]: value }));
+  };
   const handlePhoneChange = (phone) => {
     setCustomerDetails((prev) => ({ ...prev, phone }));
-    validateField("phone", phone);
   };
-
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    const emailIsValid = !validateField("email", customerDetails.email) && !formErrors.email;
-    const phoneIsValid = !validateField("phone", customerDetails.phone) && !formErrors.phone;
-
-    if (emailIsValid && phoneIsValid && customerDetails.firstName && customerDetails.lastName) {
-      console.log(`Processing ${paymentMethod} payment...`);
-      processOrder({ cartItems: items, customerDetails });
-    } else {
-      console.log("Form has errors, submission blocked.");
-    }
-  };
-
   const paymentSelectorClasses = (method) =>
     `flex items-center justify-center gap-2 p-3 rounded-md transition-all font-semibold w-full ${
       paymentMethod === method
         ? "bg-cloud text-phantom scale-105"
         : "bg-phantom text-space hover:bg-phantom/70"
     }`;
-
-  if (items.length === 0) {
-    return (
-      <div className="text-center py-20">
-        <h1 className="text-4xl font-bold text-steel mb-4">Your Cart is Empty</h1>
-        <p className="text-space">Looks like you haven't added any rentals yet.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -164,6 +236,7 @@ function CheckoutPage() {
             <div className="bg-arsenic p-6 rounded-lg">
               <h2 className="text-2xl font-bold text-cloud mb-4">Your Details</h2>
               <div className="space-y-4">
+                {/* Customer Details Form Fields... */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label
@@ -173,26 +246,32 @@ function CheckoutPage() {
                       First Name <span className="text-red-500">*</span>
                     </label>
                     <input
+                      id="firstName"
                       type="text"
-                      name="firstName"
                       value={customerDetails.firstName}
-                      onChange={handleInputChange}
-                      className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
+                      onChange={handleCustomerDetailsChange}
+                      className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud"
                       required
                     />
+                    {formErrors.firstName && (
+                      <p className="text-red-400 text-sm mt-1">{formErrors.firstName}</p>
+                    )}
                   </div>
                   <div>
                     <label htmlFor="lastName" className="block text-sm font-medium text-space mb-1">
                       Last Name <span className="text-red-500">*</span>
                     </label>
                     <input
+                      id="lastName"
                       type="text"
-                      name="lastName"
                       value={customerDetails.lastName}
-                      onChange={handleInputChange}
-                      className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
+                      onChange={handleCustomerDetailsChange}
+                      className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud"
                       required
                     />
+                    {formErrors.lastName && (
+                      <p className="text-red-400 text-sm mt-1">{formErrors.lastName}</p>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -200,11 +279,11 @@ function CheckoutPage() {
                     Email Address <span className="text-red-500">*</span>
                   </label>
                   <input
+                    id="email"
                     type="email"
-                    name="email"
                     value={customerDetails.email}
-                    onChange={handleInputChange}
-                    className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
+                    onChange={handleCustomerDetailsChange}
+                    className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud"
                     required
                   />
                   {formErrors.email && (
@@ -218,12 +297,9 @@ function CheckoutPage() {
                   <div className="phone-input-container">
                     <PhoneInput
                       id="phone"
-                      placeholder="Enter phone number"
                       value={customerDetails.phone}
                       onChange={handlePhoneChange}
                       defaultCountry="PT"
-                      international
-                      countryCallingCodeEditable={true}
                       className="phone-input"
                     />
                   </div>
@@ -277,9 +353,48 @@ function CheckoutPage() {
                     <FaGoogle /> Google Pay
                   </button>
                 </div>
-                <div className="pt-4">
+
+                {/* --- MODIFICATION START --- */}
+                {/* This section now conditionally renders the correct payment UI */}
+                <div className="pt-4 min-h-[100px]">
                   {paymentMethod === "revolut" && (
-                    <p className="text-center text-space">Card payment form will appear here.</p>
+                    <>
+                      {isFetchingOrder && (
+                        <p className="text-center text-space">Initializing Payment...</p>
+                      )}
+
+                      {fetchOrderError && !checkoutUrl && (
+                        <p className="text-center text-red-500">
+                          Could not initialize payment. Please try again or select a different
+                          method.
+                        </p>
+                      )}
+
+                      {revolutOrderToken && (
+                        <RevolutCardField
+                          ref={revolutCardRef}
+                          orderToken={revolutOrderToken}
+                          onPaymentSuccess={handlePaymentSuccess}
+                          onPaymentError={handlePaymentError}
+                        />
+                      )}
+
+                      {checkoutUrl && !revolutOrderToken && (
+                        <div>
+                          <p className="text-center text-sm text-space mb-4">
+                            The embedded card form is unavailable. Please complete your payment on
+                            Revolut's secure page.
+                          </p>
+                          <Button
+                            type="button"
+                            onClick={handleRedirectToRevolut}
+                            className="w-full bg-purple-600 text-white hover:bg-purple-700"
+                          >
+                            Pay with Revolut
+                          </Button>
+                        </div>
+                      )}
+                    </>
                   )}
                   {paymentMethod === "mbway" && (
                     <MbWayPayment
@@ -289,11 +404,30 @@ function CheckoutPage() {
                     />
                   )}
                 </div>
+                {/* --- MODIFICATION END --- */}
               </div>
-              <Button type="submit" disabled={isCreatingOrder} className="w-full mt-8 py-3 text-lg">
-                {isCreatingOrder ? "Processing..." : `Pay & Confirm Booking`}
-              </Button>
-              {orderError && <p className="text-red-400 text-center mt-4">{orderError.message}</p>}
+
+              {/* --- MODIFICATION START --- */}
+              {/* The main button is now hidden if the redirect flow is active, */}
+              {/* as that flow has its own button. */}
+              {!(paymentMethod === "revolut" && checkoutUrl) && (
+                <Button
+                  type="submit"
+                  disabled={
+                    isProcessingPaymentAndOrder ||
+                    isFetchingOrder ||
+                    (paymentMethod === "revolut" && !revolutOrderToken)
+                  }
+                  className="w-full mt-8 py-3 text-lg"
+                >
+                  {isFetchingOrder
+                    ? "Initializing..."
+                    : isProcessingPaymentAndOrder
+                    ? "Processing..."
+                    : "Pay & Confirm Booking"}
+                </Button>
+              )}
+              {/* --- MODIFICATION END --- */}
             </div>
           </div>
         </div>
