@@ -1,120 +1,92 @@
-import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from "react";
-import RevolutCheckout from "@revolut/checkout";
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 
 const RevolutCardField = forwardRef(
   ({ amount, currency, onPaymentSuccess, onPaymentError }, ref) => {
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const containerRef = useRef(null);
     const cardFieldRef = useRef(null);
-    const cardInstanceRef = useRef(null);
+    const [rc, setRc] = useState(null);
 
+    // Load Revolut SDK script manually
+    const loadRevolutScript = () => {
+      return new Promise((resolve, reject) => {
+        if (window.RevolutCheckout) {
+          return resolve(window.RevolutCheckout);
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://merchant.revolut.com/embed.js';
+        script.async = true;
+        script.onload = () => resolve(window.RevolutCheckout);
+        script.onerror = () => reject(new Error('Failed to load Revolut script'));
+        document.body.appendChild(script);
+      });
+    };
+
+    // Initialize Revolut Checkout SDK and card field
     useEffect(() => {
-      // Ensure we don't re-initialize if not needed
-      if (!cardFieldRef.current || cardInstanceRef.current) return;
+      let revolutInstance;
 
-      let isMounted = true; // Track if the component is mounted
-
-      const initializeCardField = async () => {
-        try {
-          // Fetch the payment token from your Netlify function
-          const response = await fetch("/.netlify/functions/create-revolut-order", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ amount, currency }),
+      loadRevolutScript()
+        .then((RevolutCheckout) => RevolutCheckout({ publicKey: import.meta.env.VITE_REVOLUT_PUBLIC_KEY }))
+        .then((revolut) => {
+          revolutInstance = revolut;
+          setRc(revolut);
+          return revolut.createCardField({
+            element: containerRef.current,
+            style: {},
+            amount,
+            currency,
           });
+        })
+        .then((cardField) => {
+          cardFieldRef.current = cardField;
+        })
+        .catch((err) => {
+          console.error('Revolut Checkout init error', err);
+          onPaymentError(err);
+        });
 
-          if (!response.ok) {
-            const errBody = await response.text();
-            throw new Error(`Failed to retrieve payment token: ${errBody}`);
-          }
-
-          const { token } = await response.json();
-          console.log('🎟️ Revolut token:', token);
-          if (!token) {
-            throw new Error("Server did not return a valid payment token.");
-          }
-
-          // Wait for the RevolutCheckout library to be ready
-          const RC = await RevolutCheckout(token);
-
-          if (!isMounted) return; // Don't proceed if component unmounted
-
-          const cardField = RC.createCardField({
-            target: cardFieldRef.current,
-            onSuccess() {
-              setError(null);
-              onPaymentSuccess("Payment successful!");
-            },
-            onError(message) {
-              const errorMessage = `Payment failed: ${message}`;
-              setError(errorMessage);
-              onPaymentError(message);
-            },
-            // It's good practice to style the card field
-            styles: {
-              base: {
-                color: "#EDEFF7",
-                "::placeholder": { color: "#6E7180" },
-              },
-              focused: { color: "#FFFFFF" },
-              error: { color: "#EF4444" },
-            },
-          });
-
-          cardInstanceRef.current = cardField;
-
-        } catch (err) {
-          console.error("Revolut initialization failed:", err);
-          // Provide a user-friendly error message
-          setError(
-            "Could not load the payment form. This may be due to an ad blocker. Please try disabling it or use a different browser."
-          );
-          onPaymentError(err.message);
-        } finally {
-          if (isMounted) {
-            setIsLoading(false);
-          }
-        }
-      };
-
-      // Only initialize if there's an amount to pay
-      if (amount > 0) {
-        initializeCardField();
-      } else {
-        setIsLoading(false);
-      }
-
-      // Cleanup function to run when the component unmounts
       return () => {
-        isMounted = false;
-        if (cardInstanceRef.current && typeof cardInstanceRef.current.destroy === "function") {
-          cardInstanceRef.current.destroy();
-          cardInstanceRef.current = null;
-        }
+        // Cleanup if necessary in future
       };
-    }, [amount, currency, onPaymentSuccess, onPaymentError]); // Dependencies for the useEffect hook
+    }, [amount, currency, onPaymentError]);
 
-    // Expose a `submit` method via the ref
+    // Expose submit() to parent via ref
     useImperativeHandle(ref, () => ({
-      submit: (customerDetails) => {
-        if (cardInstanceRef.current) {
-          cardInstanceRef.current.submit({
-            name: `${customerDetails.firstName} ${customerDetails.lastName}`,
-            email: customerDetails.email,
-            phone: customerDetails.phone,
+      submit: async (customerDetails) => {
+        if (!cardFieldRef.current || !rc) {
+          throw new Error('Revolut not ready');
+        }
+        try {
+          // Collect card details and get a payment token
+          const paymentToken = await cardFieldRef.current.submit({
+            billingDetails: {
+              name: `${customerDetails.firstName} ${customerDetails.lastName}`,
+              email: customerDetails.email,
+              phone: customerDetails.phone,
+            },
           });
+
+          // Launch payment modal
+          const result = await rc.startPayment({ paymentToken });
+          if (['AUTHORIZED', 'CAPTURED'].includes(result.status)) {
+            onPaymentSuccess(result);
+          } else {
+            onPaymentError(result);
+          }
+        } catch (err) {
+          onPaymentError(err);
         }
       },
     }));
 
-    // Render loading/error states
-    return (
-      <div>
-        {isLoading && <p className="text-center text-space">Loading payment form...</p>}
-        <div ref={cardFieldRef} style={{ minHeight: "50px" }}></div>
-        {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
-      </div>
-    );
+    return <div ref={containerRef} style={{ minHeight: '200px' }} />;
   }
 );
 
