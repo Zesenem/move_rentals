@@ -29,6 +29,7 @@ const RevolutCardField = forwardRef(
           }
 
           const { token } = await response.json();
+          console.log('🎟️ Revolut token:', token);
           if (!token) {
             throw new Error("Server did not return a valid payment token.");
           }

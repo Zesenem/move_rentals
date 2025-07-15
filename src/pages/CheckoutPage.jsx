@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useMutation } from "@tanstack/react-query";
 import { createOrder } from "../services/twice.js";
@@ -18,8 +18,7 @@ const CartItem = ({ item, onRemove }) => (
       <div>
         <h2 className="font-bold text-xl text-cloud">{item.name}</h2>
         <p className="text-base text-space mt-1">
-          {format(new Date(item.range.from), "MMM d, yyyy")} to{" "}
-          {format(new Date(item.range.to), "MMM d, yyyy")}
+          {format(new Date(item.range.from), "MMM d, yyyy")} to {format(new Date(item.range.to), "MMM d, yyyy")}
         </p>
         <p className="text-sm font-semibold text-steel">{item.days} days</p>
         {item.extras && Object.keys(item.extras).length > 0 && (
@@ -36,10 +35,7 @@ const CartItem = ({ item, onRemove }) => (
     </div>
     <div className="text-right sm:text-right w-full sm:w-auto self-end sm:self-center">
       <p className="font-bold text-xl text-cloud mb-1">€{item.totalPrice.toFixed(2)}</p>
-      <button
-        onClick={() => onRemove(item.id)}
-        className="text-space hover:text-red-500 transition-colors"
-      >
+      <button onClick={() => onRemove(item.id)} className="text-space hover:text-red-500 transition-colors">
         <FaTrash />
       </button>
     </div>
@@ -75,6 +71,7 @@ const MbWayPayment = ({ phone, setPhone, error }) => (
 function CheckoutPage() {
   const { items, removeItem, clearCart, getCartTotal } = useCartStore();
   const total = getCartTotal();
+  const stableAmount = useMemo(() => total, [total]);
   const navigate = useNavigate();
   const revolutCardRef = useRef();
   const [paymentMethod, setPaymentMethod] = useState("revolut");
@@ -86,11 +83,7 @@ function CheckoutPage() {
     phone: "",
   });
 
-  const {
-    mutate: processOrder,
-    isPending: isCreatingOrder,
-    error: orderError,
-  } = useMutation({
+  const { mutate: processOrder, isPending: isCreatingOrder, error: orderError } = useMutation({
     mutationFn: createOrder,
     onSuccess: (order) => {
       clearCart();
@@ -99,12 +92,11 @@ function CheckoutPage() {
   });
 
   const handlePaymentSuccess = useCallback(() => {
-    console.log("Payment successful! Creating order in Twice...");
     processOrder({ cartItems: items, customerDetails });
   }, [processOrder, items, customerDetails]);
 
   const handlePaymentError = useCallback((errorMessage) => {
-    console.error("Payment failed:", errorMessage);
+    console.error(errorMessage);
   }, []);
 
   const validateForm = () => {
@@ -122,23 +114,17 @@ function CheckoutPage() {
   const handleFormSubmit = (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
-    if (paymentMethod === "revolut") {
-      if (revolutCardRef.current) {
-        revolutCardRef.current.submit(customerDetails);
-      }
-    } else {
-      console.log("Submitting MB WAY payment...");
-      // In a real app, you would integrate the MB WAY SDK here.
+    if (paymentMethod === "revolut" && revolutCardRef.current) {
+      revolutCardRef.current.submit(customerDetails);
+    }
+    if (paymentMethod === "mbway") {
       handlePaymentSuccess();
     }
   };
 
   const paymentSelectorClasses = (method) =>
     `flex items-center justify-center gap-2 p-3 rounded-md transition-all font-semibold w-full ${
-      paymentMethod === method
-        ? "bg-cloud text-phantom scale-105"
-        : "bg-phantom text-space hover:bg-phantom/70"
+      paymentMethod === method ? "bg-cloud text-phantom scale-105" : "bg-phantom text-space hover:bg-phantom/70"
     }`;
 
   if (items.length === 0) {
@@ -169,61 +155,42 @@ function CheckoutPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label
-                      htmlFor="firstName"
-                      className="block text-sm font-medium text-space mb-1"
-                    >
-                      First Name <span className="text-red-500">*</span>
-                    </label>
+                    <label htmlFor="firstName" className="block text-sm font-medium text-space mb-1">First Name <span className="text-rogueRed">*</span></label>
                     <input
+                      id="firstName"
                       type="text"
-                      name="firstName"
                       value={customerDetails.firstName}
-                      onChange={(e) =>
-                        setCustomerDetails({ ...customerDetails, firstName: e.target.value })
-                      }
+                      onChange={(e) => setCustomerDetails({ ...customerDetails, firstName: e.target.value })}
                       className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-space mb-1">
-                      Last Name <span className="text-red-500">*</span>
-                    </label>
+                    <label htmlFor="lastName" className="block text-sm font-medium text-space mb-1">Last Name <span className="text-rogueRed">*</span></label>
                     <input
+                      id="lastName"
                       type="text"
-                      name="lastName"
                       value={customerDetails.lastName}
-                      onChange={(e) =>
-                        setCustomerDetails({ ...customerDetails, lastName: e.target.value })
-                      }
+                      onChange={(e) => setCustomerDetails({ ...customerDetails, lastName: e.target.value })}
                       className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
                       required
                     />
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-space mb-1">
-                    Email Address <span className="text-red-500">*</span>
-                  </label>
+                  <label htmlFor="email" className="block text-sm font-medium text-space mb-1">Email Address <span className="text-rogueRed">*</span></label>
                   <input
+                    id="email"
                     type="email"
-                    name="email"
                     value={customerDetails.email}
-                    onChange={(e) =>
-                      setCustomerDetails({ ...customerDetails, email: e.target.value })
-                    }
+                    onChange={(e) => setCustomerDetails({ ...customerDetails, email: e.target.value })}
                     className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
                     required
                   />
-                  {formErrors.email && (
-                    <p className="text-red-400 text-sm mt-1">{formErrors.email}</p>
-                  )}
+                  {formErrors.email && <p className="text-red-400 text-sm mt-1">{formErrors.email}</p>}
                 </div>
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-space mb-1">
-                    Phone Number <span className="text-red-500">*</span>
-                  </label>
+                  <label htmlFor="phone" className="block text-sm font-medium text-space mb-1">Phone Number <span className="text-rogueRed">*</span></label>
                   <div className="phone-input-container">
                     <PhoneInput
                       id="phone"
@@ -236,61 +203,32 @@ function CheckoutPage() {
                       className="phone-input"
                     />
                   </div>
-                  {formErrors.phone && (
-                    <p className="text-red-400 text-sm mt-1">{formErrors.phone}</p>
-                  )}
+                  {formErrors.phone && <p className="text-red-400 text-sm mt-1">{formErrors.phone}</p>}
                 </div>
               </div>
             </div>
           </div>
           <div className="lg:col-span-1">
             <div className="bg-arsenic p-6 rounded-lg sticky top-24">
-              <h2 className="text-2xl font-bold text-cloud border-b border-graphite/50 pb-4 mb-4">
-                Complete Your Booking
-              </h2>
+              <h2 className="text-2xl font-bold text-cloud border-b border-graphite/50 pb-4 mb-4">Complete Your Booking</h2>
               <div className="flex justify-between font-bold text-xl text-cloud my-4">
-                <span>Total</span>
-                <span>€{total.toFixed(2)}</span>
+                <span>Total</span><span>€{total.toFixed(2)}</span>
               </div>
               <div className="space-y-4 mt-8">
                 <h3 className="text-lg font-semibold text-cloud">Payment Method</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod("revolut")}
-                    className={paymentSelectorClasses("revolut")}
-                  >
-                    <FaCreditCard /> Card
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod("mbway")}
-                    className={paymentSelectorClasses("mbway")}
-                  >
-                    <MbWayIcon /> MB WAY
-                  </button>
+                  <button type="button" onClick={() => setPaymentMethod("revolut")} className={paymentSelectorClasses("revolut")}> <FaCreditCard /> Card </button>
+                  <button type="button" onClick={() => setPaymentMethod("mbway")} className={paymentSelectorClasses("mbway")}> <MbWayIcon /> MB WAY </button>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    disabled
-                    className="flex items-center justify-center gap-2 p-3 rounded-md bg-phantom text-space/50 cursor-not-allowed"
-                  >
-                    <FaApple /> Apple Pay
-                  </button>
-                  <button
-                    type="button"
-                    disabled
-                    className="flex items-center justify-center gap-2 p-3 rounded-md bg-phantom text-space/50 cursor-not-allowed"
-                  >
-                    <FaGoogle /> Google Pay
-                  </button>
+                  <button type="button" disabled className="flex items-center justify-center gap-2 p-3 rounded-md bg-phantom text-space/50 cursor-not-allowed"> <FaApple /> Apple Pay </button>
+                  <button type="button" disabled className="flex items-center justify-center gap-2 p-3 rounded-md bg-phantom text-space/50 cursor-not-allowed"> <FaGoogle /> Google Pay </button>
                 </div>
                 <div className="pt-4">
                   {paymentMethod === "revolut" && (
                     <RevolutCardField
                       ref={revolutCardRef}
-                      amount={total}
+                      amount={stableAmount}
                       currency="EUR"
                       onPaymentSuccess={handlePaymentSuccess}
                       onPaymentError={handlePaymentError}
