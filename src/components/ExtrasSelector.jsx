@@ -1,5 +1,3 @@
-import React from "react";
-
 function ExtrasSelector({ extras, selectedExtras, onExtrasChange }) {
   const handleCheckboxChange = (extraItem, isChecked) => {
     onExtrasChange((prev) => {

@@ -1,85 +1,99 @@
-import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
-import RevolutCheckout from '@revolut/checkout';
+import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from "react";
+import RevolutCheckout from "@revolut/checkout";
 
-const RevolutCardField = forwardRef(({ amount, currency, onPaymentSuccess, onPaymentError }, ref) => {
+const RevolutCardField = forwardRef(
+  ({ amount, currency, onPaymentSuccess, onPaymentError }, ref) => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
     const cardFieldRef = useRef(null);
-    const [cardInstance, setCardInstance] = useState(null);
-    const [error, setError] = useState('');
+    const cardInstanceRef = useRef(null);
 
     useEffect(() => {
-        let instance;
+      const initializeCardField = async () => {
+        if (!cardFieldRef.current) return;
 
-        const createOrderAndMountField = async () => {
-            try {
-                const response = await fetch('/.netlify/functions/create-revolut-order', {
-                    method: 'POST',
-                    body: JSON.stringify({ amount, currency }),
-                });
+        try {
+          const response = await fetch("/.netlify/functions/create-revolut-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount, currency }),
+          });
 
-                if (!response.ok) {
-                    throw new Error('Failed to create Revolut order.');
-                }
+          if (!response.ok) {
+            throw new Error("Failed to retrieve payment token from server.");
+          }
 
-                const { token } = await response.json();
-                if (!token) {
-                    throw new Error('Missing order token from Revolut.');
-                }
+          const { token } = await response.json();
 
-                const RC = await RevolutCheckout(token);
-                
-                instance = RC.createCardField({
-                    target: cardFieldRef.current,
-                    onSuccess: onPaymentSuccess,
-                    onError: (message) => {
-                        setError(message);
-                        onPaymentError(message);
-                    },
-                    styles: {
-                        base: {
-                            color: '#EDEFF7',
-                            '::placeholder': { color: '#6E7180' },
-                        },
-                    },
-                });
-                
-                setCardInstance(instance);
+          if (!token) {
+            throw new Error("Server did not return a valid payment token.");
+          }
 
-            } catch {
-                const errorMessage = 'Could not initialize payment field. Please try again.';
-                setError(errorMessage);
-                onPaymentError(errorMessage);
-            }
-        };
+          const RC = await RevolutCheckout(token, "sandbox");
 
-        if (amount > 0) {
-            createOrderAndMountField();
+          const cardField = RC.createCardField({
+            target: cardFieldRef.current,
+            onSuccess() {
+              setError(null);
+              onPaymentSuccess("Payment successful!");
+            },
+            onError(message) {
+              setError(`Payment failed: ${message}`);
+              onPaymentError(message);
+            },
+            styles: {
+              base: {
+                color: "#EDEFF7",
+                "::placeholder": { color: "#6E7180" },
+              },
+              focused: { color: "#FFFFFF" },
+              error: { color: "#EF4444" },
+            },
+          });
+
+          cardInstanceRef.current = cardField;
+        } catch (err) {
+          console.error("Revolut initialization failed:", err);
+          setError(
+            "Could not load the payment form. This may be due to a browser extension (like an ad blocker). Please try disabling it or use a different browser."
+          );
+          onPaymentError(err.message);
+        } finally {
+          setIsLoading(false);
         }
+      };
 
-        return () => {
-            if (instance) {
-                instance.destroy();
-            }
-        };
+      if (amount > 0) {
+        initializeCardField();
+      }
+
+      return () => {
+        if (cardInstanceRef.current && typeof cardInstanceRef.current.destroy === "function") {
+          cardInstanceRef.current.destroy();
+        }
+      };
     }, [amount, currency, onPaymentSuccess, onPaymentError]);
 
     useImperativeHandle(ref, () => ({
-        submit: (customerDetails) => {
-            if (cardInstance) {
-                cardInstance.submit({
-                    name: `${customerDetails.firstName} ${customerDetails.lastName}`,
-                    email: customerDetails.email,
-                    phone: customerDetails.phone,
-                });
-            }
-        },
+      submit: (customerDetails) => {
+        if (cardInstanceRef.current) {
+          cardInstanceRef.current.submit({
+            name: `${customerDetails.firstName} ${customerDetails.lastName}`,
+            email: customerDetails.email,
+            phone: customerDetails.phone,
+          });
+        }
+      },
     }));
 
     return (
-        <div>
-            <div ref={cardFieldRef}></div>
-            {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
-        </div>
+      <div>
+        {isLoading && <p className="text-center text-space">Loading payment form...</p>}
+        <div ref={cardFieldRef} style={{ minHeight: "50px" }}></div>
+        {error && <p className="text-red-500 text-sm mt-2 text-center">{error}</p>}
+      </div>
     );
-});
+  }
+);
 
 export default RevolutCardField;
