@@ -25,7 +25,7 @@ export const handler = async (event) => {
       headers: {
         Authorization: `Bearer ${REVOLUT_API_KEY}`,
         "Content-Type": "application/json",
-        "Revolut-Api-Version": "2023-09-01",
+        "Revolut-Api-Version": "2024-02-15",
       },
       body: JSON.stringify({
         amount: Math.round(amount * 100),
