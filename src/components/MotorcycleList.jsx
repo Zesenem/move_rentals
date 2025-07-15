@@ -15,6 +15,8 @@ function MotorcycleList() {
     queryFn: fetchProducts,
   });
 
+  const sortedMotorcycles = motorcycles.sort((a, b) => a.price_per_day - b.price_per_day);
+
   if (isLoading) {
     return (
       <div id="fleet-section" className="container mx-auto px-4 py-16">
@@ -43,7 +45,7 @@ function MotorcycleList() {
       <h2 className="text-4xl font-extrabold text-center text-steel mb-12">Our Fleet</h2>
 
       <div className="flex flex-wrap justify-center gap-8">
-        {motorcycles.map((bike, index) => (
+        {sortedMotorcycles.map((bike, index) => (
           <MotorcycleCard key={bike.id} bike={bike} index={index} />
         ))}
       </div>

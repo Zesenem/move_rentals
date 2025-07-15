@@ -44,7 +44,7 @@ const RevolutCardField = forwardRef(({ amount, currency, onPaymentSuccess, onPay
                 
                 setCardInstance(instance);
 
-            } catch  {
+            } catch {
                 const errorMessage = 'Could not initialize payment field. Please try again.';
                 setError(errorMessage);
                 onPaymentError(errorMessage);

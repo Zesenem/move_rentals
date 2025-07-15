@@ -12,7 +12,7 @@ import { FaExclamationTriangle } from "react-icons/fa";
 
 const TechnicalFeaturesList = ({ features }) => (
   <ul className="text-base space-y-1">
-    {features.map((feature, index) => (
+    {features?.map((feature, index) => (
       <li key={index} className="flex justify-between py-2 border-b border-graphite/50">
         <span className="text-space">{feature.label}:</span>
         <span className="font-semibold text-cloud text-right">{feature.value}</span>
@@ -27,7 +27,7 @@ const IncludedInRentalList = ({ items, deposit }) => (
       Security Deposit: <span className="font-semibold text-cloud">€{deposit}</span>
     </p>
     <ul className="text-base space-y-2.5 text-steel">
-      {items.map((item, index) => (
+      {items?.map((item, index) => (
         <li key={index} className="flex items-center gap-2">
           {iconMap[item.icon] || iconMap["default-check"]}
           {item.item}
@@ -39,7 +39,7 @@ const IncludedInRentalList = ({ items, deposit }) => (
 
 const RequirementsList = ({ items }) => (
   <ul className="text-base space-y-2.5 text-steel">
-    {items.map((req, index) => (
+    {items?.map((req, index) => (
       <li key={index} className="flex items-center gap-2">
         {iconMap[req.icon]}
         {req.item}
@@ -74,30 +74,12 @@ const MotorcyclePageSkeleton = () => (
   </div>
 );
 
-const staticCommonData = {
-  requirements: [
-    { item: "Identity card or Valid Passport", icon: "id-card" },
-    { item: "Driving license: category A1 or B if driver is 25+ years old", icon: "license" },
-    { item: "Credit or debit card for security deposit", icon: "credit-card" },
-    { item: "Adequate riding experience", icon: "experience" },
-  ],
-  included: [
-    { item: "All taxes (VAT 23%)", icon: "tax" },
-    { item: "CDW & TP - Damages and theft insurance", icon: "shield" },
-    { item: "Third party insurance", icon: "users" },
-    { item: "Road assistance", icon: "road" },
-    { item: "Unlimited mileage", icon: "infinity" },
-    { item: "Driver helmet - Jet Type", icon: "helmet" },
-    { item: "Locker", icon: "lock" },
-  ],
-};
-
 function MotorcyclePage() {
   const { slug } = useParams();
   const [selectedExtras, setSelectedExtras] = useState({});
 
   const {
-    data: bike,
+    data,
     isLoading: isLoadingBike,
     error: bikeError,
   } = useQuery({
@@ -129,6 +111,8 @@ function MotorcyclePage() {
     );
   }
 
+  const { bike, commonData } = data || {};
+
   return (
     <div className="container mx-auto px-4 py-12">
       <Link to="/" className="text-steel hover:text-cloud mb-8 inline-block font-semibold">
@@ -138,22 +122,19 @@ function MotorcyclePage() {
       <div className="grid grid-cols-1 md:grid-cols-5 gap-x-12 gap-y-10">
         <div className="md:col-span-3">
           <div className="w-full aspect-video mb-12">
-            <ImageCarousel images={bike.image_urls} />
+            <ImageCarousel images={bike?.image_urls} />
           </div>
           <div className="space-y-2">
-            {bike.technical_features?.length > 0 && (
+            {bike?.technical_features?.length > 0 && (
               <AccordionItem title="Technical Features">
                 <TechnicalFeaturesList features={bike.technical_features} />
               </AccordionItem>
             )}
             <AccordionItem title="Included in Rental">
-              <IncludedInRentalList
-                items={staticCommonData.included}
-                deposit={bike.security_deposit}
-              />
+              <IncludedInRentalList items={commonData?.included} deposit={bike?.security_deposit} />
             </AccordionItem>
             <AccordionItem title="Requirements">
-              <RequirementsList items={staticCommonData.requirements} />
+              <RequirementsList items={commonData?.requirements} />
             </AccordionItem>
           </div>
         </div>
@@ -161,8 +142,8 @@ function MotorcyclePage() {
         <div className="md:col-span-2">
           <div className="sticky top-24 space-y-6">
             <div>
-              <h1 className="text-4xl font-extrabold text-cloud tracking-tight">{bike.name}</h1>
-              <p className="mt-4 text-space">{bike.description}</p>
+              <h1 className="text-4xl font-extrabold text-cloud tracking-tight">{bike?.name}</h1>
+              <p className="mt-4 text-space">{bike?.description}</p>
             </div>
 
             <ExtrasSelector
@@ -171,7 +152,7 @@ function MotorcyclePage() {
               onExtrasChange={setSelectedExtras}
             />
 
-            <BookingWidget bike={bike} selectedExtras={selectedExtras} />
+            {bike && <BookingWidget bike={bike} selectedExtras={selectedExtras} />}
           </div>
         </div>
       </div>

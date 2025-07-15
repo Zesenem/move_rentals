@@ -27,18 +27,47 @@ function mapApiProductToAppProduct(apiProduct) {
     };
 };
 
+const fetchStaticData = async () => {
+    try {
+        const response = await fetch('/db.json');
+        if (!response.ok) throw new Error('Could not fetch the static data file.');
+        return await response.json();
+    } catch (error) {
+        console.error("Failed to fetch db.json:", error);
+        throw error;
+    }
+};
+
 export const fetchProducts = async () => {
     try {
         if (!MOTORCYCLE_CATEGORY_ID || MOTORCYCLE_CATEGORY_ID === 'replace-with-your-motorcycle-category-id') {
             throw new Error("Motorcycle Category ID is not set in twice.js");
         }
-        const response = await fetch(`${API_BASE_URL}/products?categories=${MOTORCYCLE_CATEGORY_ID}`, { headers: twiceHeaders });
-        if (!response.ok) {
-            const errorData = await response.json();
+
+        const [apiResponse, staticData] = await Promise.all([
+            fetch(`${API_BASE_URL}/products?categories=${MOTORCYCLE_CATEGORY_ID}`, { headers: twiceHeaders }),
+            fetchStaticData()
+        ]);
+
+        if (!apiResponse.ok) {
+            const errorData = await apiResponse.json();
             throw new Error(errorData.error?.message || 'Failed to fetch products.');
         }
-        const paginatedResponse = await response.json();
-        return paginatedResponse.data.map(mapApiProductToAppProduct);
+
+        const paginatedResponse = await apiResponse.json();
+        const liveProducts = paginatedResponse.data.map(mapApiProductToAppProduct);
+
+        const staticMotorcycles = staticData.motorcycles_static_data;
+
+        return liveProducts.map(liveProduct => {
+            const staticInfo = staticMotorcycles.find(p => p.id === liveProduct.id);
+            return {
+                ...liveProduct,
+                badges: staticInfo?.badges || [],
+                quick_glance: staticInfo?.quick_glance || [],
+            };
+        });
+
     } catch (error) {
         console.error("Error in fetchProducts:", error);
         throw error;
@@ -63,12 +92,27 @@ export const fetchExtras = async () => {
 export const fetchProductBySlug = async (slug) => {
     if (!slug) throw new Error("A product slug must be provided.");
     try {
-        const allMotorcycles = await fetchProducts();
-        const bike = allMotorcycles.find(p => p.slug === slug);
-        if (!bike) {
-            throw new Error("Motorcycle not found by slug");
+        const [productResponse, staticData] = await Promise.all([
+            fetch(`${API_BASE_URL}/products/${slug}`, { headers: twiceHeaders }),
+            fetchStaticData()
+        ]);
+        
+        if (!productResponse.ok) {
+            throw new Error("Motorcycle not found by slug or ID");
         }
-        return bike;
+        const productData = await productResponse.json();
+        const bike = mapApiProductToAppProduct(productData);
+
+        const staticInfo = staticData.motorcycles_static_data.find(p => p.id === bike.id);
+
+        return {
+            bike: {
+                ...bike,
+                badges: staticInfo?.badges || [],
+                quick_glance: staticInfo?.quick_glance || [],
+            },
+            commonData: staticData.common_data,
+        };
     } catch (error) {
         console.error(`Error in fetchProductBySlug for slug: ${slug}`, error);
         throw error;
