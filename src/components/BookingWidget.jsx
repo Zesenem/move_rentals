@@ -48,7 +48,7 @@ const PriceBreakdown = ({ basePricePerDay, numberOfDays, extrasPrice, totalPrice
 function BookingWidget({ bike, selectedExtras }) {
   const [range, setRange] = useState();
   const [isAdded, setIsAdded] = useState(false);
-  const [pickupTime, setPickupTime] = useState('10:00'); // Default pickup time
+  const [pickupTime, setPickupTime] = useState('10:00'); 
 
   const { items: cartItems, addItem: addItemToCart } = useCartStore();
 
@@ -99,11 +99,10 @@ function BookingWidget({ bike, selectedExtras }) {
   const isInCart = bookingId ? cartItems.some((item) => item.id === bookingId) : false;
 
   const handleAddToCart = useCallback(() => {
-    // Frontend validation for time range (can also be validated by 'min'/'max' attributes)
     const [hours, minutes] = pickupTime.split(':').map(Number);
     const totalMinutes = hours * 60 + minutes;
-    const minMinutes = 8 * 60; // 8:00 AM
-    const maxMinutes = 18 * 60 + 30; // 6:30 PM
+    const minMinutes = 8 * 60; 
+    const maxMinutes = 18 * 60 + 30; 
 
     if (totalMinutes < minMinutes || totalMinutes > maxMinutes) {
         alert("Please select a pickup time between 8:00 AM and 6:30 PM.");
@@ -131,7 +130,6 @@ function BookingWidget({ bike, selectedExtras }) {
     setIsAdded(true);
   }, [bookingId, bike, numberOfDays, totalPrice, selectedExtras, addItemToCart, range, pickupTime]);
 
-  // Calendar footer text
   let footerText = "Please select the first day of your rental.";
   if (range?.from) {
     footerText = range.to
@@ -207,7 +205,6 @@ function BookingWidget({ bike, selectedExtras }) {
         />
       </div>
 
-      {/* --- REVISED: Pickup Time Input with Restrictions and Styling --- */}
       {range?.from && (
         <div className="mt-6 border-t border-graphite/50 pt-6">
           <h3 className="mb-4 text-lg font-bold text-cloud">Select Pickup Time</h3>
@@ -221,9 +218,8 @@ function BookingWidget({ bike, selectedExtras }) {
                 id="pickupTime"
                 value={pickupTime}
                 onChange={(e) => setPickupTime(e.target.value)}
-                // --- NEW: Time Restrictions (min/max) and Consistent Styling ---
-                min="08:00" // 8:00 AM
-                max="18:30" // 6:30 PM
+                min="08:00"
+                max="18:30" 
                 className="w-full rounded-md border border-graphite/50 bg-dark-arsenic px-3 py-2 text-cloud focus:border-green-400 focus:ring focus:ring-green-400 focus:ring-opacity-50"
                 required
               />

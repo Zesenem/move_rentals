@@ -1,27 +1,15 @@
 import { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom"; // Import useNavigate
 import { FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
 import { useCartStore } from "../store/cartStore";
 import Logo from "./Logo";
 import Button from "./Button";
 
-const navItems = [
-  {
-    // to our fleet
-    name: "Our Fleet",
-    to:"/",
-    type: "action",
-
-    action: () => document.getElementById("fleet-section")?.scrollIntoView({ behavior: "smooth" }),
-  },
-
-  { name: "Contact", to: "/contact" },
-];
-
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const itemCount = useCartStore((state) => state.getItemCount());
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -41,13 +29,37 @@ function Header() {
     if (action) action();
   };
 
+  // Modified handleOurFleetClick function
+  const handleOurFleetClick = () => {
+    closeMenu(); // Close the mobile menu if open
+    if (window.location.pathname !== "/") {
+      // If not on the home page, navigate to home and then scroll
+      navigate("/");
+      // Use a timeout to allow the navigation to complete before scrolling
+      setTimeout(() => {
+        document.getElementById("fleet-section")?.scrollIntoView({ behavior: "smooth" });
+      }, 100); // A small delay is usually sufficient
+    } else {
+      // If already on the home page, just scroll
+      document.getElementById("fleet-section")?.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const navItems = [
+    {
+      name: "Our Fleet",
+      onClick: handleOurFleetClick, // Use onClick instead of action type
+    },
+    { name: "Contact", to: "/contact" },
+  ];
+
   const NavLinks = () => (
     <>
       {navItems.map((item) =>
-        item.type === "action" ? (
+        item.onClick ? ( // Check for onClick property
           <button
             key={item.name}
-            onClick={() => closeMenu(item.action)}
+            onClick={item.onClick} // Call the onClick handler
             className="rounded-md px-3 py-2 font-semibold text-steel transition-colors duration-300 hover:bg-arsenic"
           >
             {item.name}
