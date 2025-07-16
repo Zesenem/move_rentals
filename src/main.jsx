@@ -24,6 +24,7 @@ import ContactPage from "./pages/ContactPage.jsx";
 
 import "./index.css";
 
+// --- Sentry Initialization ---
 Sentry.init({
   dsn: "https://63e09e83dc19c7365dd42385009bc409@o4509673502736384.ingest.de.sentry.io/4509673504505936",
   integrations: [
@@ -42,49 +43,28 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
 });
 
+// --- TanStack Query Client ---
 const queryClient = new QueryClient();
 
+// --- React Router ---
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
     children: [
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: "motorcycle/:slug",
-        element: <MotorcyclePage />,
-      },
-      {
-        path: "checkout",
-        element: <CheckoutPage />,
-      },
-      {
-        path: "booking-success/:orderId",
-        element: <BookingSuccessPage />,
-      },
-      {
-        path: "terms-and-conditions",
-        element: <TermsPage />,
-      },
-      {
-        path: "privacy-policy",
-        element: <PrivacyPolicyPage />,
-      },
-      {
-        path: "contact",
-        element: <ContactPage />,
-      },
-      {
-        path: "*",
-        element: <NotFoundPage />,
-      },
+      { index: true, element: <HomePage /> },
+      { path: "motorcycle/:slug", element: <MotorcyclePage /> },
+      { path: "checkout", element: <CheckoutPage /> },
+      { path: "booking-success/:orderId", element: <BookingSuccessPage /> },
+      { path: "terms-and-conditions", element: <TermsPage /> },
+      { path: "privacy-policy", element: <PrivacyPolicyPage /> },
+      { path: "contact", element: <ContactPage /> },
+      { path: "*", element: <NotFoundPage /> },
     ],
   },
 ]);
 
+// --- App Rendering ---
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <HelmetProvider>

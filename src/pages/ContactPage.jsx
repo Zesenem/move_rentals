@@ -1,23 +1,70 @@
 import { Helmet } from 'react-helmet-async';
 import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt } from 'react-icons/fa';
 
-const ContactInfoCard = ({ icon, title, children }) => {
-    const IconComponent = icon;
-    return (
-        <div className="bg-arsenic p-6 rounded-lg flex items-start gap-4">
-            <IconComponent className="text-cloud text-2xl mt-1 flex-shrink-0" />
-            <div>
-                <h3 className="text-xl font-bold text-cloud">{title}</h3>
-                <div className="text-space mt-1">{children}</div>
-            </div>
+const ContactInfoCard = ({ icon: Icon, title, children }) => (
+    <div className="flex items-start gap-4 rounded-lg bg-arsenic p-6">
+        <Icon className="mt-1 text-2xl text-cloud flex-shrink-0" />
+        <div>
+            <h3 className="text-xl font-bold text-cloud">{title}</h3>
+            <div className="mt-1 text-space">{children}</div>
         </div>
-    );
+    </div>
+);
+
+const contactInfo = {
+    address: "Rua Carlos Reis 63, Lisboa, Portugal",
+    phone: "+351 920 016 794",
+    email: "move@move-rentals.com",
+    get whatsappUrl() {
+        return `https://wa.me/${this.phone.replace(/\s/g, "")}`;
+    },
+    get directionsUrl() {
+        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(this.address)}`;
+    },
 };
 
 function ContactPage() {
-    const address = "Rua Carlos Reis 63, Lisboa";
-    const mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(address)}`;
-    const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;  
+    const embedMapUrl = `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${encodeURIComponent(contactInfo.address)}`;
+
+    const contactMethods = [
+        {
+            icon: FaMapMarkerAlt,
+            title: "Our Location",
+            content: (
+                <>
+                    <p>{contactInfo.address}</p>
+                    <a href={contactInfo.directionsUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-emerald-400 hover:underline">
+                        Get Directions
+                    </a>
+                </>
+            ),
+        },
+        {
+            icon: FaWhatsapp,
+            title: "WhatsApp",
+            content: (
+                <>
+                    <p>{contactInfo.phone}</p>
+                    <a href={contactInfo.whatsappUrl} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-emerald-400 hover:underline">
+                        Send a Message
+                    </a>
+                </>
+            ),
+        },
+        {
+            icon: FaEnvelope,
+            title: "Email",
+            content: (
+                <>
+                    <p>{contactInfo.email}</p>
+                    <a href={`mailto:${contactInfo.email}`} className="mt-2 inline-block text-emerald-400 hover:underline">
+                        Send an Email
+                    </a>
+                </>
+            ),
+        },
+    ];
 
     return (
         <>
@@ -26,36 +73,23 @@ function ContactPage() {
                 <meta name="description" content="Get in touch with Move Rentals. Find our address, contact details, and location in Lisbon." />
             </Helmet>
             <div className="container mx-auto px-4 py-12">
-                <div className="max-w-4xl mx-auto">
-                    <h1 className="text-4xl sm:text-5xl font-extrabold text-cloud mb-8 text-center">Contact Us</h1>
-                    <p className="text-center text-lg text-space mb-12">
+                <div className="mx-auto max-w-4xl">
+                    <h1 className="mb-8 text-center text-4xl font-extrabold text-cloud sm:text-5xl">Contact Us</h1>
+                    <p className="mb-12 text-center text-lg text-space">
                         Have a question or need assistance? We're here to help.
                     </p>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                        <ContactInfoCard icon={FaMapMarkerAlt} title="Our Location">
-                            <p>{address}</p>
-                            <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline mt-2 inline-block">
-                                Get Directions
-                            </a>
-                        </ContactInfoCard>
-                        <ContactInfoCard icon={FaWhatsapp} title="WhatsApp">
-                            <p>+351 920 016 794</p>
-                            <a href="https://wa.me/351920016794" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:underline mt-2 inline-block">
-                                Send a Message
-                            </a>
-                        </ContactInfoCard>
-                        <ContactInfoCard icon={FaEnvelope} title="Email">
-                            <p>move@move-rentals.com</p>
-                             <a href="mailto:move@move-rentals.com" className="text-emerald-400 hover:underline mt-2 inline-block">
-                                Send an Email
-                            </a>
-                        </ContactInfoCard>
+                    <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+                        {contactMethods.map((method) => (
+                            <ContactInfoCard key={method.title} icon={method.icon} title={method.title}>
+                                {method.content}
+                            </ContactInfoCard>
+                        ))}
                     </div>
 
-                    <div className="w-full aspect-video rounded-lg overflow-hidden border-2 border-graphite/50">
+                    <div className="aspect-video w-full overflow-hidden rounded-lg border-2 border-graphite/50">
                         <iframe
-                            src={`https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${encodeURIComponent(address)}`}
+                            src={embedMapUrl}
                             width="100%"
                             height="100%"
                             style={{ border: 0 }}

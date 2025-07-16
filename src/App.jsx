@@ -6,14 +6,12 @@ function App() {
   return (
     <>
       <ScrollRestoration />
-      <div className="bg-phantom">
-        <div className="flex flex-col min-h-screen font-sans">
-          <Header />
-          <main className="flex-grow">
-            <Outlet />
-          </main>
-          <Footer />
-        </div>
+      <div className="flex min-h-screen flex-col bg-phantom font-sans">
+        <Header />
+        <main className="flex-grow">
+          <Outlet />
+        </main>
+        <Footer />
       </div>
     </>
   );
