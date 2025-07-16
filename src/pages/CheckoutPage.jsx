@@ -97,7 +97,6 @@ function CheckoutPage() {
     mutate: fetchRevolutOrderToken,
     isPending: isFetchingRevolutToken,
     error: fetchRevolutTokenError,
-    reset: resetRevolutTokenMutation,
     data: revolutTokenData, // Contains { orderToken, orderId }
   } = useMutation({
     mutationFn: createRevolutOrderToken,
@@ -111,24 +110,16 @@ function CheckoutPage() {
   });
 
   // --- Effect to fetch the Revolut token when conditions are met ---
-  // This is the key part that was fixed to prevent the infinite loop.
+  // THIS IS THE CORRECTED PART
   useEffect(() => {
-    // Only act if Revolut card payment is selected
+    // Only try to fetch if Revolut is the selected method
     if (paymentMethod === "revolut") {
-      // Fetch a new token ONLY if we don't have one, aren't fetching, there's no error, and the cart is not empty.
-      if (!revolutOrderToken && !isFetchingRevolutToken && !fetchRevolutTokenError && total > 0) {
+      // And if we don't already have a token, aren't fetching one, and the cart isn't empty.
+      if (!revolutOrderToken && !isFetchingRevolutToken && total > 0) {
         fetchRevolutOrderToken({ amount: total, currency: "EUR" });
       }
-    } else {
-      // If switching away from Revolut, clear the token and reset any errors.
-      setRevolutOrderToken(null);
-      if (fetchRevolutTokenError) {
-        resetRevolutTokenMutation();
-      }
     }
-    // The dependency array now contains only stable values. The effect will only re-run
-    // when these specific values change, not on every render.
-  }, [paymentMethod, total, revolutOrderToken, isFetchingRevolutToken, fetchRevolutTokenError, fetchRevolutOrderToken, resetRevolutTokenMutation]);
+  }, [paymentMethod, total]); // The dependency array is now simple and correct
 
 
   // --- Mutation to submit the final order after successful payment ---
@@ -144,14 +135,12 @@ function CheckoutPage() {
     },
     onError: (error) => {
       console.error("Order or Payment failed:", error);
-      // In a real app, you might use a more elegant notification system
       alert(`Booking failed: ${error.message || "Please try again."}`);
     },
   });
 
   // --- Callbacks for the RevolutCardField component ---
   const handlePaymentSuccess = useCallback((revolutPaymentResult) => {
-    // This function is called by the RevolutCardField upon successful payment authorization.
     submitOrderAndPayment({
       cartItems: items,
       customerDetails,
@@ -159,7 +148,7 @@ function CheckoutPage() {
       revolutPaymentStatus: revolutPaymentResult.status,
       totalAmount: total,
       currency: "EUR",
-      revolutOrderId: revolutTokenData?.orderId, // Get the orderId from the initial token fetch
+      revolutOrderId: revolutTokenData?.orderId,
     });
   }, [submitOrderAndPayment, items, customerDetails, total, revolutTokenData]);
 
@@ -184,26 +173,22 @@ function CheckoutPage() {
     if (!validateForm()) return;
 
     if (paymentMethod === "revolut") {
-        // Check if the card field is ready and we have a token
       if (!revolutOrderToken || !revolutCardRef.current?.isReady) {
         alert("Revolut payment is not ready. Please wait.");
         return;
       }
-      // Trigger the submit method on the RevolutCardField component
       try {
         await revolutCardRef.current.submit(customerDetails);
       } catch (error) {
         handlePaymentError(error);
       }
     }
-    
+
     if (paymentMethod === "mbway") {
-      // TODO: Implement MB Way payment logic
       console.log("Submitting with MB WAY...");
-      // Example: submitOrderAndPayment({ cartItems, customerDetails, paymentMethod: 'mbway', ... });
     }
   };
-  
+
   const handleCustomerDetailsChange = (e) => {
     const { id, value } = e.target;
     setCustomerDetails(prev => ({ ...prev, [id]: value }));
@@ -235,7 +220,6 @@ function CheckoutPage() {
       <form onSubmit={handleFormSubmit} noValidate>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-6">
-            {/* Cart Items Section */}
             <div className="bg-arsenic p-6 rounded-lg">
               <h2 className="text-2xl font-bold text-cloud mb-4">Your Items</h2>
               <ul className="space-y-4">
@@ -245,7 +229,6 @@ function CheckoutPage() {
               </ul>
             </div>
 
-            {/* Customer Details Section */}
             <div className="bg-arsenic p-6 rounded-lg">
               <h2 className="text-2xl font-bold text-cloud mb-4">Your Details</h2>
               <div className="space-y-4">
@@ -284,8 +267,6 @@ function CheckoutPage() {
               </div>
             </div>
           </div>
-
-          {/* Order Summary and Payment Section */}
           <div className="lg:col-span-1">
             <div className="bg-arsenic p-6 rounded-lg sticky top-24">
               <h2 className="text-2xl font-bold text-cloud border-b border-graphite/50 pb-4 mb-4">
@@ -314,7 +295,6 @@ function CheckoutPage() {
                     </button>
                 </div>
 
-                {/* Dynamic Payment Method Area */}
                 <div className="pt-4 min-h-[100px]">
                   {paymentMethod === "revolut" && (
                     <>

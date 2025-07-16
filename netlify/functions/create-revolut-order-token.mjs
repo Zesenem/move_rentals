@@ -1,6 +1,10 @@
 export const handler = async (event) => {
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
+    return {
+      statusCode: 405,
+      body: JSON.stringify({ message: "Method Not Allowed" }),
+      headers: { 'Allow': 'POST' }
+    };
   }
 
   const { amount, currency } = JSON.parse(event.body);
@@ -58,6 +62,10 @@ export const handler = async (event) => {
     const orderData = await response.json();
     return {
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*', // For production, you should restrict this to your domain
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
       body: JSON.stringify({ orderToken: orderData.token, orderId: orderData.id }),
     };
   } catch (error) {

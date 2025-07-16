@@ -11,9 +11,8 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://merchant.revolut.com https://checkout.revolut.com http://localhost:5173 http://localhost:8888; script-src-elem 'self' 'unsafe-inline' https://merchant.revolut.com https://checkout.revolut.com http://localhost:5173 http://localhost:8888; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.twicecommerce.com https://*.revolut.com https://*.revolut.codes https://*.sentry.io http://localhost:5173 ws://localhost:5173 http://localhost:8888; frame-src 'self' https://checkout.revolut.com https://*.revolut.codes https://www.google.com; img-src 'self' data: https://images.twicecommerce.com https://firebasestorage.googleapis.com https://purecatamphetamine.github.io; form-action 'self'; base-uri 'self'; object-src 'none'; worker-src 'self' blob:;"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' *.revolut.com *.revolut.codes; style-src 'self' 'unsafe-inline' *.revolut.com *.revolut.codes https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' *.revolut.com *.revolut.codes; connect-src 'self' *.revolut.com *.revolut.codes; img-src 'self' data: https://images.twicecommerce.com https://firebasestorage.googleapis.com https://purecatamphetamine.github.io; form-action 'self'; base-uri 'self'; object-src 'none'; worker-src 'self' blob:;"
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(self)"
-
