@@ -84,7 +84,7 @@ function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState("revolut");
   const [formErrors, setFormErrors] = useState({});
   const [customerDetails, setCustomerDetails] = useState({ firstName: "", lastName: "", email: "", phone: "" });
-  const [revolutPublicId, setRevolutPublicId] = useState(null); // Renamed from revolutOrderToken
+  const [revolutPublicId, setRevolutPublicId] = useState(null);
 
   const {
     mutate: fetchRevolutOrder,
@@ -94,16 +94,14 @@ function CheckoutPage() {
   } = useMutation({
     mutationFn: createRevolutOrderToken,
     onSuccess: (data) => {
-      setRevolutPublicId(data.publicId); // Set the correct ID
+      setRevolutPublicId(data.publicId);
     },
     onError: (error) => {
       console.error("Error fetching Revolut order:", error);
     },
   });
 
-  // --- The Second Critical Fix ---
   useEffect(() => {
-    // We add a guard to only fetch when the total is greater than 0
     if (paymentMethod === "revolut" && total > 0 && !revolutPublicId && !isFetchingOrder) {
       fetchRevolutOrder({ amount: total, currency: "EUR" });
     }
@@ -141,7 +139,6 @@ function CheckoutPage() {
   }, []);
 
   const validateForm = () => {
-    // ... (validation logic remains the same)
     const errors = {};
     if (!customerDetails.firstName.trim()) errors.firstName = "First name is required";
     if (!customerDetails.lastName.trim()) errors.lastName = "Last name is required";
@@ -151,13 +148,27 @@ function CheckoutPage() {
     return Object.keys(errors).length === 0;
   };
 
+  // --- THIS IS THE ONLY FUNCTION THAT NEEDS TO BE REPLACED ---
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+
     if (paymentMethod === "revolut" && revolutCardRef.current) {
-        revolutCardRef.current.submit(customerDetails);
+      // Create the payload Revolut expects
+      const revolutPayload = {
+        // Combine firstName and lastName into a single `name` field
+        name: `${customerDetails.firstName} ${customerDetails.lastName}`,
+        email: customerDetails.email,
+        phone: customerDetails.phone,
+      };
+      
+      // Submit the combined payload
+      revolutCardRef.current.submit(revolutPayload);
     }
-    // ... (other payment methods)
+    
+    if (paymentMethod === "mbway") {
+        // Handle MB WAY submission if necessary
+    }
   };
   
   const handleCustomerDetailsChange = (e) => {
@@ -168,7 +179,7 @@ function CheckoutPage() {
   const handlePhoneChange = (phone) => {
     setCustomerDetails(prev => ({ ...prev, phone }));
   };
-
+  
   const paymentSelectorClasses = (method) =>
     `flex items-center justify-center gap-2 p-3 rounded-md transition-all font-semibold w-full ${
       paymentMethod === method
@@ -180,10 +191,8 @@ function CheckoutPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-extrabold text-steel mb-8">Review Your Rental</h1>
-      {/* The rest of the JSX remains the same, just update the RevolutCardField props */}
       <form onSubmit={handleFormSubmit} noValidate>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Item list and customer details sections are unchanged */}
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-arsenic p-6 rounded-lg">
               <h2 className="text-2xl font-bold text-cloud mb-4">Your Items</h2>
@@ -267,7 +276,7 @@ function CheckoutPage() {
                       {revolutPublicId && (
                         <RevolutCardField
                           ref={revolutCardRef}
-                          publicId={revolutPublicId} // Pass publicId instead of orderToken
+                          publicId={revolutPublicId}
                           onPaymentSuccess={handlePaymentSuccess}
                           onPaymentError={handlePaymentError}
                         />

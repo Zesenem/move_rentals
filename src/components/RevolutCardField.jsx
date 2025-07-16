@@ -1,6 +1,27 @@
 import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
 import RevolutCheckout from '@revolut/checkout';
 
+// Style object to match your site's dark theme
+// Colors are from your tailwind.config.js (phantom, graphite, cloud, etc.)
+const cardStyles = {
+  base: {
+    backgroundColor: '#1E2A3A', // phantom
+    color: '#D0D4DB',           // cloud
+    '::placeholder': {
+      color: '#6B7280',         // space (approximated)
+    },
+    borderColor: '#394B59',      // graphite
+  },
+  focus: {
+    borderColor: '#D0D4DB',      // cloud
+  },
+  error: {
+    color: '#F87171',            // A standard red for errors
+    borderColor: '#F87171',
+  },
+};
+
+
 const RevolutCardField = forwardRef(({ publicId, onPaymentSuccess, onPaymentError }, ref) => {
   const cardFieldContainerRef = useRef(null);
   const cardFieldInstanceRef = useRef(null);
@@ -11,12 +32,16 @@ const RevolutCardField = forwardRef(({ publicId, onPaymentSuccess, onPaymentErro
     if (publicId && cardFieldContainerRef.current) {
       setError(null);
       setIsReady(false);
+
       RevolutCheckout(publicId)
         .then((instance) => {
           if (!cardFieldContainerRef.current) return;
 
           const cardField = instance.createCardField({
             target: cardFieldContainerRef.current,
+            // --- THIS IS THE NEW PART ---
+            // We pass the custom style object here
+            styles: cardStyles,
             onSuccess(paymentResult) {
               onPaymentSuccess(paymentResult);
             },
