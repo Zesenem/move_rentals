@@ -11,7 +11,7 @@ export const handler = async (event) => {
   const { REVOLUT_SECRET_KEY, REVOLUT_ENV } = process.env;
 
   const REVOLUT_API_URL =
-    REVOLUT_ENV === "sandbox"
+    REVOLUT_ENV === "merchant"
       ? "https://sandbox-merchant.revolut.com/api/1.0"
       : "https://merchant.revolut.com/api/1.0";
 
