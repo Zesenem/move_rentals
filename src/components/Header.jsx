@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { FaWhatsapp, FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
+import { FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
 import { useCartStore } from "../store/cartStore";
 import Logo from "./Logo";
 import Button from "./Button";
 
 const navItems = [
-  { name: "Our Fleet", to: "/" },
   {
-    name: "About Us",
+    // to our fleet
+    name: "Our Fleet",
+    to:"/",
     type: "action",
-    action: () => document.getElementById("footer-section")?.scrollIntoView({ behavior: "smooth" }),
+
+    action: () => document.getElementById("fleet-section")?.scrollIntoView({ behavior: "smooth" }),
   },
+
   { name: "Contact", to: "/contact" },
 ];
 
@@ -81,7 +84,6 @@ function Header() {
           </span>
         )}
       </NavLink>
-      
     </>
   );
 
