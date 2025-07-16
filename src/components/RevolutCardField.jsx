@@ -8,14 +8,10 @@ const RevolutCardField = forwardRef(({ publicId, onPaymentSuccess, onPaymentErro
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Only run if we have a publicId and a div to mount into
     if (publicId && cardFieldContainerRef.current) {
       setError(null);
       setIsReady(false);
-
-      // --- The Third Critical Fix ---
-      // Initialize with an object { publicId }, not just the string
-      RevolutCheckout({ publicId })
+      RevolutCheckout(publicId)
         .then((instance) => {
           if (!cardFieldContainerRef.current) return;
 
