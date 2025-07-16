@@ -31,7 +31,7 @@ export const handler = async (event) => {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${REVOLUT_SECRET_KEY}`,
-        "Revolut-Api-Version": "2023-09-01",
+        "Revolut-Api-Version": "2023-09-01", 
       },
       body: JSON.stringify(revolutOrderPayload),
     });
@@ -46,12 +46,12 @@ export const handler = async (event) => {
       };
     }
 
-    // --- The Critical Fix ---
-    // The API returns 'public_id', not 'token'. We return this.
+    // --- The Correct Fix ---
+    // The API now returns 'token'. We use and return that.
     return {
       statusCode: 200,
       headers: { 'Access-Control-Allow-Origin': '*' },
-      body: JSON.stringify({ publicId: responseData.public_id, orderId: responseData.id }),
+      body: JSON.stringify({ token: responseData.token, orderId: responseData.id }),
     };
 
   } catch (error) {
