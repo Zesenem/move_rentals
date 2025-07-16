@@ -5,42 +5,40 @@ import RevolutCheckout from '@revolut/checkout';
 // Colors are from your tailwind.config.js (phantom, graphite, cloud, etc.)
 const cardStyles = {
   base: {
-    backgroundColor: '#1E2A3A', // phantom
-    color: '#D0D4DB',           // cloud
+    backgroundColor: '#1E2A3A', 
+    color: '#D0D4DB',          
     '::placeholder': {
-      color: '#6B7280',         // space (approximated)
+      color: '#6B7280',       
     },
-    borderColor: '#394B59',      // graphite
+    borderColor: '#394B59',    
   },
   focus: {
-    borderColor: '#D0D4DB',      // cloud
+    borderColor: '#D0D4DB',      
   },
   error: {
-    color: '#F87171',            // A standard red for errors
+    color: '#F87171',           
     borderColor: '#F87171',
   },
 };
 
 
-const RevolutCardField = forwardRef(({ publicId, onPaymentSuccess, onPaymentError }, ref) => {
+const RevolutCardField = forwardRef(({ orderToken, onPaymentSuccess, onPaymentError }, ref) => {
   const cardFieldContainerRef = useRef(null);
   const cardFieldInstanceRef = useRef(null);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (publicId && cardFieldContainerRef.current) {
+    if (orderToken && cardFieldContainerRef.current) {
       setError(null);
       setIsReady(false);
 
-      RevolutCheckout(publicId)
+      RevolutCheckout(orderToken)
         .then((instance) => {
           if (!cardFieldContainerRef.current) return;
 
           const cardField = instance.createCardField({
             target: cardFieldContainerRef.current,
-            // --- THIS IS THE NEW PART ---
-            // We pass the custom style object here
             styles: cardStyles,
             onSuccess(paymentResult) {
               onPaymentSuccess(paymentResult);
@@ -68,7 +66,7 @@ const RevolutCardField = forwardRef(({ publicId, onPaymentSuccess, onPaymentErro
         cardFieldInstanceRef.current.destroy();
       }
     };
-  }, [publicId, onPaymentSuccess, onPaymentError]);
+  }, [orderToken, onPaymentSuccess, onPaymentError]);
 
   useImperativeHandle(ref, () => ({
     submit: (customerDetails) => {
