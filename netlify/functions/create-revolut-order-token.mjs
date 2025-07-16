@@ -23,9 +23,10 @@ export const handler = async (event) => {
 
   const revolutOrderPayload = {
     amount: Math.round(amount * 100),
-    currency: currency,
+    currency,
     capture_mode: "AUTOMATIC",
     checkout_mode: "embedded",
+    return_url: "https://move-rentals.com/revolut-confirmation",
   };
 
   // ✅ LOG the payload you're about to send
@@ -63,7 +64,7 @@ export const handler = async (event) => {
       statusCode: 200,
       headers: { "Access-Control-Allow-Origin": "*" },
       body: JSON.stringify({
-        token: responseData.token, 
+        token: responseData.token,
         checkoutUrl: responseData.checkout_url,
         orderId: responseData.id,
       }),

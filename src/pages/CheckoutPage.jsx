@@ -11,7 +11,9 @@ import "react-phone-number-input/style.css";
 import MbWayIcon from "../components/icons/MbWayIcon";
 import RevolutCardField from "../components/RevolutCardField";
 
-// (Sub-components like CartItem and MbWayPayment remain the same)
+// Sub-components (CartItem, MbWayPayment) are assumed to be in separate files or defined here.
+// They are included for completeness and context.
+
 const CartItem = ({ item, onRemove }) => (
   <li className="flex flex-col sm:items-center justify-between bg-arsenic p-6 rounded-lg sm:flex-row gap-6">
     <div className="flex items-center">
@@ -37,6 +39,7 @@ const CartItem = ({ item, onRemove }) => (
     </div>
   </li>
 );
+
 const MbWayPayment = ({ phone, setPhone, error }) => (
   <div>
     <p className="text-center text-sm text-space mb-4">
@@ -77,7 +80,12 @@ function CheckoutPage() {
     email: "",
     phone: "",
   });
+
+  // --- MODIFICATION START ---
+  // States to hold either the embedded payment token or the fallback URL
   const [revolutOrderToken, setRevolutOrderToken] = useState(null);
+  const [checkoutUrl, setCheckoutUrl] = useState(null);
+  // --- MODIFICATION END ---
 
   const {
     mutate: fetchRevolutOrder,
@@ -86,46 +94,51 @@ function CheckoutPage() {
     data: revolutOrderData,
   } = useMutation({
     mutationFn: createRevolutOrderToken,
+    // --- MODIFICATION START ---
+    // Update onSuccess to handle both token and checkoutUrl responses
     onSuccess: (data) => {
       console.log("✅ Received revolut order token response:", data);
-
-      setRevolutOrderToken(data.token);
+      if (data.token) {
+        setRevolutOrderToken(data.token);
+        setCheckoutUrl(null); // Ensure fallback URL is cleared
+      } else if (data.checkoutUrl) {
+        setCheckoutUrl(data.checkoutUrl);
+        setRevolutOrderToken(null); // Ensure token is cleared
+      } else {
+        console.warn("⚠️ Neither token nor checkoutUrl was returned from the API.");
+      }
     },
+    // --- MODIFICATION END ---
     onError: (error) => {
-      console.error("Error fetching Revolut order:", error);
+      console.error("❌ Error fetching Revolut order:", error);
     },
   });
 
   const orderRequestedRef = useRef(false);
 
   useEffect(() => {
+    // This effect triggers the API call to get a payment token/URL
     if (
       paymentMethod === "revolut" &&
       total > 0 &&
       !revolutOrderToken &&
+      !checkoutUrl && // Also check for checkoutUrl
       !isFetchingOrder &&
       !orderRequestedRef.current
     ) {
       orderRequestedRef.current = true;
       fetchRevolutOrder({ amount: total, currency: "EUR" });
     }
-  }, [paymentMethod, total, revolutOrderToken, isFetchingOrder, fetchRevolutOrder]);
+  }, [paymentMethod, total, revolutOrderToken, checkoutUrl, isFetchingOrder, fetchRevolutOrder]);
 
   useEffect(() => {
+    // This effect resets the payment details if the method or total changes
     if (paymentMethod !== "revolut" || total === 0) {
       orderRequestedRef.current = false;
       setRevolutOrderToken(null);
+      setCheckoutUrl(null); // Also reset the checkoutUrl
     }
   }, [paymentMethod, total]);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      if (!revolutOrderToken && paymentMethod === "revolut") {
-        console.warn("Token not received after 10s — user could retry manually.");
-      }
-    }, 10000);
-    return () => clearTimeout(timeout);
-  }, [revolutOrderToken, paymentMethod]);
 
   const { mutate: submitOrderAndPayment, isPending: isProcessingPaymentAndOrder } = useMutation({
     mutationFn: processRevolutPaymentAndOrder,
@@ -150,6 +163,7 @@ function CheckoutPage() {
   );
 
   const handlePaymentError = useCallback((error) => {
+    // Using a more robust way to show errors is recommended, but alert works for now
     alert(`Payment failed: ${error.message || "Please check your card details"}`);
   }, []);
 
@@ -168,8 +182,10 @@ function CheckoutPage() {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+    localStorage.setItem("customerDetails", JSON.stringify(customerDetails));
 
-    if (paymentMethod === "revolut" && revolutCardRef.current) {
+    // This form submission is only for the embedded card field flow
+    if (paymentMethod === "revolut" && revolutCardRef.current && revolutOrderToken) {
       const revolutPayload = {
         name: `${customerDetails.firstName} ${customerDetails.lastName}`,
         email: customerDetails.email,
@@ -177,9 +193,18 @@ function CheckoutPage() {
       };
       revolutCardRef.current.submit(revolutPayload);
     }
+    // Note: The redirect flow is handled by its own button, not the main form submit
   };
 
-  // ... (rest of the component, no other changes needed)
+  // --- MODIFICATION START ---
+  // Handler for the redirect fallback button
+  const handleRedirectToRevolut = () => {
+    if (checkoutUrl) {
+      window.location.href = checkoutUrl;
+    }
+  };
+  // --- MODIFICATION END ---
+
   const handleCustomerDetailsChange = (e) => {
     const { id, value } = e.target;
     setCustomerDetails((prev) => ({ ...prev, [id]: value }));
@@ -211,6 +236,7 @@ function CheckoutPage() {
             <div className="bg-arsenic p-6 rounded-lg">
               <h2 className="text-2xl font-bold text-cloud mb-4">Your Details</h2>
               <div className="space-y-4">
+                {/* Customer Details Form Fields... */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label
@@ -327,20 +353,46 @@ function CheckoutPage() {
                     <FaGoogle /> Google Pay
                   </button>
                 </div>
+
+                {/* --- MODIFICATION START --- */}
+                {/* This section now conditionally renders the correct payment UI */}
                 <div className="pt-4 min-h-[100px]">
                   {paymentMethod === "revolut" && (
                     <>
-                      {isFetchingOrder && <p className="text-center text-space">Initializing...</p>}
-                      {fetchOrderError && (
-                        <p className="text-center text-red-500">Could not load form.</p>
+                      {isFetchingOrder && (
+                        <p className="text-center text-space">Initializing Payment...</p>
                       )}
+
+                      {fetchOrderError && !checkoutUrl && (
+                        <p className="text-center text-red-500">
+                          Could not initialize payment. Please try again or select a different
+                          method.
+                        </p>
+                      )}
+
                       {revolutOrderToken && (
                         <RevolutCardField
                           ref={revolutCardRef}
-                          orderToken={revolutOrderToken} // Pass the correct token
+                          orderToken={revolutOrderToken}
                           onPaymentSuccess={handlePaymentSuccess}
                           onPaymentError={handlePaymentError}
                         />
+                      )}
+
+                      {checkoutUrl && !revolutOrderToken && (
+                        <div>
+                          <p className="text-center text-sm text-space mb-4">
+                            The embedded card form is unavailable. Please complete your payment on
+                            Revolut's secure page.
+                          </p>
+                          <Button
+                            type="button"
+                            onClick={handleRedirectToRevolut}
+                            className="w-full bg-purple-600 text-white hover:bg-purple-700"
+                          >
+                            Pay with Revolut
+                          </Button>
+                        </div>
                       )}
                     </>
                   )}
@@ -352,17 +404,30 @@ function CheckoutPage() {
                     />
                   )}
                 </div>
+                {/* --- MODIFICATION END --- */}
               </div>
-              <Button
-                type="submit"
-                disabled={
-                  isProcessingPaymentAndOrder ||
-                  (paymentMethod === "revolut" && (!revolutOrderToken || isFetchingOrder))
-                }
-                className="w-full mt-8 py-3 text-lg"
-              >
-                {isFetchingOrder ? "Initializing..." : "Pay & Confirm Booking"}
-              </Button>
+
+              {/* --- MODIFICATION START --- */}
+              {/* The main button is now hidden if the redirect flow is active, */}
+              {/* as that flow has its own button. */}
+              {!(paymentMethod === "revolut" && checkoutUrl) && (
+                <Button
+                  type="submit"
+                  disabled={
+                    isProcessingPaymentAndOrder ||
+                    isFetchingOrder ||
+                    (paymentMethod === "revolut" && !revolutOrderToken)
+                  }
+                  className="w-full mt-8 py-3 text-lg"
+                >
+                  {isFetchingOrder
+                    ? "Initializing..."
+                    : isProcessingPaymentAndOrder
+                    ? "Processing..."
+                    : "Pay & Confirm Booking"}
+                </Button>
+              )}
+              {/* --- MODIFICATION END --- */}
             </div>
           </div>
         </div>
