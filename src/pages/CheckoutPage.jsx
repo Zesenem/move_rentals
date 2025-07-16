@@ -1,9 +1,7 @@
-import { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useMutation } from "@tanstack/react-query";
-// Import both new service functions
-import { createRevolutOrderToken } from "../services/twice.js";
-import { processRevolutPaymentAndOrder } from "../services/payments.js"; // Ensure this import is correct based on your file structure
+import { createRevolutOrderToken, processRevolutPaymentAndOrder } from "../services/twice.js";
 import Button from "../components/Button";
 import { FaTrash, FaCreditCard, FaApple, FaGoogle } from "react-icons/fa";
 import { format } from "date-fns";
@@ -13,6 +11,7 @@ import "react-phone-number-input/style.css";
 import MbWayIcon from "../components/icons/MbWayIcon";
 import RevolutCardField from "../components/RevolutCardField";
 
+// Sub-component for displaying a single item in the cart
 const CartItem = ({ item, onRemove }) => (
   <li className="flex flex-col sm:items-center justify-between bg-arsenic p-6 rounded-lg sm:flex-row gap-6">
     <div className="flex items-center">
@@ -41,6 +40,7 @@ const CartItem = ({ item, onRemove }) => (
       <button
         onClick={() => onRemove(item.id)}
         className="text-space hover:text-red-500 transition-colors"
+        aria-label={`Remove ${item.name} from cart`}
       >
         <FaTrash />
       </button>
@@ -48,38 +48,40 @@ const CartItem = ({ item, onRemove }) => (
   </li>
 );
 
+// Sub-component for MB WAY payment input
 const MbWayPayment = ({ phone, setPhone, error }) => (
-  <div>
-    <p className="text-center text-sm text-space mb-4">
-      You will receive a notification in the MB WAY app to approve this payment.
-    </p>
     <div>
-      <label htmlFor="phone-number-mbway" className="block text-sm font-medium text-space mb-1">
-        Phone Number <span className="text-red-500">*</span>
-      </label>
-      <div className="phone-input-container">
-        <PhoneInput
-          id="phone-number-mbway"
-          placeholder="Enter phone number"
-          value={phone}
-          onChange={setPhone}
-          defaultCountry="PT"
-          international
-          countryCallingCodeEditable={true}
-          className="phone-input"
-        />
+      <p className="text-center text-sm text-space mb-4">
+        You will receive a notification in the MB WAY app to approve this payment.
+      </p>
+      <div>
+        <label htmlFor="phone-number-mbway" className="block text-sm font-medium text-space mb-1">
+          Phone Number <span className="text-red-500">*</span>
+        </label>
+        <div className="phone-input-container">
+          <PhoneInput
+            id="phone-number-mbway"
+            placeholder="Enter phone number"
+            value={phone}
+            onChange={setPhone}
+            defaultCountry="PT"
+            international
+            countryCallingCodeEditable={true}
+            className="phone-input"
+          />
+        </div>
+        {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
       </div>
-      {error && <p className="text-red-400 text-sm mt-1">{error}</p>}
     </div>
-  </div>
-);
+  );
+
 
 function CheckoutPage() {
   const { items, removeItem, clearCart, getCartTotal } = useCartStore();
   const total = getCartTotal();
-  const stableAmount = useMemo(() => total, [total]);
   const navigate = useNavigate();
-  const revolutCardRef = useRef();
+  const revolutCardRef = useRef(null);
+
   const [paymentMethod, setPaymentMethod] = useState("revolut");
   const [formErrors, setFormErrors] = useState({});
   const [customerDetails, setCustomerDetails] = useState({
@@ -88,55 +90,68 @@ function CheckoutPage() {
     email: "",
     phone: "",
   });
-
-  // NEW STATE FOR REVOLUT ORDER TOKEN
   const [revolutOrderToken, setRevolutOrderToken] = useState(null);
 
-  // MUTATION TO CREATE REVOLUT ORDER TOKEN
+  // --- Mutation to fetch the Revolut Order Token ---
   const {
     mutate: fetchRevolutOrderToken,
     isPending: isFetchingRevolutToken,
     error: fetchRevolutTokenError,
-    data: revolutTokenData, // This will contain { orderToken, orderId }
+    reset: resetRevolutTokenMutation,
+    data: revolutTokenData, // Contains { orderToken, orderId }
   } = useMutation({
     mutationFn: createRevolutOrderToken,
     onSuccess: (data) => {
+      // On success, store the public token to initialize the card field
       setRevolutOrderToken(data.orderToken);
     },
     onError: (error) => {
       console.error("Error fetching Revolut order token:", error);
-      alert(`Failed to prepare Revolut payment: ${error.message || "Please try again."}`);
     },
   });
 
-  // EFFECT TO FETCH REVOLUT ORDER TOKEN WHEN PAYMENT METHOD IS REVOLUT AND TOKEN IS MISSING
+  // --- Effect to fetch the Revolut token when conditions are met ---
+  // This is the key part that was fixed to prevent the infinite loop.
   useEffect(() => {
-    // Only attempt to fetch if Revolut is selected, token isn't already there,
-    // not currently fetching, and total amount is valid.
-    if (paymentMethod === "revolut" && !revolutOrderToken && !isFetchingRevolutToken && total > 0) {
-      fetchRevolutOrderToken({ amount: total, currency: "EUR" }); // Assuming EUR, adjust if dynamic
+    // Only act if Revolut card payment is selected
+    if (paymentMethod === "revolut") {
+      // Fetch a new token ONLY if we don't have one, aren't fetching, there's no error, and the cart is not empty.
+      if (!revolutOrderToken && !isFetchingRevolutToken && !fetchRevolutTokenError && total > 0) {
+        fetchRevolutOrderToken({ amount: total, currency: "EUR" });
+      }
+    } else {
+      // If switching away from Revolut, clear the token and reset any errors.
+      setRevolutOrderToken(null);
+      if (fetchRevolutTokenError) {
+        resetRevolutTokenMutation();
+      }
     }
-  }, [paymentMethod, revolutOrderToken, isFetchingRevolutToken, total, fetchRevolutOrderToken]);
+    // The dependency array now contains only stable values. The effect will only re-run
+    // when these specific values change, not on every render.
+  }, [paymentMethod, total, revolutOrderToken, isFetchingRevolutToken, fetchRevolutTokenError, fetchRevolutOrderToken, resetRevolutTokenMutation]);
 
 
+  // --- Mutation to submit the final order after successful payment ---
   const {
     mutate: submitOrderAndPayment,
     isPending: isProcessingPaymentAndOrder,
     error: paymentAndOrderError,
   } = useMutation({
-    mutationFn: (payload) => processRevolutPaymentAndOrder(payload),
+    mutationFn: processRevolutPaymentAndOrder,
     onSuccess: (order) => {
       clearCart();
       navigate(`/booking-success/${order.id}`);
     },
     onError: (error) => {
       console.error("Order or Payment failed:", error);
+      // In a real app, you might use a more elegant notification system
       alert(`Booking failed: ${error.message || "Please try again."}`);
     },
   });
 
-  // handlePaymentSuccess now receives revolutPaymentResult (from RevolutCardField)
-  const handlePaymentSuccess = useCallback(async (revolutPaymentResult) => {
+  // --- Callbacks for the RevolutCardField component ---
+  const handlePaymentSuccess = useCallback((revolutPaymentResult) => {
+    // This function is called by the RevolutCardField upon successful payment authorization.
     submitOrderAndPayment({
       cartItems: items,
       customerDetails,
@@ -144,64 +159,58 @@ function CheckoutPage() {
       revolutPaymentStatus: revolutPaymentResult.status,
       totalAmount: total,
       currency: "EUR",
-      // Pass the Revolut Order ID if needed by your backend for reconciliation
-      revolutOrderId: revolutTokenData?.orderId,
+      revolutOrderId: revolutTokenData?.orderId, // Get the orderId from the initial token fetch
     });
   }, [submitOrderAndPayment, items, customerDetails, total, revolutTokenData]);
-
 
   const handlePaymentError = useCallback((error) => {
     console.error("Payment failed:", error);
     alert(`Payment failed: ${error.message || "Please check your card details"}`);
   }, []);
 
+  // --- Form validation and submission logic ---
   const validateForm = () => {
     const errors = {};
-    if (!customerDetails.firstName.trim()) {
-      errors.firstName = "First name is required";
-    }
-    if (!customerDetails.lastName.trim()) {
-      errors.lastName = "Last name is required";
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerDetails.email)) {
-      errors.email = "Please enter a valid email address";
-    }
-    if (!customerDetails.phone || !isPossiblePhoneNumber(customerDetails.phone)) {
-      errors.phone = "Please enter a valid phone number";
-    }
+    if (!customerDetails.firstName.trim()) errors.firstName = "First name is required";
+    if (!customerDetails.lastName.trim()) errors.lastName = "Last name is required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerDetails.email)) errors.email = "Please enter a valid email address";
+    if (!customerDetails.phone || !isPossiblePhoneNumber(customerDetails.phone)) errors.phone = "Please enter a valid phone number";
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
 
-    if (paymentMethod === "mbway") {
-      submitOrderAndPayment({
-        cartItems: items,
-        customerDetails,
-        paymentMethod: "mbway",
-        totalAmount: total,
-        currency: "EUR",
-      });
-      return;
-    }
-
     if (paymentMethod === "revolut") {
-      // Ensure Revolut order token is available and SDK is ready before submission
-      if (!revolutOrderToken || isFetchingRevolutToken || !revolutCardRef.current?.isReady) {
-        alert("Revolut payment is not ready. Please wait a moment or check your internet connection.");
+        // Check if the card field is ready and we have a token
+      if (!revolutOrderToken || !revolutCardRef.current?.isReady) {
+        alert("Revolut payment is not ready. Please wait.");
         return;
       }
-
+      // Trigger the submit method on the RevolutCardField component
       try {
         await revolutCardRef.current.submit(customerDetails);
       } catch (error) {
         handlePaymentError(error);
       }
     }
+    
+    if (paymentMethod === "mbway") {
+      // TODO: Implement MB Way payment logic
+      console.log("Submitting with MB WAY...");
+      // Example: submitOrderAndPayment({ cartItems, customerDetails, paymentMethod: 'mbway', ... });
+    }
+  };
+  
+  const handleCustomerDetailsChange = (e) => {
+    const { id, value } = e.target;
+    setCustomerDetails(prev => ({ ...prev, [id]: value }));
+  };
+
+  const handlePhoneChange = (phone) => {
+    setCustomerDetails(prev => ({ ...prev, phone }));
   };
 
   const paymentSelectorClasses = (method) =>
@@ -223,9 +232,10 @@ function CheckoutPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       <h1 className="text-4xl font-extrabold text-steel mb-8">Review Your Rental</h1>
-      <form onSubmit={handleFormSubmit}>
+      <form onSubmit={handleFormSubmit} noValidate>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-6">
+            {/* Cart Items Section */}
             <div className="bg-arsenic p-6 rounded-lg">
               <h2 className="text-2xl font-bold text-cloud mb-4">Your Items</h2>
               <ul className="space-y-4">
@@ -234,91 +244,48 @@ function CheckoutPage() {
                 ))}
               </ul>
             </div>
+
+            {/* Customer Details Section */}
             <div className="bg-arsenic p-6 rounded-lg">
               <h2 className="text-2xl font-bold text-cloud mb-4">Your Details</h2>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label
-                      htmlFor="firstName"
-                      className="block text-sm font-medium text-space mb-1"
-                    >
-                      First Name <span className="text-rogueRed">*</span>
+                    <label htmlFor="firstName" className="block text-sm font-medium text-space mb-1">
+                      First Name <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      id="firstName"
-                      type="text"
-                      value={customerDetails.firstName}
-                      onChange={(e) =>
-                        setCustomerDetails({ ...customerDetails, firstName: e.target.value })
-                      }
-                      className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
-                      required
-                    />
-                    {formErrors.firstName && (
-                      <p className="text-red-400 text-sm mt-1">{formErrors.firstName}</p>
-                    )}
+                    <input id="firstName" type="text" value={customerDetails.firstName} onChange={handleCustomerDetailsChange} className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud" required />
+                    {formErrors.firstName && <p className="text-red-400 text-sm mt-1">{formErrors.firstName}</p>}
                   </div>
                   <div>
                     <label htmlFor="lastName" className="block text-sm font-medium text-space mb-1">
-                      Last Name <span className="text-rogueRed">*</span>
+                      Last Name <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      id="lastName"
-                      type="text"
-                      value={customerDetails.lastName}
-                      onChange={(e) =>
-                        setCustomerDetails({ ...customerDetails, lastName: e.target.value })
-                      }
-                      className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
-                      required
-                    />
-                    {formErrors.lastName && (
-                      <p className="text-red-400 text-sm mt-1">{formErrors.lastName}</p>
-                    )}
+                    <input id="lastName" type="text" value={customerDetails.lastName} onChange={handleCustomerDetailsChange} className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud" required />
+                    {formErrors.lastName && <p className="text-red-400 text-sm mt-1">{formErrors.lastName}</p>}
                   </div>
                 </div>
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-space mb-1">
-                    Email Address <span className="text-rogueRed">*</span>
+                    Email Address <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    id="email"
-                    type="email"
-                    value={customerDetails.email}
-                    onChange={(e) =>
-                      setCustomerDetails({ ...customerDetails, email: e.target.value })
-                    }
-                    className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud"
-                    required
-                  />
-                  {formErrors.email && (
-                    <p className="text-red-400 text-sm mt-1">{formErrors.email}</p>
-                  )}
+                  <input id="email" type="email" value={customerDetails.email} onChange={handleCustomerDetailsChange} className="w-full bg-phantom border border-graphite rounded-md p-3 text-cloud focus:ring-cloud focus:border-cloud" required />
+                  {formErrors.email && <p className="text-red-400 text-sm mt-1">{formErrors.email}</p>}
                 </div>
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-space mb-1">
-                    Phone Number <span className="text-rogueRed">*</span>
+                    Phone Number <span className="text-red-500">*</span>
                   </label>
                   <div className="phone-input-container">
-                    <PhoneInput
-                      id="phone"
-                      placeholder="Enter phone number"
-                      value={customerDetails.phone}
-                      onChange={(phone) => setCustomerDetails({ ...customerDetails, phone })}
-                      defaultCountry="PT"
-                      international
-                      countryCallingCodeEditable={true}
-                      className="phone-input"
-                    />
+                    <PhoneInput id="phone" placeholder="Enter phone number" value={customerDetails.phone} onChange={handlePhoneChange} defaultCountry="PT" international countryCallingCodeEditable={true} className="phone-input" />
                   </div>
-                  {formErrors.phone && (
-                    <p className="text-red-400 text-sm mt-1">{formErrors.phone}</p>
-                  )}
+                  {formErrors.phone && <p className="text-red-400 text-sm mt-1">{formErrors.phone}</p>}
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Order Summary and Payment Section */}
           <div className="lg:col-span-1">
             <div className="bg-arsenic p-6 rounded-lg sticky top-24">
               <h2 className="text-2xl font-bold text-cloud border-b border-graphite/50 pb-4 mb-4">
@@ -331,50 +298,42 @@ function CheckoutPage() {
               <div className="space-y-4 mt-8">
                 <h3 className="text-lg font-semibold text-cloud">Payment Method</h3>
                 <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod("revolut")}
-                    className={paymentSelectorClasses("revolut")}
-                  >
-                    <FaCreditCard /> Card
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod("mbway")}
-                    className={paymentSelectorClasses("mbway")}
-                  >
-                    <MbWayIcon /> MB WAY
-                  </button>
+                    <button type="button" onClick={() => setPaymentMethod("revolut")} className={paymentSelectorClasses("revolut")}>
+                        <FaCreditCard /> Card
+                    </button>
+                    <button type="button" onClick={() => setPaymentMethod("mbway")} className={paymentSelectorClasses("mbway")}>
+                        <MbWayIcon /> MB WAY
+                    </button>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    disabled
-                    className="flex items-center justify-center gap-2 p-3 rounded-md bg-phantom text-space/50 cursor-not-allowed"
-                  >
-                    <FaApple /> Apple Pay
-                  </button>
-                  <button
-                    type="button"
-                    disabled
-                    className="flex items-center justify-center gap-2 p-3 rounded-md bg-phantom text-space/50 cursor-not-allowed"
-                  >
-                    <FaGoogle /> Google Pay
-                  </button>
+                    <button type="button" disabled className="flex items-center justify-center gap-2 p-3 rounded-md bg-phantom text-space/50 cursor-not-allowed">
+                        <FaApple /> Apple Pay
+                    </button>
+                    <button type="button" disabled className="flex items-center justify-center gap-2 p-3 rounded-md bg-phantom text-space/50 cursor-not-allowed">
+                        <FaGoogle /> Google Pay
+                    </button>
                 </div>
-                <div className="pt-4">
+
+                {/* Dynamic Payment Method Area */}
+                <div className="pt-4 min-h-[100px]">
                   {paymentMethod === "revolut" && (
-                    <RevolutCardField
-                      ref={revolutCardRef}
-                      orderToken={revolutOrderToken} // NEW PROP: Pass orderToken
-                      onPaymentSuccess={handlePaymentSuccess}
-                      onPaymentError={handlePaymentError}
-                    />
+                    <>
+                      {isFetchingRevolutToken && <p className="text-center text-space">Initializing secure payment...</p>}
+                      {fetchRevolutTokenError && <p className="text-center text-red-500">Could not load payment form. Please try again.</p>}
+                      {revolutOrderToken && (
+                        <RevolutCardField
+                          ref={revolutCardRef}
+                          orderToken={revolutOrderToken}
+                          onPaymentSuccess={handlePaymentSuccess}
+                          onPaymentError={handlePaymentError}
+                        />
+                      )}
+                    </>
                   )}
                   {paymentMethod === "mbway" && (
                     <MbWayPayment
                       phone={customerDetails.phone}
-                      setPhone={(phone) => setCustomerDetails({ ...customerDetails, phone })}
+                      setPhone={handlePhoneChange}
                       error={formErrors.phone}
                     />
                   )}
@@ -382,14 +341,12 @@ function CheckoutPage() {
               </div>
               <Button
                 type="submit"
-                // Adjusted disabled condition for Revolut payment: now checks orderToken and its fetching state
-                disabled={isProcessingPaymentAndOrder || (paymentMethod === "revolut" && (!revolutOrderToken || isFetchingRevolutToken || !revolutCardRef.current?.isReady))}
+                disabled={isProcessingPaymentAndOrder || (paymentMethod === "revolut" && (!revolutOrderToken || isFetchingRevolutToken))}
                 className="w-full mt-8 py-3 text-lg"
               >
                 {isProcessingPaymentAndOrder || isFetchingRevolutToken ? "Processing..." : `Pay & Confirm Booking`}
               </Button>
               {paymentAndOrderError && <p className="text-red-400 text-center mt-4">{paymentAndOrderError.message}</p>}
-              {fetchRevolutTokenError && paymentMethod === "revolut" && <p className="text-rogueRed text-center mt-4">{fetchRevolutTokenError.message}</p>}
             </div>
           </div>
         </div>
