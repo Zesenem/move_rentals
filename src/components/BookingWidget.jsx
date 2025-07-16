@@ -1,31 +1,59 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
 import { DayPicker, getDefaultClassNames } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { format, differenceInCalendarDays, eachDayOfInterval } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
+import { FaCheck, FaShoppingCart, FaClock } from "react-icons/fa";
+import { RingLoader } from "react-spinners";
+
 import { getUnavailableDates } from "../services/twice.js";
 import { useCartStore } from "../store/cartStore.js";
-import Button from "./Button";
-import { RingLoader } from "react-spinners";
 import { calculateTieredPrice, calculateExtrasTotal } from "../utils/priceCalculator.js";
-import { FaCheck } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import Button from "./Button";
 
-const PriceBreakdown = ({ pricePerDay, numberOfDays, totalPrice }) => (
-  <div className="space-y-2">
-    <div className="flex justify-between items-center text-steel">
+const generateTimeSlots = (interval = 30) => {
+  const slots = [];
+  const startTime = 8 * 60;
+  const endTime = 18 * 60 + 30; 
+
+  for (let timeInMinutes = startTime; timeInMinutes <= endTime; timeInMinutes += interval) {
+    const hours = Math.floor(timeInMinutes / 60)
+      .toString()
+      .padStart(2, "0");
+    const minutes = (timeInMinutes % 60).toString().padStart(2, "0");
+    slots.push(`${hours}:${minutes}`);
+  }
+  return slots;
+};
+
+const PriceBreakdown = ({ basePricePerDay, numberOfDays, extrasPrice, totalPrice }) => (
+  <div className="space-y-3 text-sm">
+    <div className="flex justify-between text-steel">
       <span>Base price per day</span>
-      <span className="font-semibold">€{pricePerDay.toFixed(2)}</span>
+      <span className="font-semibold text-cloud">€{basePricePerDay.toFixed(2)}</span>
     </div>
+
     {numberOfDays > 0 && (
-      <div className="flex justify-between items-center text-gray-400">
-        <span>Selected days</span>
-        <span>x {numberOfDays}</span>
+      <div className="flex justify-between text-steel">
+        <span>Duration</span>
+        <span className="font-semibold text-cloud">{numberOfDays} day(s)</span>
       </div>
     )}
-    <div className="pt-4 mt-2 border-t border-graphite/50 flex justify-between items-center">
+
+    {extrasPrice > 0 && (
+      <div className="flex justify-between text-steel">
+        <span>Extras</span>
+        <span className="font-semibold text-cloud">+ €{extrasPrice.toFixed(2)}</span>
+      </div>
+    )}
+
+    <div className="!mt-4 flex items-center justify-between border-t border-graphite/50 pt-4">
       <span className="text-xl font-bold text-cloud">Total Price</span>
-      <span className="text-2xl font-bold text-cloud">
+      <span
+        key={totalPrice}
+        className="animate-[pulse_0.5s_ease-in-out] text-2xl font-bold text-cloud"
+      >
         {totalPrice > 0 ? `€${totalPrice.toFixed(2)}` : "€--.--"}
       </span>
     </div>
@@ -34,8 +62,10 @@ const PriceBreakdown = ({ pricePerDay, numberOfDays, totalPrice }) => (
 
 function BookingWidget({ bike, selectedExtras }) {
   const [range, setRange] = useState();
-  const [numberOfDays, setNumberOfDays] = useState(0);
   const [isAdded, setIsAdded] = useState(false);
+  const [pickupTime, setPickupTime] = useState("10:00");
+  const timeSlots = useMemo(() => generateTimeSlots(), []);
+
   const { items: cartItems, addItem: addItemToCart } = useCartStore();
 
   const {
@@ -50,42 +80,45 @@ function BookingWidget({ bike, selectedExtras }) {
   });
 
   const cartBookedDates = useMemo(() => {
-    const dates = [];
-    cartItems.forEach((item) => {
-      if (item.id.startsWith(bike.id)) {
-        const interval = eachDayOfInterval({
-          start: new Date(item.range.from),
-          end: new Date(item.range.to),
-        });
-        dates.push(...interval);
-      }
-    });
-    return dates;
+    return cartItems
+      .filter((item) => item.id.startsWith(bike.id))
+      .flatMap((item) =>
+        eachDayOfInterval({ start: new Date(item.range.from), end: new Date(item.range.to) })
+      );
   }, [cartItems, bike.id]);
 
   const allDisabledDates = useMemo(() => {
-    return [{ before: new Date() }, ...apiUnavailableDates, ...cartBookedDates];
+    return [{ before: new Date() }, ...(apiUnavailableDates || []), ...cartBookedDates];
   }, [apiUnavailableDates, cartBookedDates]);
 
-  useEffect(() => {
-    if (range?.from && range?.to) {
-      const days = differenceInCalendarDays(range.to, range.from) + 1;
-      setNumberOfDays(days);
-    } else {
-      setNumberOfDays(0);
-    }
-    setIsAdded(false);
+  const numberOfDays = useMemo(() => {
+    return range?.from && range?.to ? differenceInCalendarDays(range.to, range.from) + 1 : 0;
   }, [range]);
+
+  useEffect(() => {
+    setIsAdded(false);
+  }, [range, selectedExtras, pickupTime]);
 
   const basePrice = calculateTieredPrice(bike.pricingTiers, bike.price_per_day, numberOfDays);
   const extrasPrice = calculateExtrasTotal(selectedExtras, numberOfDays);
   const totalPrice = basePrice + extrasPrice;
 
-  const bookingId = range?.from ? `${bike.id}-${range.from.toISOString()}` : null;
-  const isInCart = bookingId ? cartItems.some((item) => item.id === bookingId) : false;
+  const bookingId = useMemo(
+    () =>
+      range?.from && range?.to
+        ? `${bike.id}-${range.from.toISOString()}-${range.to.toISOString()}-${pickupTime}`
+        : null,
+    [bike.id, range, pickupTime]
+  );
+
+  const isInCart = useMemo(
+    () => (bookingId ? cartItems.some((item) => item.id === bookingId) : false),
+    [bookingId, cartItems]
+  );
 
   const handleAddToCart = useCallback(() => {
-    if (!range?.from || !range?.to || !bike) return;
+    if (!range?.from || !range?.to || !bike || !pickupTime) return;
+
     const newItem = {
       id: bookingId,
       name: bike.name,
@@ -94,42 +127,35 @@ function BookingWidget({ bike, selectedExtras }) {
       pricingTiers: bike.pricingTiers,
       days: numberOfDays,
       totalPrice: totalPrice,
-      range: {
-        from: range.from,
-        to: range.to,
-      },
+      range: { from: range.from, to: range.to },
+      pickupTime: pickupTime,
       extras: selectedExtras,
     };
     addItemToCart(newItem);
     setIsAdded(true);
-  }, [bookingId, bike, numberOfDays, totalPrice, selectedExtras, addItemToCart, range]);
+  }, [bookingId, bike, numberOfDays, totalPrice, selectedExtras, addItemToCart, range, pickupTime]);
 
-  let footerText = "Please select the first day of your rental.";
+  let footerText = "Please select your rental period.";
   if (range?.from) {
-    if (!range.to) {
-      footerText = `Selected: ${format(range.from, "PPP")}.`;
-    } else {
-      footerText = `${format(range.from, "PPP")} – ${format(range.to, "PPP")}`;
-    }
+    footerText = range.to
+      ? `${format(range.from, "PPP")} – ${format(range.to, "PPP")}`
+      : `Selected: ${format(range.from, "PPP")}.`;
   }
-
   const defaultClassNames = getDefaultClassNames();
-  const today = new Date();
 
   if (isError) {
     return (
-      <div className="bg-arsenic p-6 rounded-lg border border-graphite/50 text-center text-red-400">
-        <p>Error loading availability.</p>
-        <p>Please try refreshing the page.</p>
+      <div className="rounded-lg border border-graphite/50 bg-arsenic p-6 text-center text-red-400">
+        <p>Error loading availability. Please try refreshing.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-arsenic p-4 sm:p-6 rounded-lg border border-graphite/50 shadow-lg">
+    <div className="rounded-lg border border-graphite/50 bg-arsenic p-4 shadow-lg sm:p-6">
       <div className="relative flex justify-center">
         {isLoading && (
-          <div className="absolute inset-0 bg-arsenic/80 flex items-center justify-center z-20 rounded-lg">
+          <div className="absolute inset-0 z-20 flex items-center justify-center rounded-lg bg-arsenic/80">
             <RingLoader color="#6EE7B7" />
           </div>
         )}
@@ -139,8 +165,8 @@ function BookingWidget({ bike, selectedExtras }) {
           onSelect={setRange}
           disabled={allDisabledDates}
           numberOfMonths={1}
-          fromDate={today}
-          footer={<p className="text-center pt-4 text-steel font-semibold text-sm">{footerText}</p>}
+          fromDate={new Date()}
+          footer={<p className="pt-4 text-center text-sm font-semibold text-steel">{footerText}</p>}
           classNames={{
             root: `${defaultClassNames.root} shadow-lg p-5 bg-zinc-100`,
             caption: "flex justify-between items-center h-12 px-1",
@@ -168,14 +194,14 @@ function BookingWidget({ bike, selectedExtras }) {
                   {...buttonProps}
                   type="button"
                   className={`
-                                        ${className}
-                                        text-zinc-950
-                                        bg-zinc-200
-                                        w-10 h-10
-                                        group-aria-selected:bg-orange-700
-                                        group-aria-selected:text-white
-                                        rounded-full
-                                    `}
+                    ${className}
+                    text-zinc-950
+                    bg-zinc-200
+                    w-10 h-10
+                    group-aria-selected:bg-orange-700
+                    group-aria-selected:text-white
+                    rounded-full
+                  `}
                 />
               );
             },
@@ -183,21 +209,46 @@ function BookingWidget({ bike, selectedExtras }) {
         />
       </div>
 
-      <div className="mt-6 border-t border-graphite/50 pt-6">
+      <div className="mt-6 space-y-6 border-t border-graphite/50 pt-6">
+        {range?.from && (
+          <div>
+            <label
+              htmlFor="pickupTime"
+              className="mb-2 flex items-center gap-2 text-lg font-bold text-cloud"
+            >
+              <FaClock />
+              Pickup Time
+            </label>
+            <select
+              id="pickupTime"
+              value={pickupTime}
+              onChange={(e) => setPickupTime(e.target.value)}
+              className="w-full cursor-pointer rounded-md border-graphite/50 bg-phantom p-3 text-cloud focus:border-emerald-500 focus:ring-emerald-500"
+            >
+              {timeSlots.map((time) => (
+                <option key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <PriceBreakdown
-          pricePerDay={bike.price_per_day}
+          basePricePerDay={bike.price_per_day}
           numberOfDays={numberOfDays}
+          extrasPrice={extrasPrice}
           totalPrice={totalPrice}
         />
         <div className="mt-6">
           {isAdded ? (
-            <div className="text-center p-4 bg-emerald-500/10 rounded-lg">
-              <div className="flex items-center justify-center gap-2 text-emerald-400 font-bold mb-4">
+            <div className="animate-[fadeIn_0.5s_ease-in-out] rounded-lg bg-emerald-500/10 p-4 text-center">
+              <div className="mb-4 flex items-center justify-center gap-2 font-bold text-emerald-400">
                 <FaCheck />
                 <span>Added to Cart!</span>
               </div>
               <div className="flex gap-4">
-                <Button as="Link" to="/checkout" variant="primary" className="w-full">
+                <Button as={Link} to="/checkout" variant="primary" className="w-full">
                   View Cart
                 </Button>
                 <Button onClick={() => setIsAdded(false)} variant="ghost" className="w-full">
@@ -208,8 +259,9 @@ function BookingWidget({ bike, selectedExtras }) {
           ) : (
             <Button
               onClick={handleAddToCart}
-              disabled={!range?.from || !range?.to || isInCart}
-              className="w-full py-3 text-lg flex items-center justify-center gap-2"
+              disabled={!range?.from || !range?.to || !pickupTime || isInCart}
+              className="w-full py-3 text-lg"
+              icon={isInCart ? FaCheck : FaShoppingCart}
             >
               {isInCart ? "Already in Cart" : "Add to Cart"}
             </Button>

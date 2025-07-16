@@ -1,10 +1,3 @@
-// src/services/twice.js
-
-/**
- * Maps a product object from the backend API to the application's product format.
- * @param {object} apiProduct - The product object from the API.
- * @returns {object} The product object in the application's format.
- */
 function mapApiProductToAppProduct(apiProduct) {
   return {
     id: apiProduct.id,
@@ -19,10 +12,6 @@ function mapApiProductToAppProduct(apiProduct) {
   };
 }
 
-/**
- * Fetches static data from the local db.json file.
- * @returns {Promise<object>} A promise that resolves to the parsed JSON data.
- */
 const fetchStaticData = async () => {
   try {
     const response = await fetch("/db.json");
@@ -34,10 +23,6 @@ const fetchStaticData = async () => {
   }
 };
 
-/**
- * Fetches all products, combining live API data with local static data.
- * @returns {Promise<Array<object>>} A promise that resolves to an array of products.
- */
 export const fetchProducts = async () => {
   try {
     const [apiResponse, staticData] = await Promise.all([
@@ -68,10 +53,6 @@ export const fetchProducts = async () => {
   }
 };
 
-/**
- * Fetches extra products/services from the backend.
- * @returns {Promise<Array<object>>} A promise that resolves to an array of extras.
- */
 export const fetchExtras = async () => {
   try {
     const response = await fetch(`/.netlify/functions/fetch-extras`);
@@ -87,11 +68,6 @@ export const fetchExtras = async () => {
   }
 };
 
-/**
- * Fetches a single product by its slug.
- * @param {string} slug - The slug of the product to fetch.
- * @returns {Promise<object>} A promise resolving to the bike and common static data.
- */
 export const fetchProductBySlug = async (slug) => {
   try {
     const allProducts = await fetchProducts();
@@ -110,11 +86,6 @@ export const fetchProductBySlug = async (slug) => {
   }
 };
 
-/**
- * Fetches unavailable dates for a specific bike.
- * @param {string} bikeId - The ID of the bike.
- * @returns {Promise<Array<Date>>} A promise resolving to an array of disabled dates.
- */
 export const getUnavailableDates = async (bikeId) => {
   if (!bikeId) return [];
   try {
@@ -140,13 +111,6 @@ export const getUnavailableDates = async (bikeId) => {
   }
 };
 
-/**
- * Creates an order in your system before payment.
- * @param {object} payload - The order details.
- * @param {Array} payload.cartItems - The items in the cart.
- * @param {object} payload.customerDetails - The customer's information.
- * @returns {Promise<object>} The created order data.
- */
 export const createOrder = async ({ cartItems, customerDetails }) => {
   const response = await fetch(`/.netlify/functions/create-order`, {
     method: "POST",
@@ -162,13 +126,6 @@ export const createOrder = async ({ cartItems, customerDetails }) => {
   return await response.json();
 };
 
-/**
- * Creates a Revolut order to get a payment token.
- * @param {object} payload - The payment details.
- * @param {number} payload.amount - The amount to charge.
- * @param {string} payload.currency - The currency code (e.g., 'EUR').
- * @returns {Promise<object>} The Revolut order data containing the orderToken.
- */
 export const createRevolutOrderToken = async ({ amount, currency }) => {
   const response = await fetch(`/.netlify/functions/create-revolut-order-token`, {
     method: "POST",
@@ -184,22 +141,17 @@ export const createRevolutOrderToken = async ({ amount, currency }) => {
   return await response.json();
 };
 
-/**
- * Processes the final payment and order after Revolut confirmation.
- * @param {object} payload - The payload containing payment and order details.
- * @returns {Promise<object>} The final confirmation data.
- */
 export const processRevolutPaymentAndOrder = async (payload) => {
   const response = await fetch(`/.netlify/functions/process-revolut-payment-and-order`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
     const errorData = await response.json();
     console.error("Error processing Revolut payment and order:", errorData);
-    throw new Error(errorData.error?.message || 'Failed to complete booking and payment.');
+    throw new Error(errorData.error?.message || "Failed to complete booking and payment.");
   }
   return await response.json();
 };

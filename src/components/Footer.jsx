@@ -1,11 +1,20 @@
 import { Link } from "react-router-dom";
 import { FaWhatsapp, FaInstagram, FaEnvelope } from "react-icons/fa";
+import OpeningHours from "./OpeningHours"; // Import the new component
 
-const currentYear = new Date().getFullYear();
-const phoneNumber = "351920016794";
-const whatsappURL = `https://wa.me/${phoneNumber}`;
-const emailAddress = "move@move-rentals.com";
-const instagramURL = "https://www.instagram.com/move.rentals/";
+const contactInfo = {
+  email: "move@move-rentals.com",
+  whatsappUrl: "https://wa.me/351920016794",
+  instagramUrl: "https://www.instagram.com/move.rentals/",
+};
+
+const quickLinks = [
+  { name: "Our Fleet", to: "/" },
+  { name: "Contact Us", to: "/contact" },
+  { name: "View Cart", to: "/checkout" },
+  { name: "Terms & Conditions", to: "/terms-and-conditions" },
+  { name: "Privacy Policy", to: "/privacy-policy" },
+];
 
 const SocialLink = ({ href, ariaLabel, icon }) => {
   const IconComponent = icon;
@@ -15,53 +24,55 @@ const SocialLink = ({ href, ariaLabel, icon }) => {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={ariaLabel}
-      className="text-steel hover:text-cloud hover:scale-110 transform transition-transform duration-300"
+      className="text-steel transition-transform duration-300 hover:scale-110 hover:text-cloud"
     >
       <IconComponent size={22} />
     </a>
   );
 };
 
-const quickLinks = [
-  { name: "Our Fleet", to: "/" },
-  { name: "Contact Us", href: whatsappURL, isExternal: true },
-  { name: "View Cart", to: "/checkout" },
-  { name: "Terms & Conditions", to: "/terms-and-conditions" },
-  { name: "Privacy Policy", to: "/privacy-policy" },
-];
-
 function Footer() {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <footer id="footer-section" className="bg-phantom mt-20 relative z-10">
+    <footer id="footer-section" className="relative z-10 mt-20 bg-phantom">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="py-12 flex flex-col md:flex-row text-center md:text-left justify-between gap-8">
-          <div>
-            <h3 className="font-bold text-lg text-steel mb-4">About Us</h3>
-            <div className="text-space max-w-xs mx-auto md:mx-0">
+        <div className="grid grid-cols-1 gap-10 py-12 text-center md:grid-cols-3 md:text-left">
+          <div className="md:col-span-1">
+            <h3 className="mb-4 text-lg font-bold text-steel">About Us</h3>
+            <div className="mx-auto max-w-xs space-y-4 text-space md:mx-0">
               <p>
                 MOVE is Lisbon's go-to scooter rental company - combining unbeatable prices,
                 friendly service, and the freedom to ride your way.
               </p>
+
               <br />
-              <p>Your ride. Your rules. Lisbon awaits.</p>
+
+              <p>
+                <strong>Your ride. Your rules. Lisbon awaits.</strong>
+              </p>
             </div>
           </div>
-          <div>
-            <h3 className="font-bold text-lg text-steel mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-space">
+
+          <div className="md:col-span-1">
+            <h3 className="mb-4 text-lg font-bold text-steel">Quick Links</h3>
+            <ul className="space-y-3 text-space">
               {quickLinks.map((link) => (
                 <li key={link.name}>
-                  {link.isExternal ? (
+                  {link.href ? (
                     <a
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-cloud transition-colors"
+                      className="transition-colors hover:text-cloud hover:underline underline-offset-4"
                     >
                       {link.name}
                     </a>
                   ) : (
-                    <Link to={link.to} className="hover:text-cloud transition-colors">
+                    <Link
+                      to={link.to}
+                      className="transition-colors hover:text-cloud hover:underline underline-offset-4"
+                    >
                       {link.name}
                     </Link>
                   )}
@@ -69,22 +80,29 @@ function Footer() {
               ))}
             </ul>
           </div>
+
+          <div className="md:col-span-1">
+            <h3 className="mb-4 text-lg font-bold text-steel">Opening Hours</h3>
+            <div className="flex justify-center md:justify-start">
+              <OpeningHours />
+            </div>
+          </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-6 border-t border-arsenic">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-arsenic py-6 sm:flex-row">
           <div className="flex items-center space-x-6">
-            <SocialLink href={whatsappURL} ariaLabel="WhatsApp" icon={FaWhatsapp} />
-            <SocialLink href={instagramURL} ariaLabel="Instagram" icon={FaInstagram} />
-            <SocialLink href={`mailto:${emailAddress}`} ariaLabel="Email" icon={FaEnvelope} />
+            <SocialLink href={contactInfo.whatsappUrl} ariaLabel="WhatsApp" icon={FaWhatsapp} />
+            <SocialLink href={contactInfo.instagramUrl} ariaLabel="Instagram" icon={FaInstagram} />
+            <SocialLink href={`mailto:${contactInfo.email}`} ariaLabel="Email" icon={FaEnvelope} />
           </div>
-          <Link to="/" aria-label="Back to top">
+          <Link to="/" aria-label="Back to home">
             <img
-              src="/images/favicon.png"
+              src="/32x32.png"
               alt="Move Rentals Symbol"
-              className="h-8 w-auto transition-opacity hover:opacity-80 filter invert brightness-0"
+              className="h-8 w-auto filter invert transition-opacity hover:opacity-80"
             />
           </Link>
-          <p className="text-sm text-graphite order-first sm:order-last">
+          <p className="order-first text-sm text-graphite sm:order-last">
             &copy; {currentYear} Move Rentals
           </p>
         </div>

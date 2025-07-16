@@ -7,35 +7,54 @@ function AccordionItem({ title, children, defaultOpen = false }) {
 
   return (
     <div className="border-b border-graphite/50">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex justify-between items-center w-full p-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-cloud/50 rounded-md hover:bg-arsenic/50 transition-colors duration-200"
-        aria-expanded={isOpen}
-        aria-controls={contentId}
-      >
-        <span
-          className={`text-lg font-semibold transition-colors duration-200 ${
-            isOpen ? "text-cloud" : "text-steel"
-          }`}
+      <h2>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          id={`accordion-header-${contentId}`}
+          aria-expanded={isOpen}
+          aria-controls={`accordion-content-${contentId}`}
+          className="
+            flex w-full items-center justify-between rounded-md p-5 text-left 
+            transition-colors duration-300 hover:bg-arsenic/50 
+            focus:outline-none focus-visible:ring-2 focus-visible:ring-cloud/50
+          "
         >
-          {title}
-        </span>
-        <FaChevronDown
-          className={`transform transition-transform duration-300 text-steel ${
-            isOpen ? "rotate-180" : "rotate-0"
-          }`}
-          aria-hidden="true"
-        />
-      </button>
+          <span
+            className={`
+              text-lg font-semibold transition-colors duration-300 
+              ${isOpen ? "text-cloud" : "text-steel"}
+            `}
+          >
+            {title}
+          </span>
+          <FaChevronDown
+            aria-hidden="true"
+            className={`
+              transform text-steel transition-transform duration-300 
+              ${isOpen ? "rotate-180" : "rotate-0"}
+            `}
+          />
+        </button>
+      </h2>
 
       <div
-        id={contentId}
-        className={`grid overflow-hidden transition-all duration-300 ease-in-out ${
-          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-        }`}
+        id={`accordion-content-${contentId}`}
+        role="region"
+        aria-labelledby={`accordion-header-${contentId}`}
+        className={`
+          grid overflow-hidden transition-all duration-300 ease-in-out
+          ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}
+        `}
       >
         <div className="overflow-hidden">
-          <div className="pt-0 pb-5 px-5 text-space">{children}</div>
+          <div
+            className={`
+              p-5 pt-0 text-space transition-opacity duration-300
+              ${isOpen ? "opacity-100" : "opacity-0"}
+            `}
+          >
+            {children}
+          </div>
         </div>
       </div>
     </div>

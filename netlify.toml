@@ -11,10 +11,7 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    # This CSP allows Google Fonts, Sentry, and Revolut's tracking/analytics
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' *.revolut.com *.revolut.codes; style-src 'self' 'unsafe-inline' *.revolut.com *.revolut.codes https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' *.revolut.com *.revolut.codes; connect-src 'self' *.revolut.com *.revolut.codes *.sentry.io aqueduct.revolut.com; img-src 'self' data: https://images.twicecommerce.com https://firebasestorage.googleapis.com https://purecatamphetamine.github.io; form-action 'self'; base-uri 'self'; object-src 'none'; worker-src 'self' blob:;"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' *.revolut.com *.revolut.codes; style-src 'self' 'unsafe-inline' *.revolut.com *.revolut.codes https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' *.google.com *.revolut.com *.revolut.codes; connect-src 'self' *.revolut.com *.revolut.codes *.sentry.io aqueduct.revolut.com; img-src 'self' data: https://images.twicecommerce.com https://firebasestorage.googleapis.com https://purecatamphetamine.github.io https://images.pexels.com; media-src 'self' https://videos.pexels.com; form-action 'self'; base-uri 'self'; object-src 'none'; worker-src 'self' blob:;"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    # --- THE FINAL FIX ---
-    # We explicitly grant payment permissions to Revolut's domains.
     Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(*)"

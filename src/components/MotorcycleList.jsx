@@ -1,59 +1,73 @@
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { FaExclamationTriangle } from "react-icons/fa";
 import { fetchProducts } from "../services/twice.js";
 import MotorcycleCard from "./MotorcycleCard";
 import ComingSoonCard from "./ComingSoonCard";
 import MotorcycleCardSkeleton from "./MotorcycleCardSkeleton.jsx";
-import { FaExclamationTriangle } from "react-icons/fa";
+import useIsMobile from "../hooks/useIsMobile"; // We'll assume a simple hook for this
 
 function MotorcycleList() {
+  const isMobile = useIsMobile(); // A custom hook to check for mobile screen size
   const {
     data: motorcycles = [],
     isLoading,
+    isError,
     error,
   } = useQuery({
     queryKey: ["products"],
     queryFn: fetchProducts,
   });
 
-  const sortedMotorcycles = motorcycles.sort((a, b) => a.price_per_day - b.price_per_day);
+  // This memoized value now contains all our filtering logic
+  const filteredAndSortedMotorcycles = useMemo(() => {
+    let bikesToShow = motorcycles;
 
-  if (isLoading) {
-    return (
-      <div id="fleet-section" className="container mx-auto px-4 py-16">
-        <h2 className="text-4xl font-extrabold text-center text-steel mb-12">Our Fleet</h2>
-        <div className="flex flex-wrap justify-center gap-8">
-          {[...Array(3)].map((_, i) => (
-            <MotorcycleCardSkeleton key={i} />
-          ))}
+    // If on mobile, filter out the placeholder bikes (price > 998)
+    if (isMobile) {
+      bikesToShow = bikesToShow.filter((bike) => bike.price_per_day <= 998);
+    }
+
+    // Then, sort the remaining bikes by price
+    return [...bikesToShow].sort((a, b) => a.price_per_day - b.price_per_day);
+  }, [motorcycles, isMobile]);
+
+  const renderContent = () => {
+    if (isLoading) {
+      return [...Array(3)].map((_, i) => <MotorcycleCardSkeleton key={i} />);
+    }
+
+    if (isError) {
+      return (
+        <div className="flex max-w-sm flex-col items-center justify-center rounded-lg bg-phantom p-8 text-center">
+          <FaExclamationTriangle className="mb-4 text-5xl text-red-500" />
+          <h3 className="mb-2 text-xl font-bold text-cloud">Could Not Load Fleet</h3>
+          <p className="text-space">{error.message}</p>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  if (error) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <FaExclamationTriangle className="text-red-500 text-5xl mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-cloud mb-2">Could Not Load Fleet</h2>
-        <p className="text-space">{error.message}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div id="fleet-section" className="container mx-auto px-4 py-16">
-      <h2 className="text-4xl font-extrabold text-center text-steel mb-12">Our Fleet</h2>
-
-      <div className="flex flex-wrap justify-center gap-8">
-        {sortedMotorcycles.map((bike, index) => (
+      <>
+        {filteredAndSortedMotorcycles.map((bike, index) => (
           <MotorcycleCard key={bike.id} bike={bike} index={index} />
         ))}
-      </div>
-
-      <div className="mt-8">
         <ComingSoonCard />
+      </>
+    );
+  };
+
+  return (
+    <section id="fleet-section" className="py-16 sm:py-24">
+      <div className="container mx-auto px-4 text-center">
+        <h2 className="text-4xl font-extrabold text-steel">Our Fleet</h2>
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-space">
+          Affordable, reliable, and ready for your Lisbon adventure. Pick your ride.
+        </p>
+
+        <div className="mt-12 flex flex-wrap justify-center gap-8">{renderContent()}</div>
       </div>
-    </div>
+    </section>
   );
 }
 

@@ -1,4 +1,7 @@
+import { FaCheck } from "react-icons/fa";
+
 function ExtrasSelector({ extras, selectedExtras, onExtrasChange }) {
+  // This handler logic is clean and correct, no changes needed here.
   const handleCheckboxChange = (extraItem, isChecked) => {
     onExtrasChange((prev) => {
       const newExtras = { ...prev };
@@ -16,31 +19,60 @@ function ExtrasSelector({ extras, selectedExtras, onExtrasChange }) {
   }
 
   return (
-    <div className="border border-graphite/50 rounded-lg p-4">
-      <h3 className="text-lg font-bold text-cloud mb-4">Select Your Extras</h3>
-      <ul className="space-y-3">
+    <div className="space-y-4">
+      <h3 className="text-lg font-bold text-cloud">Select Your Extras</h3>
+      <div className="space-y-3">
         {extras.map((extra) => (
-          <li key={extra.id} className="flex items-center justify-between">
-            <div className="flex items-center">
-              <label htmlFor={extra.id} className="flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  id={extra.id}
-                  checked={!!selectedExtras[extra.id]}
-                  onChange={(e) => handleCheckboxChange(extra, e.target.checked)}
-                  className="h-5 w-5 rounded bg-arsenic border-graphite text-emerald-500 focus:ring-emerald-500/50"
-                />
-                <span className="ml-3 flex items-center gap-2">
-                  <span className="font-semibold text-cloud">{extra.name}</span>
-                </span>
-              </label>
-            </div>
-            <span className="text-space text-sm font-medium">
-              €{extra.price_per_day.toFixed(2)} / day
-            </span>
-          </li>
+          <div key={extra.id}>
+            <label
+              htmlFor={extra.id}
+              className={`
+                flex cursor-pointer items-center justify-between rounded-lg border-2 bg-arsenic p-4 
+                transition-all duration-200
+                ${
+                  selectedExtras[extra.id]
+                    ? "border-emerald-500 ring-2 ring-emerald-500/30"
+                    : "border-graphite/50 hover:border-graphite"
+                }
+              `}
+            >
+              <input
+                type="checkbox"
+                id={extra.id}
+                checked={!!selectedExtras[extra.id]}
+                onChange={(e) => handleCheckboxChange(extra, e.target.checked)}
+                className="sr-only"
+              />
+
+              <div className="flex items-center gap-3">
+                <div
+                  className={`
+                    grid h-6 w-6 flex-shrink-0 place-items-center rounded-md border-2 
+                    transition-colors duration-200
+                    ${
+                      selectedExtras[extra.id]
+                        ? "border-emerald-500 bg-emerald-500"
+                        : "border-graphite"
+                    }
+                  `}
+                >
+                  <FaCheck
+                    className={`
+                      text-xs text-white transition-opacity duration-200
+                      ${selectedExtras[extra.id] ? "opacity-100" : "opacity-0"}
+                    `}
+                  />
+                </div>
+                <span className="font-semibold text-cloud">{extra.name}</span>
+              </div>
+
+              <span className="text-sm font-medium text-space">
+                + €{extra.price_per_day.toFixed(2)} / day
+              </span>
+            </label>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

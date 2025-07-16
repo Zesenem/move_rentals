@@ -21,8 +21,7 @@ function Button({ variant = "primary", as = "button", children, icon, className 
     </>
   );
 
-  const Element = as === "a" ? "a" : as === "Link" ? Link : "button";
-
+  const Element = typeof as === "string" && as === "a" ? "a" : as === Link ? Link : "button";
   return (
     <Element className={combinedClassName} {...props}>
       {content}
