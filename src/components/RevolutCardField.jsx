@@ -1,8 +1,6 @@
 import React, { forwardRef, useImperativeHandle, useRef, useEffect, useState } from 'react';
 import RevolutCheckout from '@revolut/checkout';
 
-// Style object to match your site's dark theme
-// Colors are from your tailwind.config.js (phantom, graphite, cloud, etc.)
 const cardStyles = {
   base: {
     backgroundColor: '#1E2A3A', 

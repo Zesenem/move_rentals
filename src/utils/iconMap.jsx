@@ -19,27 +19,29 @@ import {
 import { GiFullMotorcycleHelmet, GiGloves, GiLeatherBoot } from "react-icons/gi";
 import { GrTag } from "react-icons/gr";
 
-const iconBaseClass = "mr-3 flex-shrink-0 text-lg";
+const createIcon = (IconComponent, colorClass = "text-steel") => {
+  const baseClasses = "flex-shrink-0 text-lg";
+  return <IconComponent className={`${baseClasses} ${colorClass}`} />;
+};
 
 export const iconMap = {
-  "id-card": <FaIdCard className={`${iconBaseClass} text-steel`} />,
-  license: <PiSteeringWheelFill className={`${iconBaseClass} text-steel`} />,
-  "credit-card": <FaCreditCard className={`${iconBaseClass} text-steel`} />,
-  experience: <PiMotorcycleFill className={`${iconBaseClass} text-steel`} />,
-  helmet: <GiFullMotorcycleHelmet className={`${iconBaseClass} text-status-available`} />,
-  gloves: <GiGloves className={`${iconBaseClass} text-steel`} />,
-  jacket: <PiCoatHangerBold className={`${iconBaseClass} text-steel`} />,
-  trousers: <PiPantsFill className={`${iconBaseClass} text-steel`} />,
-  boots: <GiLeatherBoot className={`${iconBaseClass} text-steel`} />,
-  toll: <GrTag className={`${iconBaseClass} text-steel`} />,
-  delivery: <PiMotorcycleFill className={`${iconBaseClass} text-steel`} />,
-  airport: <FaPlaneDeparture className={`${iconBaseClass} text-steel`} />,
-  tax: <PiPercentFill className={`${iconBaseClass} text-status-available`} />,
-  shield: <FaShieldAlt className={`${iconBaseClass} text-status-available`} />,
-  users: <FaUsers className={`${iconBaseClass} text-status-available`} />,
-  road: <FaRoad className={`${iconBaseClass} text-status-available`} />,
-  infinity: <FaInfinity className={`${iconBaseClass} text-status-available`} />,
-  lock: <FaLock className={`${iconBaseClass} text-status-available`} />,
-
-  "default-check": <FaCheckCircle className={`${iconBaseClass} text-status-available`} />,
+  "id-card": createIcon(FaIdCard),
+  license: createIcon(PiSteeringWheelFill),
+  "credit-card": createIcon(FaCreditCard),
+  experience: createIcon(PiMotorcycleFill),
+  helmet: createIcon(GiFullMotorcycleHelmet, "text-status-available"),
+  gloves: createIcon(GiGloves),
+  jacket: createIcon(PiCoatHangerBold),
+  trousers: createIcon(PiPantsFill),
+  boots: createIcon(GiLeatherBoot),
+  toll: createIcon(GrTag),
+  delivery: createIcon(PiMotorcycleFill),
+  airport: createIcon(FaPlaneDeparture),
+  lock: createIcon(FaLock, "text-status-available"),
+  tax: createIcon(PiPercentFill, "text-status-available"),
+  shield: createIcon(FaShieldAlt, "text-status-available"),
+  users: createIcon(FaUsers, "text-status-available"),
+  road: createIcon(FaRoad, "text-status-available"),
+  infinity: createIcon(FaInfinity, "text-status-available"),
+  "default-check": createIcon(FaCheckCircle, "text-status-available"),
 };

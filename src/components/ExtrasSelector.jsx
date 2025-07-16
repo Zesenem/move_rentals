@@ -36,17 +36,15 @@ function ExtrasSelector({ extras, selectedExtras, onExtrasChange }) {
                 }
               `}
             >
-              {/* This checkbox is visually hidden but powers the selection state */}
               <input
                 type="checkbox"
                 id={extra.id}
                 checked={!!selectedExtras[extra.id]}
                 onChange={(e) => handleCheckboxChange(extra, e.target.checked)}
-                className="sr-only" // Hides the default checkbox
+                className="sr-only"
               />
 
               <div className="flex items-center gap-3">
-                {/* Custom-styled checkbox */}
                 <div
                   className={`
                     grid h-6 w-6 flex-shrink-0 place-items-center rounded-md border-2 

@@ -7,7 +7,7 @@ function Hero() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden text-center">
-      <video
+      {/* <video
         autoPlay
         loop
         muted
@@ -17,8 +17,8 @@ function Hero() {
       >
         <source src="/hero-video.mp4" type="video/mp4" />
         Your browser does not support the video tag.
-      </video>
-      <div className="absolute top-0 left-0 z-10 h-full w-full bg-black/50"></div>
+      </video> */}
+      {/* <div className="absolute top-0 left-0 z-10 h-full w-full bg-black/50"></div> */}
       <div className="relative z-20 mx-auto max-w-4xl px-4">
         <h1 className="card-animate text-4xl font-extrabold tracking-tight text-steel drop-shadow-lg sm:text-5xl md:text-6xl">
           Your Adventure on <span className="text-cloud">Two Wheels</span> Starts Here.

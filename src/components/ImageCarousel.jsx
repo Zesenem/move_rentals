@@ -6,11 +6,11 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 const CarouselArrow = ({ direction, onClick }) => {
   const isLeft = direction === "left";
   return (
-    <div className={`absolute top-1/2 -translate-y-1/2 ${isLeft ? "left-3" : "right-3"} z-10`}>
+    <div className={`absolute top-1/2 z-10 -translate-y-1/2 ${isLeft ? "left-3" : "right-3"}`}>
       <button
         onClick={onClick}
         aria-label={isLeft ? "Previous Image" : "Next Image"}
-        className="rounded-full p-3 bg-phantom/60 text-cloud hover:bg-phantom/90 transition-all duration-300 opacity-100 md:opacity-0 group-hover:opacity-100"
+        className="rounded-full bg-phantom/60 p-3 text-cloud opacity-100 backdrop-blur-sm transition-all duration-300 hover:bg-phantom/90 md:opacity-0 group-hover:opacity-100"
       >
         {isLeft ? <FaChevronLeft /> : <FaChevronRight />}
       </button>
@@ -27,8 +27,7 @@ function ImageCarousel({ images }) {
   const goToPrevious = useCallback(
     (e) => {
       e.stopPropagation();
-      const isFirstSlide = currentIndex === 0;
-      const newIndex = isFirstSlide ? images.length - 1 : currentIndex - 1;
+      const newIndex = currentIndex === 0 ? images.length - 1 : currentIndex - 1;
       setCurrentIndex(newIndex);
     },
     [currentIndex, images.length]
@@ -37,30 +36,58 @@ function ImageCarousel({ images }) {
   const goToNext = useCallback(
     (e) => {
       e.stopPropagation();
-      const isLastSlide = currentIndex === images.length - 1;
-      const newIndex = isLastSlide ? 0 : currentIndex + 1;
+      const newIndex = currentIndex === images.length - 1 ? 0 : currentIndex + 1;
       setCurrentIndex(newIndex);
     },
     [currentIndex, images.length]
   );
 
   if (!images || images.length === 0) {
-    return <div className="w-full h-full rounded-lg bg-phantom animate-pulse"></div>;
+    return <div className="w-full aspect-video animate-pulse rounded-lg bg-phantom"></div>;
   }
 
   return (
     <>
-      <div
-        className="relative w-full h-full group cursor-pointer overflow-hidden rounded-lg"
-        onClick={() => setOpen(true)}
-      >
+      <div className="flex flex-col gap-4">
         <div
-          style={{ backgroundImage: `url(${slides[currentIndex].src})` }}
-          className="w-full h-full bg-center bg-cover transition-transform duration-500 group-hover:scale-105 shadow-xl"
-        ></div>
-
-        <CarouselArrow direction="left" onClick={goToPrevious} />
-        <CarouselArrow direction="right" onClick={goToNext} />
+          className="group relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg"
+          onClick={() => setOpen(true)}
+        >
+          {images.map((src, index) => (
+            <img
+              key={src}
+              src={src}
+              alt={`Rental vehicle image ${index + 1}`}
+              loading="lazy"
+              className={`
+                absolute inset-0 h-full w-full object-cover shadow-xl 
+                transition-opacity duration-500 ease-in-out
+                ${index === currentIndex ? "opacity-100" : "opacity-0"}
+              `}
+            />
+          ))}
+          <CarouselArrow direction="left" onClick={goToPrevious} />
+          <CarouselArrow direction="right" onClick={goToNext} />
+        </div>
+        {images.length > 1 && (
+          <div className="grid grid-cols-5 gap-3">
+            {images.map((src, index) => (
+              <button
+                key={`thumb-${src}`}
+                onClick={() => setCurrentIndex(index)}
+                className={`aspect-video w-full rounded-md border-2 bg-cover bg-center transition-all
+                  ${
+                    index === currentIndex
+                      ? "border-cloud ring-2 ring-cloud/50"
+                      : "border-transparent opacity-60 hover:opacity-100"
+                  }
+                `}
+                style={{ backgroundImage: `url(${src})` }}
+                aria-label={`View image ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <Lightbox

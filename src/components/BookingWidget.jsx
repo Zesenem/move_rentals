@@ -48,6 +48,8 @@ const PriceBreakdown = ({ basePricePerDay, numberOfDays, extrasPrice, totalPrice
 function BookingWidget({ bike, selectedExtras }) {
   const [range, setRange] = useState();
   const [isAdded, setIsAdded] = useState(false);
+  const [pickupTime, setPickupTime] = useState('10:00'); // Default pickup time
+
   const { items: cartItems, addItem: addItemToCart } = useCartStore();
 
   const {
@@ -85,17 +87,34 @@ function BookingWidget({ bike, selectedExtras }) {
 
   useEffect(() => {
     setIsAdded(false);
-  }, [range, selectedExtras]);
+  }, [range, selectedExtras, pickupTime]);
 
   const basePrice = calculateTieredPrice(bike.pricingTiers, bike.price_per_day, numberOfDays);
   const extrasPrice = calculateExtrasTotal(selectedExtras, numberOfDays);
   const totalPrice = basePrice + extrasPrice;
 
-  const bookingId = range?.from ? `${bike.id}-${range.from.toISOString()}` : null;
+  const bookingId = range?.from && range?.to
+    ? `${bike.id}-${range.from.toISOString()}-${range.to.toISOString()}-${pickupTime}`
+    : null;
   const isInCart = bookingId ? cartItems.some((item) => item.id === bookingId) : false;
 
   const handleAddToCart = useCallback(() => {
-    if (!range?.from || !range?.to || !bike) return;
+    // Frontend validation for time range (can also be validated by 'min'/'max' attributes)
+    const [hours, minutes] = pickupTime.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes;
+    const minMinutes = 8 * 60; // 8:00 AM
+    const maxMinutes = 18 * 60 + 30; // 6:30 PM
+
+    if (totalMinutes < minMinutes || totalMinutes > maxMinutes) {
+        alert("Please select a pickup time between 8:00 AM and 6:30 PM.");
+        return;
+    }
+
+    if (!range?.from || !range?.to || !bike || !pickupTime) {
+      alert("Please select dates and a pickup time.");
+      return;
+    }
+
     const newItem = {
       id: bookingId,
       name: bike.name,
@@ -105,12 +124,14 @@ function BookingWidget({ bike, selectedExtras }) {
       days: numberOfDays,
       totalPrice: totalPrice,
       range: { from: range.from, to: range.to },
+      pickupTime: pickupTime,
       extras: selectedExtras,
     };
     addItemToCart(newItem);
     setIsAdded(true);
-  }, [bookingId, bike, numberOfDays, totalPrice, selectedExtras, addItemToCart, range]);
+  }, [bookingId, bike, numberOfDays, totalPrice, selectedExtras, addItemToCart, range, pickupTime]);
 
+  // Calendar footer text
   let footerText = "Please select the first day of your rental.";
   if (range?.from) {
     footerText = range.to
@@ -186,6 +207,31 @@ function BookingWidget({ bike, selectedExtras }) {
         />
       </div>
 
+      {/* --- REVISED: Pickup Time Input with Restrictions and Styling --- */}
+      {range?.from && (
+        <div className="mt-6 border-t border-graphite/50 pt-6">
+          <h3 className="mb-4 text-lg font-bold text-cloud">Select Pickup Time</h3>
+          <div className="grid grid-cols-1 gap-4">
+            <div>
+              <label htmlFor="pickupTime" className="block text-sm font-medium text-steel mb-1">
+                Pickup Time:
+              </label>
+              <input
+                type="time"
+                id="pickupTime"
+                value={pickupTime}
+                onChange={(e) => setPickupTime(e.target.value)}
+                // --- NEW: Time Restrictions (min/max) and Consistent Styling ---
+                min="08:00" // 8:00 AM
+                max="18:30" // 6:30 PM
+                className="w-full rounded-md border border-graphite/50 bg-dark-arsenic px-3 py-2 text-cloud focus:border-green-400 focus:ring focus:ring-green-400 focus:ring-opacity-50"
+                required
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mt-6 border-t border-graphite/50 pt-6">
         <PriceBreakdown
           basePricePerDay={bike.price_per_day}
@@ -212,7 +258,7 @@ function BookingWidget({ bike, selectedExtras }) {
           ) : (
             <Button
               onClick={handleAddToCart}
-              disabled={!range?.from || !range?.to || isInCart}
+              disabled={!range?.from || !range?.to || !pickupTime || isInCart}
               className="w-full py-3 text-lg"
               icon={isInCart ? FaCheck : FaShoppingCart}
             >

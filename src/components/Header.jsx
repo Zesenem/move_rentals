@@ -81,16 +81,7 @@ function Header() {
           </span>
         )}
       </NavLink>
-      <Button
-        as="a"
-        href="https://wa.me/351920016794"
-        target="_blank"
-        rel="noopener noreferrer"
-        variant="primary"
-        icon={FaWhatsapp}
-      >
-        Contact Us
-      </Button>
+      
     </>
   );
 
