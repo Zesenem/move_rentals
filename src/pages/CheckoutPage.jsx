@@ -20,16 +20,12 @@ const CartItem = ({ item, onRemove }) => (
           {format(new Date(item.range.from), "MMM d, yyyy")} to{" "}
           {format(new Date(item.range.to), "MMM d, yyyy")}
         </p>
-        <p className="text-sm font-semibold text-steel">{item.days} days</p>
+        <p className="text-sm font-semibold text-steel">{item.days} {item.days === 1 ? 'day' : 'days'}</p>
       </div>
     </div>
     <div className="flex items-center justify-between sm:w-auto sm:flex-col sm:items-end sm:text-right">
       <p className="mb-1 text-xl font-bold text-cloud">€{item.totalPrice.toFixed(2)}</p>
-      <button
-        onClick={() => onRemove(item.id)}
-        className="text-space transition-colors hover:text-red-500"
-        aria-label={`Remove ${item.name} from cart`}
-      >
+      <button onClick={() => onRemove(item.id)} className="text-space transition-colors hover:text-red-500" aria-label={`Remove ${item.name} from cart`}>
         <FaTrash />
       </button>
     </div>
@@ -97,12 +93,14 @@ function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="container mx-auto py-20 text-center">
-        <h1 className="text-4xl font-extrabold text-steel">Your Cart is Empty</h1>
-        <p className="mt-4 text-lg text-space">Looks like you haven't selected a bike yet.</p>
-        <Button as={Link} to="/" variant="primary" className="mt-8">
-          Browse Our Fleet
-        </Button>
+      <div className="container mx-auto flex min-h-[70vh] items-center justify-center py-20 text-center">
+        <div>
+          <h1 className="text-4xl font-extrabold text-steel">Your Cart is Empty</h1>
+          <p className="mt-4 text-lg text-space">Looks like you haven't selected a bike yet.</p>
+          <Button as={Link} to="/#fleet-section" variant="primary" className="mt-8">
+            Browse Our Fleet
+          </Button>
+        </div>
       </div>
     );
   }
@@ -111,6 +109,7 @@ function CheckoutPage() {
     <div className="container mx-auto px-4 py-12">
       <h1 className="mb-8 text-4xl font-extrabold text-steel">Review Your Rental</h1>
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+        {/* Left Side: Cart Items & Customer Details */}
         <div className="space-y-6 lg:col-span-2">
           <div className="rounded-lg bg-arsenic p-6">
             <h2 className="mb-4 text-2xl font-bold text-cloud">Your Items</h2>
@@ -125,40 +124,33 @@ function CheckoutPage() {
             <div className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-space">
-                    First Name <span className="text-red-500">*</span>
-                  </label>
-                  <input id="firstName" type="text" value={customerDetails.firstName} onChange={handleCustomerDetailsChange} className="w-full rounded-md border border-graphite bg-phantom p-3 text-cloud" required />
+                  <label htmlFor="firstName" className="mb-1 block text-sm font-medium text-space">First Name <span className="text-red-500">*</span></label>
+                  <input id="firstName" type="text" value={customerDetails.firstName} onChange={handleCustomerDetailsChange} className="w-full rounded-md border border-graphite bg-phantom p-3 text-cloud focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/50" required />
                   {formErrors.firstName && <p className="mt-1 text-sm text-red-400">{formErrors.firstName}</p>}
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="mb-1 block text-sm font-medium text-space">
-                    Last Name <span className="text-red-500">*</span>
-                  </label>
-                  <input id="lastName" type="text" value={customerDetails.lastName} onChange={handleCustomerDetailsChange} className="w-full rounded-md border border-graphite bg-phantom p-3 text-cloud" required />
+                  <label htmlFor="lastName" className="mb-1 block text-sm font-medium text-space">Last Name <span className="text-red-500">*</span></label>
+                  <input id="lastName" type="text" value={customerDetails.lastName} onChange={handleCustomerDetailsChange} className="w-full rounded-md border border-graphite bg-phantom p-3 text-cloud focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/50" required />
                   {formErrors.lastName && <p className="mt-1 text-sm text-red-400">{formErrors.lastName}</p>}
                 </div>
               </div>
               <div>
-                <label htmlFor="email" className="mb-1 block text-sm font-medium text-space">
-                  Email Address <span className="text-red-500">*</span>
-                </label>
-                <input id="email" type="email" value={customerDetails.email} onChange={handleCustomerDetailsChange} className="w-full rounded-md border border-graphite bg-phantom p-3 text-cloud" required />
+                <label htmlFor="email" className="mb-1 block text-sm font-medium text-space">Email Address <span className="text-red-500">*</span></label>
+                <input id="email" type="email" value={customerDetails.email} onChange={handleCustomerDetailsChange} className="w-full rounded-md border border-graphite bg-phantom p-3 text-cloud focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/50" required />
                 {formErrors.email && <p className="mt-1 text-sm text-red-400">{formErrors.email}</p>}
               </div>
               <div>
-                <label htmlFor="phone" className="mb-1 block text-sm font-medium text-space">
-                  Phone Number <span className="text-red-500">*</span>
-                </label>
+                <label htmlFor="phone" className="mb-1 block text-sm font-medium text-space">Phone Number <span className="text-red-500">*</span></label>
                 <div className="phone-input-container">
-                  <PhoneInput id="phone" value={customerDetails.phone} onChange={handlePhoneChange} defaultCountry="PT" className="phone-input" />
+                  <PhoneInput id="phone" value={customerDetails.phone} onChange={handlePhoneChange} defaultCountry="PT" international countryCallingCodeEditable={false} />
                 </div>
                 {formErrors.phone && <p className="mt-1 text-sm text-red-400">{formErrors.phone}</p>}
               </div>
             </div>
           </div>
         </div>
-
+        
+        {/* Right Side: Order Summary & Payment */}
         <div className="lg:col-span-1">
           <div className="sticky top-24 rounded-lg bg-arsenic p-6">
             <h2 className="mb-4 border-b border-graphite/50 pb-4 text-2xl font-bold text-cloud">

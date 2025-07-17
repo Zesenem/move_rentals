@@ -9,7 +9,7 @@ function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const itemCount = useCartStore((state) => state.getItemCount());
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -29,18 +29,14 @@ function Header() {
     if (action) action();
   };
 
-  // Modified handleOurFleetClick function
   const handleOurFleetClick = () => {
-    closeMenu(); // Close the mobile menu if open
+    closeMenu();
     if (window.location.pathname !== "/") {
-      // If not on the home page, navigate to home and then scroll
       navigate("/");
-      // Use a timeout to allow the navigation to complete before scrolling
       setTimeout(() => {
         document.getElementById("fleet-section")?.scrollIntoView({ behavior: "smooth" });
-      }, 100); // A small delay is usually sufficient
+      }, 100); 
     } else {
-      // If already on the home page, just scroll
       document.getElementById("fleet-section")?.scrollIntoView({ behavior: "smooth" });
     }
   };
@@ -48,7 +44,7 @@ function Header() {
   const navItems = [
     {
       name: "Our Fleet",
-      onClick: handleOurFleetClick, // Use onClick instead of action type
+      onClick: handleOurFleetClick, 
     },
     { name: "Contact", to: "/contact" },
   ];
@@ -56,10 +52,10 @@ function Header() {
   const NavLinks = () => (
     <>
       {navItems.map((item) =>
-        item.onClick ? ( // Check for onClick property
+        item.onClick ? ( 
           <button
             key={item.name}
-            onClick={item.onClick} // Call the onClick handler
+            onClick={item.onClick} 
             className="rounded-md px-3 py-2 font-semibold text-steel transition-colors duration-300 hover:bg-arsenic"
           >
             {item.name}

@@ -4,13 +4,28 @@ import { DayPicker, getDefaultClassNames } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { format, differenceInCalendarDays, eachDayOfInterval } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
-import { FaCheck, FaShoppingCart } from "react-icons/fa";
+import { FaCheck, FaShoppingCart, FaClock } from "react-icons/fa";
 import { RingLoader } from "react-spinners";
 
 import { getUnavailableDates } from "../services/twice.js";
 import { useCartStore } from "../store/cartStore.js";
 import { calculateTieredPrice, calculateExtrasTotal } from "../utils/priceCalculator.js";
 import Button from "./Button";
+
+const generateTimeSlots = (interval = 30) => {
+  const slots = [];
+  const startTime = 8 * 60;
+  const endTime = 18 * 60 + 30; 
+
+  for (let timeInMinutes = startTime; timeInMinutes <= endTime; timeInMinutes += interval) {
+    const hours = Math.floor(timeInMinutes / 60)
+      .toString()
+      .padStart(2, "0");
+    const minutes = (timeInMinutes % 60).toString().padStart(2, "0");
+    slots.push(`${hours}:${minutes}`);
+  }
+  return slots;
+};
 
 const PriceBreakdown = ({ basePricePerDay, numberOfDays, extrasPrice, totalPrice }) => (
   <div className="space-y-3 text-sm">
@@ -48,7 +63,8 @@ const PriceBreakdown = ({ basePricePerDay, numberOfDays, extrasPrice, totalPrice
 function BookingWidget({ bike, selectedExtras }) {
   const [range, setRange] = useState();
   const [isAdded, setIsAdded] = useState(false);
-  const [pickupTime, setPickupTime] = useState('10:00'); 
+  const [pickupTime, setPickupTime] = useState("10:00");
+  const timeSlots = useMemo(() => generateTimeSlots(), []);
 
   const { items: cartItems, addItem: addItemToCart } = useCartStore();
 
@@ -67,10 +83,7 @@ function BookingWidget({ bike, selectedExtras }) {
     return cartItems
       .filter((item) => item.id.startsWith(bike.id))
       .flatMap((item) =>
-        eachDayOfInterval({
-          start: new Date(item.range.from),
-          end: new Date(item.range.to),
-        })
+        eachDayOfInterval({ start: new Date(item.range.from), end: new Date(item.range.to) })
       );
   }, [cartItems, bike.id]);
 
@@ -79,10 +92,7 @@ function BookingWidget({ bike, selectedExtras }) {
   }, [apiUnavailableDates, cartBookedDates]);
 
   const numberOfDays = useMemo(() => {
-    if (range?.from && range?.to) {
-      return differenceInCalendarDays(range.to, range.from) + 1;
-    }
-    return 0;
+    return range?.from && range?.to ? differenceInCalendarDays(range.to, range.from) + 1 : 0;
   }, [range]);
 
   useEffect(() => {
@@ -93,26 +103,21 @@ function BookingWidget({ bike, selectedExtras }) {
   const extrasPrice = calculateExtrasTotal(selectedExtras, numberOfDays);
   const totalPrice = basePrice + extrasPrice;
 
-  const bookingId = range?.from && range?.to
-    ? `${bike.id}-${range.from.toISOString()}-${range.to.toISOString()}-${pickupTime}`
-    : null;
-  const isInCart = bookingId ? cartItems.some((item) => item.id === bookingId) : false;
+  const bookingId = useMemo(
+    () =>
+      range?.from && range?.to
+        ? `${bike.id}-${range.from.toISOString()}-${range.to.toISOString()}-${pickupTime}`
+        : null,
+    [bike.id, range, pickupTime]
+  );
+
+  const isInCart = useMemo(
+    () => (bookingId ? cartItems.some((item) => item.id === bookingId) : false),
+    [bookingId, cartItems]
+  );
 
   const handleAddToCart = useCallback(() => {
-    const [hours, minutes] = pickupTime.split(':').map(Number);
-    const totalMinutes = hours * 60 + minutes;
-    const minMinutes = 8 * 60; 
-    const maxMinutes = 18 * 60 + 30; 
-
-    if (totalMinutes < minMinutes || totalMinutes > maxMinutes) {
-        alert("Please select a pickup time between 8:00 AM and 6:30 PM.");
-        return;
-    }
-
-    if (!range?.from || !range?.to || !bike || !pickupTime) {
-      alert("Please select dates and a pickup time.");
-      return;
-    }
+    if (!range?.from || !range?.to || !bike || !pickupTime) return;
 
     const newItem = {
       id: bookingId,
@@ -130,13 +135,12 @@ function BookingWidget({ bike, selectedExtras }) {
     setIsAdded(true);
   }, [bookingId, bike, numberOfDays, totalPrice, selectedExtras, addItemToCart, range, pickupTime]);
 
-  let footerText = "Please select the first day of your rental.";
+  let footerText = "Please select your rental period.";
   if (range?.from) {
     footerText = range.to
       ? `${format(range.from, "PPP")} – ${format(range.to, "PPP")}`
       : `Selected: ${format(range.from, "PPP")}.`;
   }
-
   const defaultClassNames = getDefaultClassNames();
 
   if (isError) {
@@ -205,30 +209,31 @@ function BookingWidget({ bike, selectedExtras }) {
         />
       </div>
 
-      {range?.from && (
-        <div className="mt-6 border-t border-graphite/50 pt-6">
-          <h3 className="mb-4 text-lg font-bold text-cloud">Select Pickup Time</h3>
-          <div className="grid grid-cols-1 gap-4">
-            <div>
-              <label htmlFor="pickupTime" className="block text-sm font-medium text-steel mb-1">
-                Pickup Time:
-              </label>
-              <input
-                type="time"
-                id="pickupTime"
-                value={pickupTime}
-                onChange={(e) => setPickupTime(e.target.value)}
-                min="08:00"
-                max="18:30" 
-                className="w-full rounded-md border border-graphite/50 bg-dark-arsenic px-3 py-2 text-cloud focus:border-green-400 focus:ring focus:ring-green-400 focus:ring-opacity-50"
-                required
-              />
-            </div>
+      <div className="mt-6 space-y-6 border-t border-graphite/50 pt-6">
+        {range?.from && (
+          <div>
+            <label
+              htmlFor="pickupTime"
+              className="mb-2 flex items-center gap-2 text-lg font-bold text-cloud"
+            >
+              <FaClock />
+              Pickup Time
+            </label>
+            <select
+              id="pickupTime"
+              value={pickupTime}
+              onChange={(e) => setPickupTime(e.target.value)}
+              className="w-full cursor-pointer rounded-md border-graphite/50 bg-phantom p-3 text-cloud focus:border-emerald-500 focus:ring-emerald-500"
+            >
+              {timeSlots.map((time) => (
+                <option key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="mt-6 border-t border-graphite/50 pt-6">
         <PriceBreakdown
           basePricePerDay={bike.price_per_day}
           numberOfDays={numberOfDays}

@@ -25,47 +25,38 @@
   animation: fadeInUp 0.5s ease-out forwards;
 }
 
-.smoke-blob-effect {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-}
+/* --- Consolidated Phone Input Styles --- */
 
+/* The main container for the input */
 .phone-input-container {
-  @apply flex items-stretch w-full;
+  @apply relative flex w-full items-center;
 }
 
+/* The country select button part on the left */
 .phone-input-container .PhoneInputCountry {
-  @apply bg-arsenic border border-graphite rounded-l-md p-3 flex items-center cursor-pointer transition-colors hover:bg-graphite/50;
-  border-right: none;
+  @apply z-10 inline-flex shrink-0 items-center rounded-l-lg border border-graphite bg-arsenic p-3 text-center text-sm font-medium text-cloud hover:bg-graphite/50 focus:outline-none focus:ring-2 focus:ring-cloud/50;
 }
 
+/* The phone number input field on the right */
 .phone-input-container .PhoneInputInput {
-  @apply bg-phantom border border-graphite rounded-r-md p-3 text-cloud w-full focus:ring-cloud focus:border-cloud focus:z-10 relative;
-  border-left: 0;
+  @apply relative z-0 -ml-px block w-full rounded-r-lg border border-graphite bg-phantom p-3 text-cloud focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/50;
 }
 
+/* The dropdown menu that appears when you click the flag */
 .PhoneInputCountrySelect {
-  @apply bg-arsenic border border-graphite rounded-md shadow-lg max-h-60 overflow-y-auto p-2;
+  @apply z-10 max-h-60 overflow-y-auto rounded-lg border border-graphite bg-arsenic p-2 shadow-lg;
 }
 
+/* The search bar inside the dropdown */
 .PhoneInputCountrySelect-search {
-  @apply w-full bg-phantom border border-graphite rounded-md p-2 mb-2 text-cloud placeholder-gray-500 focus:ring-cloud focus:border-cloud;
+  @apply mb-2 w-full rounded-md border border-graphite bg-phantom p-2 text-cloud placeholder-gray-500 focus:border-cloud focus:ring-cloud;
 }
 
+/* An individual country option in the dropdown */
 .PhoneInputCountryOption {
-  @apply flex items-center p-2 rounded-md cursor-pointer hover:bg-graphite text-steel;
+  @apply flex cursor-pointer items-center rounded-md p-2 text-steel hover:bg-graphite;
 }
 
 .PhoneInputCountryOption--selected {
   @apply bg-graphite text-cloud;
-}
-
-.PhoneInputCountryIcon {
-  @apply mr-3;
-  box-shadow: none;
-}
-
-.PhoneInputCountrySelectArrow {
-  @apply opacity-70 ml-2;
 }

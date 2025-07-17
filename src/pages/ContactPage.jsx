@@ -1,10 +1,11 @@
 import { Helmet } from "react-helmet-async";
-import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaClock } from "react-icons/fa";
+import OpeningHours from "../components/OpeningHours"; 
 
 const ContactInfoCard = ({ icon, title, children }) => {
   const IconComponent = icon;
   return (
-    <div className="flex items-start gap-4 rounded-lg bg-arsenic p-6">
+    <div className="flex items-start gap-4 rounded-lg bg-arsenic p-6 h-full">
       <IconComponent className="mt-1 text-2xl text-cloud flex-shrink-0" />
       <div>
         <h3 className="text-xl font-bold text-cloud">{title}</h3>
@@ -13,8 +14,9 @@ const ContactInfoCard = ({ icon, title, children }) => {
     </div>
   );
 };
+
 const contactInfo = {
-  address: "Rua Carlos Reis 63, Lisboa, Portugal",
+  address: "Rua da Beneficência 44D, Lisboa, Portugal",
   phone: "+351 920 016 794",
   email: "move@move-rentals.com",
   get whatsappUrl() {
@@ -26,7 +28,7 @@ const contactInfo = {
 };
 
 function ContactPage() {
-  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+  const googleMapsApiKey = import.meta.env.VITE_Maps_API_KEY;
   const embedMapUrl = `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${encodeURIComponent(
     contactInfo.address
   )}`;
@@ -48,6 +50,11 @@ function ContactPage() {
           </a>
         </>
       ),
+    },
+    {
+      icon: FaClock,
+      title: "Opening Hours",
+      content: <OpeningHours />,
     },
     {
       icon: FaWhatsapp,
@@ -101,7 +108,7 @@ function ContactPage() {
             Have a question or need assistance? We're here to help.
           </p>
 
-          <div className="mb-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="mb-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
             {contactMethods.map((method) => (
               <ContactInfoCard key={method.title} icon={method.icon} title={method.title}>
                 {method.content}
