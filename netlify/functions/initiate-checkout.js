@@ -1,7 +1,5 @@
-/* eslint-env node */
-
-
 import { Buffer } from 'buffer';
+import process from 'process';
 
 const TWICE_API_BASE = 'https://api.twicecommerce.com/admin';
 const REVOLUT_API_BASE = 'https://merchant.revolut.com/api/1.0';
