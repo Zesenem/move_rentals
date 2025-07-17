@@ -5,14 +5,18 @@ import process from 'process';
 // After running it successfully, you can delete this file.
 
 export const handler = async () => {
-  const { REVOLUT_SECRET_KEY, URL: NETLIFY_SITE_URL } = process.env;
-  const siteUrl = NETLIFY_SITE_URL || 'http://localhost:8888'; // Fallback for local testing if needed
+  const { REVOLUT_SECRET_KEY, REVOLUT_ENV, URL: NETLIFY_SITE_URL } = process.env;
+  const siteUrl = NETLIFY_SITE_URL || 'http://localhost:8888';
 
   if (!REVOLUT_SECRET_KEY) {
     return { statusCode: 500, body: "Server configuration error: REVOLUT_SECRET_KEY is missing." };
   }
 
-  // The URL of your *other* function that will listen for events
+  // FIXED: Use the correct API URL based on the environment variable.
+  const REVOLUT_API_URL = REVOLUT_ENV === "sandbox"
+    ? "https://sandbox-merchant.revolut.com/api/webhooks"
+    : "https://merchant.revolut.com/api/webhooks";
+
   const webhookListenerUrl = `${siteUrl}/.netlify/functions/revolut-webhook`;
 
   const payload = {
@@ -21,7 +25,7 @@ export const handler = async () => {
   };
 
   try {
-    const response = await fetch('https://merchant.revolut.com/api/webhooks', {
+    const response = await fetch(REVOLUT_API_URL, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${REVOLUT_SECRET_KEY}`,
