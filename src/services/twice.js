@@ -8,7 +8,6 @@ function mapApiProductToAppProduct(apiProduct) {
     image_urls: apiProduct.images || [],
     status: apiProduct.limitations?.visibleInListing ? "available" : "unavailable",
     description: apiProduct.description?.en || apiProduct.description?.def || "",
-    security_deposit: apiProduct.rentals?.deposit / 100 || 0,
   };
 }
 
@@ -45,6 +44,7 @@ export const fetchProducts = async () => {
         ...liveProduct,
         badges: staticInfo?.badges || [],
         quick_glance: staticInfo?.quick_glance || [],
+        security_deposit: staticInfo?.security_deposit || 0, 
       };
     });
   } catch (error) {

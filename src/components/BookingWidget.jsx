@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { DayPicker, getDefaultClassNames } from "react-day-picker";
 import "react-day-picker/dist/style.css";
-import { format, differenceInCalendarDays, eachDayOfInterval } from "date-fns";
+import { format, differenceInCalendarDays, eachDayOfInterval, isToday } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { FaCheck, FaShoppingCart, FaClock } from "react-icons/fa";
 import { RingLoader } from "react-spinners";
@@ -12,16 +12,36 @@ import { useCartStore } from "../store/cartStore.js";
 import { calculateTieredPrice, calculateExtrasTotal } from "../utils/priceCalculator.js";
 import Button from "./Button";
 
-const generateTimeSlots = (interval = 30) => {
+/**
+ * Generates time slots for the dropdown.
+ * @param {number} [interval=30] - The interval between slots in minutes.
+ * @param {string} [minTime='00:00'] - The minimum time to start generating slots from, in "HH:mm" format.
+ * @returns {string[]} An array of time slots.
+ */
+const generateTimeSlots = (interval = 30, minTime = '00:00') => {
   const slots = [];
-  const startTime = 8 * 60;
-  const endTime = 18 * 60 + 30; 
+  const startTime = 8 * 60; // 8:00 AM in minutes
+  const endTime = 18 * 60 + 30; // 6:30 PM in minutes
 
-  for (let timeInMinutes = startTime; timeInMinutes <= endTime; timeInMinutes += interval) {
-    const hours = Math.floor(timeInMinutes / 60)
-      .toString()
-      .padStart(2, "0");
-    const minutes = (timeInMinutes % 60).toString().padStart(2, "0");
+  const [minHours, minMinutes] = minTime.split(':').map(Number);
+  const minTimeInMinutes = minHours * 60 + minMinutes;
+
+  let loopStartTime = Math.max(startTime, minTimeInMinutes);
+
+  // If the current time is already past the last slot, return no slots.
+  if (loopStartTime > endTime) {
+    return [];
+  }
+
+  // Adjust the start time to the next available interval.
+  // e.g., if it's 09:10 and interval is 30, the first available slot is 09:30.
+  if (loopStartTime % interval !== 0) {
+    loopStartTime = loopStartTime - (loopStartTime % interval) + interval;
+  }
+
+  for (let timeInMinutes = loopStartTime; timeInMinutes <= endTime; timeInMinutes += interval) {
+    const hours = Math.floor(timeInMinutes / 60).toString().padStart(2, '0');
+    const minutes = (timeInMinutes % 60).toString().padStart(2, '0');
     slots.push(`${hours}:${minutes}`);
   }
   return slots;
@@ -33,27 +53,21 @@ const PriceBreakdown = ({ basePricePerDay, numberOfDays, extrasPrice, totalPrice
       <span>Base price per day</span>
       <span className="font-semibold text-cloud">€{basePricePerDay.toFixed(2)}</span>
     </div>
-
     {numberOfDays > 0 && (
       <div className="flex justify-between text-steel">
         <span>Duration</span>
         <span className="font-semibold text-cloud">{numberOfDays} day(s)</span>
       </div>
     )}
-
     {extrasPrice > 0 && (
       <div className="flex justify-between text-steel">
         <span>Extras</span>
         <span className="font-semibold text-cloud">+ €{extrasPrice.toFixed(2)}</span>
       </div>
     )}
-
     <div className="!mt-4 flex items-center justify-between border-t border-graphite/50 pt-4">
       <span className="text-xl font-bold text-cloud">Total Price</span>
-      <span
-        key={totalPrice}
-        className="animate-[pulse_0.5s_ease-in-out] text-2xl font-bold text-cloud"
-      >
+      <span key={totalPrice} className="animate-[pulse_0.5s_ease-in-out] text-2xl font-bold text-cloud">
         {totalPrice > 0 ? `€${totalPrice.toFixed(2)}` : "€--.--"}
       </span>
     </div>
@@ -63,28 +77,41 @@ const PriceBreakdown = ({ basePricePerDay, numberOfDays, extrasPrice, totalPrice
 function BookingWidget({ bike, selectedExtras }) {
   const [range, setRange] = useState();
   const [isAdded, setIsAdded] = useState(false);
-  const [pickupTime, setPickupTime] = useState("10:00");
-  const timeSlots = useMemo(() => generateTimeSlots(), []);
+  const [pickupTime, setPickupTime] = useState('10:00');
 
   const { items: cartItems, addItem: addItemToCart } = useCartStore();
 
-  const {
-    data: apiUnavailableDates,
-    isLoading,
-    isError,
-  } = useQuery({
+  const { data: apiUnavailableDates, isLoading, isError } = useQuery({
     queryKey: ["availability", bike.id],
     queryFn: () => getUnavailableDates(bike.id),
     enabled: !!bike.id,
     initialData: [],
   });
+  
+  const timeSlots = useMemo(() => {
+    if (range?.from && isToday(range.from)) {
+      const now = new Date();
+      const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      return generateTimeSlots(30, currentTime);
+    }
+    return generateTimeSlots();
+  }, [range?.from]);
+  
+  useEffect(() => {
+    // If the available time slots change (e.g., user selects today) and the
+    // currently selected time is no longer valid, reset it to the first available slot.
+    if (timeSlots.length > 0 && !timeSlots.includes(pickupTime)) {
+      setPickupTime(timeSlots[0]);
+    } else if (timeSlots.length === 0) {
+      // If there are no slots available for today, clear the pickup time
+      setPickupTime('');
+    }
+  }, [timeSlots, pickupTime]);
 
   const cartBookedDates = useMemo(() => {
     return cartItems
       .filter((item) => item.id.startsWith(bike.id))
-      .flatMap((item) =>
-        eachDayOfInterval({ start: new Date(item.range.from), end: new Date(item.range.to) })
-      );
+      .flatMap((item) => eachDayOfInterval({ start: new Date(item.range.from), end: new Date(item.range.to) }));
   }, [cartItems, bike.id]);
 
   const allDisabledDates = useMemo(() => {
@@ -103,16 +130,15 @@ function BookingWidget({ bike, selectedExtras }) {
   const extrasPrice = calculateExtrasTotal(selectedExtras, numberOfDays);
   const totalPrice = basePrice + extrasPrice;
 
-  const bookingId = useMemo(
-    () =>
-      range?.from && range?.to
-        ? `${bike.id}-${range.from.toISOString()}-${range.to.toISOString()}-${pickupTime}`
-        : null,
+  const bookingId = useMemo(() =>
+    range?.from && range?.to
+      ? `${bike.id}-${range.from.toISOString()}-${range.to.toISOString()}-${pickupTime}`
+      : null,
     [bike.id, range, pickupTime]
   );
-
-  const isInCart = useMemo(
-    () => (bookingId ? cartItems.some((item) => item.id === bookingId) : false),
+  
+  const isInCart = useMemo(() =>
+    bookingId ? cartItems.some((item) => item.id === bookingId) : false,
     [bookingId, cartItems]
   );
 
@@ -137,9 +163,7 @@ function BookingWidget({ bike, selectedExtras }) {
 
   let footerText = "Please select your rental period.";
   if (range?.from) {
-    footerText = range.to
-      ? `${format(range.from, "PPP")} – ${format(range.to, "PPP")}`
-      : `Selected: ${format(range.from, "PPP")}.`;
+    footerText = range.to ? `${format(range.from, "PPP")} – ${format(range.to, "PPP")}` : `Selected: ${format(range.from, "PPP")}.`;
   }
   const defaultClassNames = getDefaultClassNames();
 
@@ -212,25 +236,26 @@ function BookingWidget({ bike, selectedExtras }) {
       <div className="mt-6 space-y-6 border-t border-graphite/50 pt-6">
         {range?.from && (
           <div>
-            <label
-              htmlFor="pickupTime"
-              className="mb-2 flex items-center gap-2 text-lg font-bold text-cloud"
-            >
+            <label htmlFor="pickupTime" className="mb-2 flex items-center gap-2 text-lg font-bold text-cloud">
               <FaClock />
               Pickup Time
             </label>
-            <select
-              id="pickupTime"
-              value={pickupTime}
-              onChange={(e) => setPickupTime(e.target.value)}
-              className="w-full cursor-pointer rounded-md border-graphite/50 bg-phantom p-3 text-cloud focus:border-emerald-500 focus:ring-emerald-500"
-            >
-              {timeSlots.map((time) => (
-                <option key={time} value={time}>
-                  {time}
-                </option>
-              ))}
-            </select>
+            {timeSlots.length > 0 ? (
+              <select
+                id="pickupTime"
+                value={pickupTime}
+                onChange={(e) => setPickupTime(e.target.value)}
+                className="w-full cursor-pointer rounded-md border-graphite/50 bg-phantom p-3 text-cloud focus:border-emerald-500 focus:ring-emerald-500"
+              >
+                {timeSlots.map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p className="text-sm text-steel">No more pickup times available for today. Please select a future date.</p>
+            )}
           </div>
         )}
 

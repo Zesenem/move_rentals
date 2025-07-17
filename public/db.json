@@ -12,7 +12,7 @@
       { "item": "Third party insurance", "icon": "users" },
       { "item": "Road assistance", "icon": "road" },
       { "item": "Unlimited mileage", "icon": "infinity" },
-      { "item": "Driver helmet - Jet Type", "icon": "helmetinc" },
+      { "item": "Driver helmet - Jet Type", "icon": "helmet" },
       { "item": "Locker", "icon": "lock" }
     ]
   },
@@ -23,8 +23,9 @@
       "quick_glance": [
         { "label": "125 cc", "icon": "engine" },
         { "label": "A1 / B", "icon": "license" },
-        { "label": "7.1 L", "icon": "gas" }
-      ]
+        { "label": "7.1 L", "icon": "gas" } 
+      ],
+      "security_deposit": 330
     },
     {
       "id": "mcQ69eD3JllbMrC8FriN",
@@ -33,7 +34,8 @@
         { "label": "125 cc", "icon": "engine" },
         { "label": "A1 / B", "icon": "license" },
         { "label": "5.2 L", "icon": "gas" }
-      ]
+      ],
+      "security_deposit": 290
     },
     {
       "id": "c0cxAwwBOEjg0R8PYsiy",
@@ -42,7 +44,8 @@
         { "label": "125 cc", "icon": "engine" },
         { "label": "A1 / B", "icon": "license" },
         { "label": "7.1 L", "icon": "gas" }
-      ]
+      ],
+      "security_deposit": 440
     },
     {
       "id": "AqIgZ8WQpmmtuaN9QrZE",
@@ -51,7 +54,8 @@
         { "label": "300 cc", "icon": "engine" },
         { "label": "A2 / A", "icon": "license" },
         { "label": "13.2 L", "icon": "gas" }
-      ]
+      ],
+      "security_deposit": 790
     }
   ]
 }
