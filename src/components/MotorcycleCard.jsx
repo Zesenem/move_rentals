@@ -106,12 +106,8 @@ function MotorcycleCard({ bike, index }) {
           <QuickGlance stats={bike.quick_glance} />
           <div className="mt-auto space-y-4 border-t border-graphite/30 pt-4">
             <div className="flex items-baseline text-cloud">
-              <span
-                className={`text-3xl font-bold tracking-tight ${
-                  isPlaceholder ? "line-through" : ""
-                }`}
-              >
-                €{bike.price_per_day.toFixed(2)}
+              <span className="text-3xl font-bold tracking-tight">
+                {isPlaceholder ? '€ --.-' : `€${bike.price_per_day.toFixed(2)}`}
               </span>
               <span className="ml-1 text-sm font-semibold text-space">/day</span>
             </div>

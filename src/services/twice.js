@@ -8,7 +8,6 @@ function mapApiProductToAppProduct(apiProduct) {
     image_urls: apiProduct.images || [],
     status: apiProduct.limitations?.visibleInListing ? "available" : "unavailable",
     description: apiProduct.description?.en || apiProduct.description?.def || "",
-    security_deposit: apiProduct.rentals?.deposit / 100 || 0,
   };
 }
 
@@ -45,6 +44,7 @@ export const fetchProducts = async () => {
         ...liveProduct,
         badges: staticInfo?.badges || [],
         quick_glance: staticInfo?.quick_glance || [],
+        security_deposit: staticInfo?.security_deposit || 0, 
       };
     });
   } catch (error) {
@@ -81,7 +81,7 @@ export const fetchProductBySlug = async (slug) => {
       commonData: staticData.common_data,
     };
   } catch (error) {
-    console.error(`Error in fetchProductBySlug for slug: ${slug}`, error);
+    console.error("Error in fetchProductBySlug:", error);
     throw error;
   }
 };
@@ -106,52 +106,26 @@ export const getUnavailableDates = async (bikeId) => {
     });
     return disabledDates;
   } catch (error) {
-    console.error(`Error in getUnavailableDates for bikeId: ${bikeId}`, error);
+    console.error("Error in getUnavailableDates:", error);
     throw error;
   }
 };
 
-export const createOrder = async ({ cartItems, customerDetails }) => {
-  const response = await fetch(`/.netlify/functions/create-order`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ cartItems, customerDetails }),
-  });
+export const initiateCheckout = async ({ cartItems, customerDetails }) => {
+  try {
+    const response = await fetch(`/.netlify/functions/initiate-checkout`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cartItems, customerDetails }),
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error("Error creating order:", errorData);
-    throw new Error(errorData.error?.message || "Failed to create order.");
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || "Could not start the checkout process.");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error initiating checkout:", error);
+    throw error;
   }
-  return await response.json();
-};
-
-export const createRevolutOrderToken = async ({ amount, currency }) => {
-  const response = await fetch(`/.netlify/functions/create-revolut-order-token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ amount, currency }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error("Error creating Revolut order token:", errorData);
-    throw new Error(errorData.error?.message || "Failed to create Revolut order token.");
-  }
-  return await response.json();
-};
-
-export const processRevolutPaymentAndOrder = async (payload) => {
-  const response = await fetch(`/.netlify/functions/process-revolut-payment-and-order`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    console.error("Error processing Revolut payment and order:", errorData);
-    throw new Error(errorData.error?.message || "Failed to complete booking and payment.");
-  }
-  return await response.json();
 };
