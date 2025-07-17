@@ -50,10 +50,16 @@ function TermsPage() {
             <section>
               <h2 className="text-2xl font-bold text-steel mb-3">3. Security Deposit</h2>
               <p>
-                A security deposit of €200 is required for each scooter rental. This deposit is
-                taken as a pre-authorization on a valid credit card and is fully refundable upon the
-                safe and timely return of the scooter and all equipment in its original condition,
-                without damage or fines.
+                A security deposit is required for each scooter rental and is taken as a
+                pre-authorization on a valid credit card. The amount may vary depending on the
+                scooter model. This deposit is fully refundable upon the safe and timely return of
+                the scooter and all included equipment in their original condition, free from
+                damage, loss, or any traffic-related fines.
+              </p>{" "}
+              <p>
+                Even if a reduced security deposit package is purchased, the renter remains legally
+                responsible for the full security deposit amount in the event of damage, loss, or
+                violations.
               </p>
             </section>
 

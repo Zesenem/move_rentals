@@ -5,6 +5,9 @@ import process from 'process';
 const TWICE_API_BASE = 'https://api.twicecommerce.com/admin';
 
 const verifySignature = (payload, header, secret) => {
+  if (!header) {
+    return false;
+  }
   try {
     const [timestamp, signature] = header.split(',');
     const signedPayload = `${timestamp.split('=')[1]}.${payload}`;
@@ -24,10 +27,12 @@ export const handler = async (event) => {
   }
 
   const { TWICE_API_ID, TWICE_API_SECRET, REVOLUT_WEBHOOK_SIGNING_SECRET } = process.env;
-  const signatureHeader = event.headers['revolut-signature'];
+  
+  const signatureHeader = event.headers['Revolut-Signature'] || event.headers['revolut-signature'];
 
   if (!verifySignature(event.body, signatureHeader, REVOLUT_WEBHOOK_SIGNING_SECRET)) {
     console.warn("Invalid webhook signature received.");
+    console.log("Received headers:", JSON.stringify(event.headers, null, 2));
     return { statusCode: 401, body: 'Invalid signature' };
   }
 

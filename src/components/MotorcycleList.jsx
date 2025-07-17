@@ -5,10 +5,10 @@ import { fetchProducts } from "../services/twice.js";
 import MotorcycleCard from "./MotorcycleCard";
 import ComingSoonCard from "./ComingSoonCard";
 import MotorcycleCardSkeleton from "./MotorcycleCardSkeleton.jsx";
-import useIsMobile from "../hooks/useIsMobile"; // We'll assume a simple hook for this
+import useIsMobile from "../hooks/useIsMobile";
 
 function MotorcycleList() {
-  const isMobile = useIsMobile(); // A custom hook to check for mobile screen size
+  const isMobile = useIsMobile();
   const {
     data: motorcycles = [],
     isLoading,
@@ -19,16 +19,13 @@ function MotorcycleList() {
     queryFn: fetchProducts,
   });
 
-  // This memoized value now contains all our filtering logic
   const filteredAndSortedMotorcycles = useMemo(() => {
     let bikesToShow = motorcycles;
 
-    // If on mobile, filter out the placeholder bikes (price > 998)
     if (isMobile) {
       bikesToShow = bikesToShow.filter((bike) => bike.price_per_day <= 998);
     }
 
-    // Then, sort the remaining bikes by price
     return [...bikesToShow].sort((a, b) => a.price_per_day - b.price_per_day);
   }, [motorcycles, isMobile]);
 
