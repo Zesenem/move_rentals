@@ -29,7 +29,7 @@ export const handler = async () => {
         Accept: "application/json",
         Authorization: `Bearer ${REVOLUT_SECRET_KEY}`,
         "Content-Type": "application/json",
-        "Revolut-Api-Version": "2023-09-01",
+        "Revolut-Api-Version": "2024-09-01",
       },
       body: JSON.stringify(payload),
     });
