@@ -1,5 +1,8 @@
 /* eslint-env node */
 
+
+import { Buffer } from 'buffer';
+
 const TWICE_API_BASE = 'https://api.twicecommerce.com/admin';
 const REVOLUT_API_BASE = 'https://merchant.revolut.com/api/1.0';
 
@@ -9,8 +12,6 @@ export const handler = async (event) => {
   }
 
   const { TWICE_API_ID, TWICE_API_SECRET, REVOLUT_SECRET_KEY, URL: NETLIFY_SITE_URL } = process.env;
-
-  // FIXED: Use a fallback URL for local development
   const siteUrl = NETLIFY_SITE_URL || 'http://localhost:8888';
 
   if (!TWICE_API_ID || !TWICE_API_SECRET || !REVOLUT_SECRET_KEY) {
@@ -27,14 +28,12 @@ export const handler = async (event) => {
       "x-rentle-version": "2023-02-01",
     };
 
-    // --- Step 1: Get Store ID from Twice ---
     const storesResponse = await fetch(`${TWICE_API_BASE}/stores`, { headers: twiceHeaders });
     if (!storesResponse.ok) throw new Error("Could not fetch store details.");
     const storesData = await storesResponse.json();
     const storeId = storesData.data?.[0]?.id;
     if (!storeId) throw new Error("Default store ID not found.");
 
-    // --- Step 2: Create a Pending Order in Twice Commerce ---
     const twiceOrderPayload = {
       storeId: storeId,
       customer: { ...customerDetails, marketingConsent: true },
@@ -67,7 +66,6 @@ export const handler = async (event) => {
       throw new Error('Could not get order ID from Twice Commerce response.');
     }
 
-    // --- Step 3: Create Revolut Payment Order ---
     const totalAmount = cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
     const amountInCents = Math.round(totalAmount * 100);
 
@@ -94,9 +92,14 @@ export const handler = async (event) => {
     }
     const revolutOrder = await revolutResponse.json();
 
-    // --- Step 4: Return Secure Checkout URL ---
-    // FIXED: Use the `siteUrl` variable which has a local fallback
-    const checkoutUrl = `https://${revolutOrder.checkout_url_web}?success_redirect_url=${siteUrl}/booking-success/${twiceOrderId}&failure_redirect_url=${siteUrl}/checkout`;
+    const paymentPageUrl = revolutOrder.checkout_url;
+
+    if (!paymentPageUrl) {
+      console.error("Revolut response did not contain a 'checkout_url':", revolutOrder);
+      throw new Error("Could not construct payment redirect URL from Revolut's response.");
+    }
+
+    const checkoutUrl = `${paymentPageUrl}?success_redirect_url=${siteUrl}/booking-success/${twiceOrderId}&failure_redirect_url=${siteUrl}/checkout`;
 
     return {
       statusCode: 200,
