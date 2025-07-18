@@ -1,3 +1,6 @@
+import { Buffer } from "buffer";
+import process from "process";
+
 export const handler = async (event) => {
   const { bikeId } = event.queryStringParameters;
   if (!bikeId) {
@@ -43,7 +46,19 @@ export const handler = async (event) => {
         order.state !== "cancelled" && order.items.some((item) => item.productId === bikeId)
     );
 
-    return { statusCode: 200, body: JSON.stringify(bookingsForBike) };
+    const formattedBookings = bookingsForBike.map((order) => {
+      const startDate = new Date(order.startDate);
+      const endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + (order.duration.value - 1));
+
+      return {
+        startDate: order.startDate,
+        endDate: endDate.toISOString(),
+        pickupTime: order.meta?.pickupTime || "10:00", 
+      };
+    });
+
+    return { statusCode: 200, body: JSON.stringify(formattedBookings) };
   } catch (error) {
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }

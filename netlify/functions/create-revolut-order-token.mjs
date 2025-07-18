@@ -29,8 +29,7 @@ export const handler = async (event) => {
     return_url: "https://move-rentals.com/revolut-confirmation",
   };
 
-  // ✅ LOG the payload you're about to send
-  console.log("🔼 Sending to Revolut:", revolutOrderPayload);
+  console.log("Sending to Revolut:", revolutOrderPayload);
 
   try {
     const response = await fetch(REVOLUT_API_URL, {
@@ -45,11 +44,10 @@ export const handler = async (event) => {
 
     const responseData = await response.json();
 
-    // ✅ LOG the full Revolut API response
-    console.log("🔽 Revolut API response:", responseData);
+    console.log("Revolut API response:", responseData);
 
     if (!response.ok) {
-      console.error("❌ Revolut API error:", responseData);
+      console.error("Revolut API error:", responseData);
       return {
         statusCode: response.status,
         body: JSON.stringify({ error: responseData.message || "Failed to create order." }),
@@ -57,7 +55,7 @@ export const handler = async (event) => {
     }
 
     if (!responseData.token) {
-      console.warn("⚠️ No token received from Revolut — check if embedded checkout is enabled.");
+      console.warn("No token received from Revolut — check if embedded checkout is enabled.");
     }
 
     return {
