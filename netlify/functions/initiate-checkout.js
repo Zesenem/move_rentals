@@ -34,6 +34,11 @@ export const handler = async (event) => {
     const storeId = storesData.data?.[0]?.id;
     if (!storeId) throw new Error("Default store ID not found.");
 
+    // This is a more robust way to create the start date with the correct time
+    const startDateOnly = new Date(cartItems[0].range.from);
+    const [pickupHours, pickupMinutes] = cartItems[0].pickupTime.split(':').map(Number);
+    const preciseStartDate = new Date(startDateOnly.getFullYear(), startDateOnly.getMonth(), startDateOnly.getDate(), pickupHours, pickupMinutes);
+
     const twiceOrderPayload = {
       storeId: storeId,
       customer: { ...customerDetails, marketingConsent: true },
@@ -45,11 +50,13 @@ export const handler = async (event) => {
         }));
         return [mainItem, ...extraItems];
       }),
-      startDate: cartItems[0].range.from,
+      startDate: preciseStartDate.toISOString(),
       duration: { period: "days", value: cartItems[0].days },
       status: "pending_payment",
       meta: {
         pickupTime: cartItems[0].pickupTime,
+        originalStartDate: cartItems[0].range.from,
+        originalEndDate: cartItems[0].range.to,
       },
     };
 
@@ -61,8 +68,10 @@ export const handler = async (event) => {
 
     if (!twiceOrderResponse.ok) {
       const errorData = await twiceOrderResponse.json();
+      console.error("Twice API error:", errorData);
       throw new Error(`Failed to create pending order: ${JSON.stringify(errorData)}`);
     }
+    
     const twiceOrder = await twiceOrderResponse.json();
     const twiceOrderId = twiceOrder.id;
     if (!twiceOrderId) {
@@ -84,17 +93,18 @@ export const handler = async (event) => {
       headers: {
         Authorization: `Bearer ${REVOLUT_SECRET_KEY}`,
         "Content-Type": "application/json",
-        "Revolut-Api-Version": "2024-09-02",
+        "Revolut-Api-Version": "2024-09-01", // Using the version confirmed to work
       },
       body: JSON.stringify(revolutOrderPayload),
     });
 
     if (!revolutResponse.ok) {
       const errorData = await revolutResponse.json();
+      console.error("Revolut API error:", errorData);
       throw new Error(`Failed to create Revolut order: ${JSON.stringify(errorData)}`);
     }
+    
     const revolutOrder = await revolutResponse.json();
-
     const paymentPageUrl = revolutOrder.checkout_url;
 
     if (!paymentPageUrl) {
