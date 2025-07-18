@@ -1,16 +1,16 @@
-import { Buffer } from 'buffer';
-import process from 'process';
+import { Buffer } from "buffer";
+import process from "process";
 
-const TWICE_API_BASE = 'https://api.twicecommerce.com/admin';
-const REVOLUT_API_BASE = 'https://merchant.revolut.com/api/1.0';
+const TWICE_API_BASE = "https://api.twicecommerce.com/admin";
+const REVOLUT_API_BASE = "https://merchant.revolut.com/api/1.0";
 
 export const handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, body: "Method Not Allowed" };
   }
 
   const { TWICE_API_ID, TWICE_API_SECRET, REVOLUT_SECRET_KEY, URL: NETLIFY_SITE_URL } = process.env;
-  const siteUrl = NETLIFY_SITE_URL || 'http://localhost:8888';
+  const siteUrl = NETLIFY_SITE_URL || "http://localhost:8888";
 
   if (!TWICE_API_ID || !TWICE_API_SECRET || !REVOLUT_SECRET_KEY) {
     return { statusCode: 500, body: JSON.stringify({ error: "Server configuration error." }) };
@@ -19,10 +19,12 @@ export const handler = async (event) => {
   try {
     const { cartItems, customerDetails } = JSON.parse(event.body);
 
-    const twiceEncodedCredentials = Buffer.from(`${TWICE_API_ID}:${TWICE_API_SECRET}`).toString("base64");
+    const twiceEncodedCredentials = Buffer.from(`${TWICE_API_ID}:${TWICE_API_SECRET}`).toString(
+      "base64"
+    );
     const twiceHeaders = {
       "Content-Type": "application/json",
-      "Authorization": `Basic ${twiceEncodedCredentials}`,
+      Authorization: `Basic ${twiceEncodedCredentials}`,
       "x-rentle-version": "2023-02-01",
     };
 
@@ -45,7 +47,10 @@ export const handler = async (event) => {
       }),
       startDate: cartItems[0].range.from,
       duration: { period: "days", value: cartItems[0].days },
-      status: 'pending_payment',
+      status: "pending_payment",
+      meta: {
+        pickupTime: cartItems[0].pickupTime,
+      },
     };
 
     const twiceOrderResponse = await fetch(`${TWICE_API_BASE}/orders`, {
@@ -61,7 +66,7 @@ export const handler = async (event) => {
     const twiceOrder = await twiceOrderResponse.json();
     const twiceOrderId = twiceOrder.id;
     if (!twiceOrderId) {
-      throw new Error('Could not get order ID from Twice Commerce response.');
+      throw new Error("Could not get order ID from Twice Commerce response.");
     }
 
     const totalAmount = cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
@@ -69,17 +74,17 @@ export const handler = async (event) => {
 
     const revolutOrderPayload = {
       amount: amountInCents,
-      currency: 'EUR',
+      currency: "EUR",
       merchant_order_ext_ref: twiceOrderId,
       metadata: { twice_order_id: twiceOrderId },
     };
 
     const revolutResponse = await fetch(`${REVOLUT_API_BASE}/orders`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${REVOLUT_SECRET_KEY}`,
-        'Content-Type': 'application/json',
-        'Revolut-Api-Version': '2023-09-01',
+        Authorization: `Bearer ${REVOLUT_SECRET_KEY}`,
+        "Content-Type": "application/json",
+        "Revolut-Api-Version": "2024-09-02",
       },
       body: JSON.stringify(revolutOrderPayload),
     });
@@ -103,9 +108,8 @@ export const handler = async (event) => {
       statusCode: 200,
       body: JSON.stringify({ checkoutUrl }),
     };
-
   } catch (error) {
-    console.error('Checkout initiation failed:', error);
+    console.error("Checkout initiation failed:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: error.message }),

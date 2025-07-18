@@ -15,7 +15,6 @@ export const handler = async (event) => {
     const projectId = dsn.substring(dsn.lastIndexOf('/') + 1);
     const sentryHost = dsn.substring(dsn.indexOf('@') + 1, dsn.lastIndexOf('/'));
 
-    // Prevent misuse of the proxy
     if (!sentryHost.endsWith('sentry.io')) {
         return { statusCode: 403, body: 'Invalid Sentry host.' };
     }
