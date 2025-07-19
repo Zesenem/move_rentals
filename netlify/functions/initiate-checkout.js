@@ -19,12 +19,10 @@ export const handler = async (event) => {
   try {
     const { cartItems, customerDetails } = JSON.parse(event.body);
 
-    const twiceEncodedCredentials = Buffer.from(`${TWICE_API_ID}:${TWICE_API_SECRET}`).toString(
-      "base64"
-    );
+    const twiceEncodedCredentials = Buffer.from(`${TWICE_API_ID}:${TWICE_API_SECRET}`).toString("base64");
     const twiceHeaders = {
       "Content-Type": "application/json",
-      Authorization: `Basic ${twiceEncodedCredentials}`,
+      "Authorization": `Basic ${twiceEncodedCredentials}`,
       "x-rentle-version": "2023-02-01",
     };
 
@@ -34,9 +32,9 @@ export const handler = async (event) => {
     const storeId = storesData.data?.[0]?.id;
     if (!storeId) throw new Error("Default store ID not found.");
 
-    // This is a more robust way to create the start date with the correct time
-    const startDateOnly = new Date(cartItems[0].range.from);
-    const [pickupHours, pickupMinutes] = cartItems[0].pickupTime.split(':').map(Number);
+    const firstItem = cartItems[0];
+    const startDateOnly = new Date(firstItem.range.from);
+    const [pickupHours, pickupMinutes] = firstItem.pickupTime.split(':').map(Number);
     const preciseStartDate = new Date(startDateOnly.getFullYear(), startDateOnly.getMonth(), startDateOnly.getDate(), pickupHours, pickupMinutes);
 
     const twiceOrderPayload = {
@@ -51,12 +49,12 @@ export const handler = async (event) => {
         return [mainItem, ...extraItems];
       }),
       startDate: preciseStartDate.toISOString(),
-      duration: { period: "days", value: cartItems[0].days },
+      duration: { period: "days", value: firstItem.days },
       status: "pending_payment",
       meta: {
-        pickupTime: cartItems[0].pickupTime,
-        originalStartDate: cartItems[0].range.from,
-        originalEndDate: cartItems[0].range.to,
+        pickupTime: firstItem.pickupTime,
+        originalStartDate: firstItem.range.from,
+        originalEndDate: firstItem.range.to,
       },
     };
 
@@ -71,7 +69,7 @@ export const handler = async (event) => {
       console.error("Twice API error:", errorData);
       throw new Error(`Failed to create pending order: ${JSON.stringify(errorData)}`);
     }
-    
+
     const twiceOrder = await twiceOrderResponse.json();
     const twiceOrderId = twiceOrder.id;
     if (!twiceOrderId) {
@@ -84,16 +82,17 @@ export const handler = async (event) => {
     const revolutOrderPayload = {
       amount: amountInCents,
       currency: "EUR",
-      merchant_order_ext_ref: twiceOrderId,
-      metadata: { twice_order_id: twiceOrderId },
+      merchant_order_ext_ref: twiceOrderId, 
+      success_redirect_url: `${siteUrl}/booking-success/${twiceOrderId}`,
+      failure_redirect_url: `${siteUrl}/checkout`,
     };
 
     const revolutResponse = await fetch(`${REVOLUT_API_BASE}/orders`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${REVOLUT_SECRET_KEY}`,
+        "Authorization": `Bearer ${REVOLUT_SECRET_KEY}`,
         "Content-Type": "application/json",
-        "Revolut-Api-Version": "2024-09-01", // Using the version confirmed to work
+        "Revolut-Api-Version": "2023-12-18", 
       },
       body: JSON.stringify(revolutOrderPayload),
     });
@@ -103,21 +102,21 @@ export const handler = async (event) => {
       console.error("Revolut API error:", errorData);
       throw new Error(`Failed to create Revolut order: ${JSON.stringify(errorData)}`);
     }
-    
-    const revolutOrder = await revolutResponse.json();
-    const paymentPageUrl = revolutOrder.checkout_url;
 
-    if (!paymentPageUrl) {
+    const revolutOrder = await revolutResponse.json();
+    
+    const checkoutUrl = revolutOrder.checkout_url;
+
+    if (!checkoutUrl) {
       console.error("Revolut response did not contain a 'checkout_url':", revolutOrder);
       throw new Error("Could not construct payment redirect URL from Revolut's response.");
     }
 
-    const checkoutUrl = `${paymentPageUrl}?success_redirect_url=${siteUrl}/booking-success/${twiceOrderId}&failure_redirect_url=${siteUrl}/checkout`;
-
     return {
       statusCode: 200,
-      body: JSON.stringify({ checkoutUrl }),
+      body: JSON.stringify({ checkoutUrl }), 
     };
+
   } catch (error) {
     console.error("Checkout initiation failed:", error);
     return {

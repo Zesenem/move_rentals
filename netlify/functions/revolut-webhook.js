@@ -5,14 +5,19 @@ import process from 'process';
 const TWICE_API_BASE = 'https://api.twicecommerce.com/admin';
 
 const verifySignature = (payload, header, secret) => {
-  if (!header) return false;
+  if (!header || !secret) return false;
   try {
     const [timestamp, signature] = header.split(',');
-    const signedPayload = `${timestamp.split('=')[1]}.${payload}`;
-    const hmac = crypto.createHmac('sha266', secret);
+    const timestampValue = timestamp?.split('=')[1];
+    const signatureValue = signature?.split('=')[1];
+    if (!timestampValue || !signatureValue) return false;
+
+    const signedPayload = `${timestampValue}.${payload}`;
+    const hmac = crypto.createHmac('sha256', secret);
     hmac.update(signedPayload);
     const computedSignature = hmac.digest('hex');
-    return crypto.timingSafeEqual(Buffer.from(computedSignature), Buffer.from(signature.split('=')[1]));
+
+    return crypto.timingSafeEqual(Buffer.from(computedSignature), Buffer.from(signatureValue));
   } catch (error) {
     console.error("Error during signature verification:", error);
     return false;
@@ -25,29 +30,28 @@ export const handler = async (event) => {
   }
 
   const { TWICE_API_ID, TWICE_API_SECRET, REVOLUT_WEBHOOK_SIGNING_SECRET } = process.env;
-  const signatureHeader = event.headers['revolut-signature'] || event.headers['Revolut-Signature'];
+  const signatureHeader = event.headers['revolut-signature'];
 
   console.log("--- Revolut Webhook Received ---");
-  
+
   if (!verifySignature(event.body, signatureHeader, REVOLUT_WEBHOOK_SIGNING_SECRET)) {
-    console.warn(" Invalid webhook signature.");
-    console.log("Received Headers:", JSON.stringify(event.headers, null, 2));
+    console.warn("Invalid webhook signature.");
     return { statusCode: 401, body: 'Invalid signature' };
   }
 
   try {
     const webhookEvent = JSON.parse(event.body);
-    console.log(` Signature verified. Event type: ${webhookEvent.event}`);
+    console.log(`Signature verified. Event type: ${webhookEvent.event}`);
 
     if (webhookEvent.event === 'ORDER_COMPLETED') {
       const orderData = webhookEvent.data;
-      const twiceOrderId = orderData.metadata?.twice_order_id;
+      const twiceOrderId = orderData.merchant_order_ext_ref;
 
       if (!twiceOrderId) {
-        console.error(" Webhook missing twice_order_id in metadata.");
-        return { statusCode: 200, body: 'OK: No action taken (missing metadata).' };
+        console.error("Webhook missing merchant_order_ext_ref.");
+        return { statusCode: 200, body: 'OK: No action taken (missing order reference).' };
       }
-      
+
       console.log(`Processing confirmation for Twice Order ID: ${twiceOrderId}`);
 
       const twiceEncodedCredentials = Buffer.from(`${TWICE_API_ID}:${TWICE_API_SECRET}`).toString("base64");
@@ -58,7 +62,6 @@ export const handler = async (event) => {
       };
 
       const updatePayload = {
-        paid: true,
         status: 'confirmed'
       };
 
@@ -80,7 +83,7 @@ export const handler = async (event) => {
     return { statusCode: 200, body: 'Webhook received successfully.' };
 
   } catch (error) {
-    console.error(' Webhook handler failed:', error);
+    console.error('Webhook handler failed:', error);
     return { statusCode: 500, body: JSON.stringify({ error: 'Internal Server Error' }) };
   }
 };
