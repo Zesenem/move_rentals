@@ -12,36 +12,29 @@ import { useCartStore } from "../store/cartStore.js";
 import { calculateTieredPrice, calculateExtrasTotal } from "../utils/priceCalculator.js";
 import Button from "./Button";
 
-/**
- * Generates time slots for the dropdown.
- * @param {number} [interval=30] - The interval between slots in minutes.
- * @param {string} [minTime='00:00'] - The minimum time to start generating slots from, in "HH:mm" format.
- * @returns {string[]} An array of time slots.
- */
-const generateTimeSlots = (interval = 30, minTime = '00:00') => {
+const generateTimeSlots = (interval = 30, minTime = "00:00") => {
   const slots = [];
-  const startTime = 8 * 60; // 8:00 AM in minutes
-  const endTime = 18 * 60 + 30; // 6:30 PM in minutes
+  const startTime = 8 * 60;
+  const endTime = 18 * 60 + 30;
 
-  const [minHours, minMinutes] = minTime.split(':').map(Number);
+  const [minHours, minMinutes] = minTime.split(":").map(Number);
   const minTimeInMinutes = minHours * 60 + minMinutes;
 
   let loopStartTime = Math.max(startTime, minTimeInMinutes);
 
-  // If the current time is already past the last slot, return no slots.
   if (loopStartTime > endTime) {
     return [];
   }
 
-  // Adjust the start time to the next available interval.
-  // e.g., if it's 09:10 and interval is 30, the first available slot is 09:30.
   if (loopStartTime % interval !== 0) {
     loopStartTime = loopStartTime - (loopStartTime % interval) + interval;
   }
 
   for (let timeInMinutes = loopStartTime; timeInMinutes <= endTime; timeInMinutes += interval) {
-    const hours = Math.floor(timeInMinutes / 60).toString().padStart(2, '0');
-    const minutes = (timeInMinutes % 60).toString().padStart(2, '0');
+    const hours = Math.floor(timeInMinutes / 60)
+      .toString()
+      .padStart(2, "0");
+    const minutes = (timeInMinutes % 60).toString().padStart(2, "0");
     slots.push(`${hours}:${minutes}`);
   }
   return slots;
@@ -50,8 +43,11 @@ const generateTimeSlots = (interval = 30, minTime = '00:00') => {
 const PriceBreakdown = ({ basePricePerDay, numberOfDays, extrasPrice, totalPrice }) => (
   <div className="space-y-3 text-sm">
     <div className="flex justify-between text-steel">
+      {/* FIX: Add a check for basePricePerDay before calling toFixed */}
       <span>Base price per day</span>
-      <span className="font-semibold text-cloud">€{basePricePerDay.toFixed(2)}</span>
+      <span className="font-semibold text-cloud">
+        €{basePricePerDay ? basePricePerDay.toFixed(2) : "0.00"}
+      </span>
     </div>
     {numberOfDays > 0 && (
       <div className="flex justify-between text-steel">
@@ -67,7 +63,10 @@ const PriceBreakdown = ({ basePricePerDay, numberOfDays, extrasPrice, totalPrice
     )}
     <div className="!mt-4 flex items-center justify-between border-t border-graphite/50 pt-4">
       <span className="text-xl font-bold text-cloud">Total Price</span>
-      <span key={totalPrice} className="animate-[pulse_0.5s_ease-in-out] text-2xl font-bold text-cloud">
+      <span
+        key={totalPrice}
+        className="animate-[pulse_0.5s_ease-in-out] text-2xl font-bold text-cloud"
+      >
         {totalPrice > 0 ? `€${totalPrice.toFixed(2)}` : "€--.--"}
       </span>
     </div>
@@ -77,42 +76,49 @@ const PriceBreakdown = ({ basePricePerDay, numberOfDays, extrasPrice, totalPrice
 function BookingWidget({ bike, selectedExtras }) {
   const [range, setRange] = useState();
   const [isAdded, setIsAdded] = useState(false);
-  const [pickupTime, setPickupTime] = useState('10:00');
+  const [pickupTime, setPickupTime] = useState("10:00");
 
   const { items: cartItems, addItem: addItemToCart } = useCartStore();
 
-  const { data: apiUnavailableDates, isLoading, isError } = useQuery({
-    queryKey: ["availability", bike.id],
+  const {
+    data: apiUnavailableDates,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["availability", bike?.id], // FIX: Use optional chaining here
     queryFn: () => getUnavailableDates(bike.id),
-    enabled: !!bike.id,
+    enabled: !!bike?.id, // FIX: And here
     initialData: [],
   });
-  
+
   const timeSlots = useMemo(() => {
     if (range?.from && isToday(range.from)) {
       const now = new Date();
-      const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      const currentTime = `${now.getHours().toString().padStart(2, "0")}:${now
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")}`;
       return generateTimeSlots(30, currentTime);
     }
     return generateTimeSlots();
   }, [range?.from]);
-  
+
   useEffect(() => {
-    // If the available time slots change (e.g., user selects today) and the
-    // currently selected time is no longer valid, reset it to the first available slot.
     if (timeSlots.length > 0 && !timeSlots.includes(pickupTime)) {
       setPickupTime(timeSlots[0]);
     } else if (timeSlots.length === 0) {
-      // If there are no slots available for today, clear the pickup time
-      setPickupTime('');
+      setPickupTime("");
     }
   }, [timeSlots, pickupTime]);
 
   const cartBookedDates = useMemo(() => {
+    if (!bike?.id) return [];
     return cartItems
-      .filter((item) => item.id.startsWith(bike.id))
-      .flatMap((item) => eachDayOfInterval({ start: new Date(item.range.from), end: new Date(item.range.to) }));
-  }, [cartItems, bike.id]);
+      .filter((item) => item && typeof item.id === "string" && item.id.startsWith(bike.id))
+      .flatMap((item) =>
+        eachDayOfInterval({ start: new Date(item.range.from), end: new Date(item.range.to) })
+      );
+  }, [cartItems, bike?.id]);
 
   const allDisabledDates = useMemo(() => {
     return [{ before: new Date() }, ...(apiUnavailableDates || []), ...cartBookedDates];
@@ -126,19 +132,27 @@ function BookingWidget({ bike, selectedExtras }) {
     setIsAdded(false);
   }, [range, selectedExtras, pickupTime]);
 
-  const basePrice = calculateTieredPrice(bike.pricingTiers, bike.price_per_day, numberOfDays);
-  const extrasPrice = calculateExtrasTotal(selectedExtras, numberOfDays);
+  // FIX: Add a check to ensure bike data exists before trying to calculate prices.
+  const basePrice = useMemo(
+    () => (bike ? calculateTieredPrice(bike.pricingTiers, bike.price_per_day, numberOfDays) : 0),
+    [bike, numberOfDays]
+  );
+  const extrasPrice = useMemo(
+    () => calculateExtrasTotal(selectedExtras, numberOfDays),
+    [selectedExtras, numberOfDays]
+  );
   const totalPrice = basePrice + extrasPrice;
 
-  const bookingId = useMemo(() =>
-    range?.from && range?.to
-      ? `${bike.id}-${range.from.toISOString()}-${range.to.toISOString()}-${pickupTime}`
-      : null,
-    [bike.id, range, pickupTime]
+  const bookingId = useMemo(
+    () =>
+      range?.from && range?.to && bike?.id // FIX: Add check for bike.id
+        ? `${bike.id}-${range.from.toISOString()}-${range.to.toISOString()}-${pickupTime}`
+        : null,
+    [bike?.id, range, pickupTime] // FIX: Add optional chaining to dependency
   );
-  
-  const isInCart = useMemo(() =>
-    bookingId ? cartItems.some((item) => item.id === bookingId) : false,
+
+  const isInCart = useMemo(
+    () => (bookingId ? cartItems.some((item) => item.id === bookingId) : false),
     [bookingId, cartItems]
   );
 
@@ -163,9 +177,20 @@ function BookingWidget({ bike, selectedExtras }) {
 
   let footerText = "Please select your rental period.";
   if (range?.from) {
-    footerText = range.to ? `${format(range.from, "PPP")} – ${format(range.to, "PPP")}` : `Selected: ${format(range.from, "PPP")}.`;
+    footerText = range.to
+      ? `${format(range.from, "PPP")} – ${format(range.to, "PPP")}`
+      : `Selected: ${format(range.from, "PPP")}.`;
   }
   const defaultClassNames = getDefaultClassNames();
+
+  // FIX: Main guard clause. Don't render anything until the bike data is available.
+  if (!bike) {
+    return (
+      <div className="flex h-64 items-center justify-center rounded-lg border border-graphite/50 bg-arsenic p-4 shadow-lg sm:p-6">
+        <RingLoader color="#6EE7B7" />
+      </div>
+    );
+  }
 
   if (isError) {
     return (
@@ -236,7 +261,10 @@ function BookingWidget({ bike, selectedExtras }) {
       <div className="mt-6 space-y-6 border-t border-graphite/50 pt-6">
         {range?.from && (
           <div>
-            <label htmlFor="pickupTime" className="mb-2 flex items-center gap-2 text-lg font-bold text-cloud">
+            <label
+              htmlFor="pickupTime"
+              className="mb-2 flex items-center gap-2 text-lg font-bold text-cloud"
+            >
               <FaClock />
               Pickup Time
             </label>
@@ -254,7 +282,9 @@ function BookingWidget({ bike, selectedExtras }) {
                 ))}
               </select>
             ) : (
-              <p className="text-sm text-steel">No more pickup times available for today. Please select a future date.</p>
+              <p className="text-sm text-steel">
+                No more pickup times available for today. Please select a future date.
+              </p>
             )}
           </div>
         )}

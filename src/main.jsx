@@ -55,7 +55,7 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "motorcycle/:slug", element: <MotorcyclePage /> },
       { path: "checkout", element: <CheckoutPage /> },
-      { path: "booking-success/:orderId", element: <BookingSuccessPage /> },
+      { path: "booking-success", element: <BookingSuccessPage /> },
       { path: "terms-and-conditions", element: <TermsPage /> },
       { path: "privacy-policy", element: <PrivacyPolicyPage /> },
       { path: "contact", element: <ContactPage /> },
