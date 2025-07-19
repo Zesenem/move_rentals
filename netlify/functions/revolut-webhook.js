@@ -4,15 +4,17 @@ import process from 'process';
 
 const TWICE_API_BASE = 'https://api.twicecommerce.com/admin';
 
-const verifySignature = (payload, header, secret) => {
-  if (!header || !secret) return false;
+const verifySignature = (rawPayload, header, secret) => {
+  if (!header || !secret || !rawPayload) return false;
   try {
     const [timestamp, signature] = header.split(',');
     const timestampValue = timestamp?.split('=')[1];
     const signatureValue = signature?.split('=')[1];
     if (!timestampValue || !signatureValue) return false;
 
-    const signedPayload = `${timestampValue}.${payload}`;
+    // The signature is created from the timestamp, a dot, and the raw text of the payload.
+    const signedPayload = `${timestampValue}.${rawPayload}`;
+    
     const hmac = crypto.createHmac('sha256', secret);
     hmac.update(signedPayload);
     const computedSignature = hmac.digest('hex');
@@ -34,12 +36,15 @@ export const handler = async (event) => {
 
   console.log("--- Revolut Webhook Received ---");
 
-  if (!verifySignature(event.body, signatureHeader, REVOLUT_WEBHOOK_SIGNING_SECRET)) {
+  // FIX: We must use event.rawBody for the signature check.
+  // We still use event.body later after the signature is verified.
+  if (!verifySignature(event.rawBody, signatureHeader, REVOLUT_WEBHOOK_SIGNING_SECRET)) {
     console.warn("Invalid webhook signature.");
     return { statusCode: 401, body: 'Invalid signature' };
   }
 
   try {
+    // Now that the signature is verified, we can safely use the parsed body.
     const webhookEvent = JSON.parse(event.body);
     console.log(`Signature verified. Event type: ${webhookEvent.event}`);
 
