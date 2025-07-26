@@ -25,7 +25,11 @@
         { "label": "A1 / B", "icon": "license" },
         { "label": "7.1 L", "icon": "gas" } 
       ],
-      "security_deposit": 330
+      "security_deposit": 330,
+      "forfait": {
+        "deposit": 140,
+        "daily_cost": 6.50
+      }
     },
     {
       "id": "mcQ69eD3JllbMrC8FriN",
@@ -35,7 +39,11 @@
         { "label": "A1 / B", "icon": "license" },
         { "label": "5.2 L", "icon": "gas" }
       ],
-      "security_deposit": 290
+      "security_deposit": 290,
+      "forfait": {
+        "deposit": 100,
+        "daily_cost": 5.50
+      }
     },
     {
       "id": "c0cxAwwBOEjg0R8PYsiy",
@@ -45,7 +53,11 @@
         { "label": "A1 / B", "icon": "license" },
         { "label": "7.1 L", "icon": "gas" }
       ],
-      "security_deposit": 440
+      "security_deposit": 440,
+      "forfait": {
+        "deposit": 180,
+        "daily_cost": 7.50
+      }
     },
     {
       "id": "AqIgZ8WQpmmtuaN9QrZE",

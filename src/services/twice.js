@@ -45,6 +45,7 @@ export const fetchProducts = async () => {
         badges: staticInfo?.badges || [],
         quick_glance: staticInfo?.quick_glance || [],
         security_deposit: staticInfo?.security_deposit || 0, 
+        forfait: staticInfo?.forfait,
       };
     });
   } catch (error) {

@@ -8,6 +8,7 @@ import {
   FaLock,
   FaRoad,
   FaPlaneDeparture,
+  FaHandshake,
 } from "react-icons/fa";
 import {
   PiSteeringWheelFill,
@@ -25,6 +26,7 @@ const createIcon = (IconComponent, colorClass = "text-steel") => {
 };
 
 export const iconMap = {
+  forfait: createIcon(FaHandshake),
   "id-card": createIcon(FaIdCard),
   license: createIcon(PiSteeringWheelFill),
   "credit-card": createIcon(FaCreditCard),

@@ -28,7 +28,7 @@ const contactInfo = {
 };
 
 function ContactPage() {
-  const googleMapsApiKey = import.meta.env.VITE_Maps_API_KEY;
+  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   const embedMapUrl = `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${encodeURIComponent(
     contactInfo.address
   )}`;

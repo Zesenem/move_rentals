@@ -22,31 +22,38 @@ const TechnicalFeaturesList = ({ features }) => (
   </ul>
 );
 
-const IncludedInRentalList = ({ items, deposit }) => (
-  <>
-    <p className="mb-4 text-sm text-steel">
-      Security Deposit: <span className="font-semibold text-cloud">€{deposit}</span>
-    </p>
-    <ul className="text-base space-y-2.5 text-steel">
-      {items?.map((item, index) => (
-        <li key={index} className="flex items-center gap-2">
-          {iconMap[item.icon] || iconMap["default-check"]}
-          {item.item}
-        </li>
-      ))}
-    </ul>
-  </>
-);
-
-const RequirementsList = ({ items }) => (
+const IncludedInRentalList = ({ items }) => (
   <ul className="text-base space-y-2.5 text-steel">
-    {items?.map((req, index) => (
+    {items?.map((item, index) => (
       <li key={index} className="flex items-center gap-2">
-        {iconMap[req.icon]}
-        {req.item}
+        {iconMap[item.icon] || iconMap["default-check"]}
+        {item.item}
       </li>
     ))}
   </ul>
+);
+
+const RequirementsList = ({ items, deposit, forfait }) => (
+  <>
+    <ul className="text-base space-y-2.5 text-steel">
+      {items?.map((req, index) => (
+        <li key={index} className="flex items-center gap-2">
+          {iconMap[req.icon]}
+          {req.item}
+        </li>
+      ))}
+    </ul>
+    <div className="mt-4 text-sm text-steel flex items-center gap-2">
+      <p>
+        Forfait: Reduce security deposit to{" "}
+        <span className="font-semibold text-cloud">€{forfait.deposit}</span> for an additional
+        <span className="font-semibold text-cloud"> €{forfait.daily_cost.toFixed(2)}/day</span>.
+      </p>
+    </div>
+    <p className="mt-2 text-sm text-steel">
+      Security Deposit: <span className="font-semibold text-cloud">€{deposit}</span>
+    </p>
+  </>
 );
 
 const MotorcyclePageSkeleton = () => (
@@ -142,13 +149,14 @@ function MotorcyclePage() {
                 </AccordionItem>
               )}
               <AccordionItem title="Included in Rental">
-                <IncludedInRentalList
-                  items={commonData?.included}
-                  deposit={bike?.security_deposit}
-                />
+                <IncludedInRentalList items={commonData?.included} />
               </AccordionItem>
               <AccordionItem title="Requirements">
-                <RequirementsList items={commonData?.requirements} />
+                <RequirementsList
+                  items={commonData?.requirements}
+                  deposit={bike?.security_deposit}
+                  forfait={bike?.forfait}
+                />
               </AccordionItem>
             </div>
           </div>
