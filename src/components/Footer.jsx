@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { FaWhatsapp, FaInstagram, FaEnvelope } from "react-icons/fa";
-import OpeningHours from "./OpeningHours"; // Import the new component
+import OpeningHours from "./OpeningHours";
 
 const contactInfo = {
   email: "move@move-rentals.com",
@@ -11,7 +11,6 @@ const contactInfo = {
 const quickLinks = [
   { name: "Our Fleet", to: "/" },
   { name: "Contact Us", to: "/contact" },
-  { name: "View Cart", to: "/checkout" },
   { name: "Terms & Conditions", to: "/terms-and-conditions" },
   { name: "Privacy Policy", to: "/privacy-policy" },
 ];

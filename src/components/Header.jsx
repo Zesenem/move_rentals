@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom"; // Import useNavigate
-import { FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { FaBars, FaTimes } from "react-icons/fa";
 import Logo from "./Logo";
-import Button from "./Button";
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -73,15 +72,6 @@ function Header() {
           </NavLink>
         )
       )}
-      <NavLink
-        to="/checkout"
-        onClick={() => closeMenu()}
-        className={({ isActive }) =>
-          `flex items-center gap-2 rounded-md px-3 py-2 font-semibold transition-colors duration-300 ${
-            isActive ? "bg-cloud text-phantom" : "text-steel hover:bg-arsenic"
-          }`
-        }
-      ></NavLink>
     </>
   );
 
