@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaClock } from "react-icons/fa";
-import OpeningHours from "../components/OpeningHours"; 
+import OpeningHours from "../components/OpeningHours";
 
 const ContactInfoCard = ({ icon, title, children }) => {
   const IconComponent = icon;

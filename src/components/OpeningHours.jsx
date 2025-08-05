@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 const weeklyHours = [
   { day: "Monday", hours: "08:00 – 18:30" },
@@ -11,19 +11,19 @@ const weeklyHours = [
 ];
 
 function OpeningHours() {
-  const [currentDay, setCurrentDay] = useState('');
+  const [currentDay, setCurrentDay] = useState("");
 
   useEffect(() => {
     const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Lisbon" }));
-    const dayName = now.toLocaleString("en-US", { weekday: 'long' });
+    const dayName = now.toLocaleString("en-US", { weekday: "long" });
     setCurrentDay(dayName);
   }, []);
 
   return (
     <div className="space-y-2">
       {weeklyHours.map(({ day, hours }) => (
-        <div 
-          key={day} 
+        <div
+          key={day}
           className={`
             flex items-center justify-between gap-x-6 text-sm
             ${currentDay === day ? "font-bold text-cloud" : "text-space"}

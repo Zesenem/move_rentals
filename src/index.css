@@ -24,32 +24,3 @@
   opacity: 0;
   animation: fadeInUp 0.5s ease-out forwards;
 }
-
-
-.phone-input-container {
-  @apply relative flex w-full items-center;
-}
-
-.phone-input-container .PhoneInputCountry {
-  @apply z-10 inline-flex shrink-0 items-center rounded-l-lg border border-graphite bg-arsenic p-3 text-center text-sm font-medium text-cloud hover:bg-graphite/50 focus:outline-none focus:ring-2 focus:ring-cloud/50;
-}
-
-.phone-input-container .PhoneInputInput {
-  @apply relative z-0 -ml-px block w-full rounded-r-lg border border-graphite bg-phantom p-3 text-cloud focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/50;
-}
-
-.PhoneInputCountrySelect {
-  @apply z-10 max-h-60 overflow-y-auto rounded-lg border border-graphite bg-arsenic p-2 shadow-lg;
-}
-
-.PhoneInputCountrySelect-search {
-  @apply mb-2 w-full rounded-md border border-graphite bg-phantom p-2 text-cloud placeholder-gray-500 focus:border-cloud focus:ring-cloud;
-}
-
-.PhoneInputCountryOption {
-  @apply flex cursor-pointer items-center rounded-md p-2 text-steel hover:bg-graphite;
-}
-
-.PhoneInputCountryOption--selected {
-  @apply bg-graphite text-cloud;
-}

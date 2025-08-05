@@ -1,5 +1,3 @@
-// src/services/twice.js
-
 function mapApiProductToAppProduct(apiProduct) {
   return {
     id: apiProduct.id,

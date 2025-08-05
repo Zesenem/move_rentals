@@ -16,8 +16,8 @@ function Hero() {
           style={{ animationDelay: "200ms" }}
         >
           <p>
-            Explore Lisbon with Confidence! At Move, we make getting around Lisbon <strong>easy,
-            fun, and worry-free.</strong>{" "}
+            Explore Lisbon with Confidence! At Move, we make getting around Lisbon{" "}
+            <strong>easy, fun, and worry-free.</strong>{" "}
           </p>
           <p>
             Located in the heart of the city, we offer reliable, well-maintained scooters for rent —

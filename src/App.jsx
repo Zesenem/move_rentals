@@ -23,11 +23,11 @@ function App() {
             "This website uses cookies to ensure you get the best experience on our website.",
           dismiss: "Got it!",
           link: "Learn more",
-          href: "/privacy-policy", 
+          href: "/privacy-policy",
         },
       });
     }
-  }, []); 
+  }, []);
 
   return (
     <>
