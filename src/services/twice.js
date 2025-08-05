@@ -1,3 +1,5 @@
+// src/services/twice.js
+
 function mapApiProductToAppProduct(apiProduct) {
   return {
     id: apiProduct.id,
@@ -44,8 +46,9 @@ export const fetchProducts = async () => {
         ...liveProduct,
         badges: staticInfo?.badges || [],
         quick_glance: staticInfo?.quick_glance || [],
-        security_deposit: staticInfo?.security_deposit || 0, 
+        security_deposit: staticInfo?.security_deposit || 0,
         forfait: staticInfo?.forfait,
+        technical_features: staticInfo?.technical_features || [],
       };
     });
   } catch (error) {

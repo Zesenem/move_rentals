@@ -19,20 +19,28 @@
   "motorcycles_static_data": [
     {
       "id": "Rt7CgmbXQoMEfIwdsE8G",
+      "name": "Yamaha NMAX 125",
       "badges": ["Best Seller"],
       "quick_glance": [
         { "label": "125 cc", "icon": "engine" },
         { "label": "A1 / B", "icon": "license" },
-        { "label": "7.1 L", "icon": "gas" } 
+        { "label": "7.1 L", "icon": "gas" }
       ],
       "security_deposit": 330,
-      "forfait": {
-        "deposit": 140,
-        "daily_cost": 6.50
-      }
+      "forfait": { "deposit": 140, "daily_cost": 6.50 },
+      "technical_features": [
+        { "label": "Engine Type", "value": "4-stroke, Liquid-cooled, SOHC" },
+        { "label": "Power", "value": "9.0 kW (12.2 PS) @ 8000 rpm" },
+        { "label": "Torque", "value": "11.2 Nm @ 6000 rpm" },
+        { "label": "Transmission", "value": "V-Belt Automatic" },
+        { "label": "Fuel Consumption", "value": "2.2 L/100km" },
+        { "label": "Seat Height", "value": "765 mm" },
+        { "label": "Weight (Wet)", "value": "131 kg" }
+      ]
     },
     {
       "id": "mcQ69eD3JllbMrC8FriN",
+      "name": "Yamaha RayZR 125",
       "badges": ["ECO"],
       "quick_glance": [
         { "label": "125 cc", "icon": "engine" },
@@ -40,13 +48,20 @@
         { "label": "5.2 L", "icon": "gas" }
       ],
       "security_deposit": 290,
-      "forfait": {
-        "deposit": 100,
-        "daily_cost": 5.50
-      }
+      "forfait": { "deposit": 100, "daily_cost": 5.50 },
+      "technical_features": [
+        { "label": "Engine Type", "value": "Air-cooled, 4-stroke, SOHC" },
+        { "label": "Power", "value": "6.0 kW (8.2 PS) @ 6500 rpm" },
+        { "label": "Torque", "value": "10.3 Nm @ 5000 rpm" },
+        { "label": "Transmission", "value": "V-Belt Automatic" },
+        { "label": "Fuel Consumption", "value": "1.8 L/100km" },
+        { "label": "Seat Height", "value": "785 mm" },
+        { "label": "Weight (Wet)", "value": "99 kg" }
+      ]
     },
     {
       "id": "c0cxAwwBOEjg0R8PYsiy",
+      "name": "Yamaha NMAX 125 Tech MAX",
       "badges": ["Premium", "GPS"],
       "quick_glance": [
         { "label": "125 cc", "icon": "engine" },
@@ -54,20 +69,36 @@
         { "label": "7.1 L", "icon": "gas" }
       ],
       "security_deposit": 440,
-      "forfait": {
-        "deposit": 180,
-        "daily_cost": 7.50
-      }
+      "forfait": { "deposit": 180, "daily_cost": 7.50 },
+      "technical_features": [
+        { "label": "Engine Type", "value": "4-stroke, Liquid-cooled, SOHC" },
+        { "label": "Power", "value": "9.0 kW (12.2 PS) @ 8000 rpm" },
+        { "label": "Torque", "value": "11.2 Nm @ 6000 rpm" },
+        { "label": "Special", "value": "TFT Display with Navi" },
+        { "label": "Fuel Consumption", "value": "2.2 L/100km" },
+        { "label": "Seat Height", "value": "765 mm" },
+        { "label": "Weight (Wet)", "value": "131 kg" }
+      ]
     },
     {
       "id": "AqIgZ8WQpmmtuaN9QrZE",
+      "name": "Yamaha XMAX 300",
       "badges": ["GPS"],
       "quick_glance": [
         { "label": "300 cc", "icon": "engine" },
         { "label": "A2 / A", "icon": "license" },
         { "label": "13.2 L", "icon": "gas" }
       ],
-      "security_deposit": 790
+      "security_deposit": 790,
+      "technical_features": [
+        { "label": "Engine Type", "value": "4-stroke, Liquid-cooled, SOHC" },
+        { "label": "Power", "value": "20.6 kW (28 PS) @ 7250 rpm" },
+        { "label": "Torque", "value": "29.0 Nm @ 5750 rpm" },
+        { "label": "Transmission", "value": "V-Belt Automatic" },
+        { "label": "Fuel Consumption", "value": "3.0 L/100km" },
+        { "label": "Seat Height", "value": "795 mm" },
+        { "label": "Weight (Wet)", "value": "180 kg" }
+      ]
     }
   ]
 }

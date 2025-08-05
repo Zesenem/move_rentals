@@ -1,25 +1,36 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
-import { fetchProductBySlug } from "../services/twice.js"; 
+import { fetchProductBySlug } from "../services/twice.js";
 
 import AccordionItem from "../components/AccordionItem";
 import ImageCarousel from "../components/ImageCarousel";
-import Button from "../components/Button"; 
+import Button from "../components/Button";
 import { iconMap } from "../utils/iconMap.jsx";
-import { FaExclamationTriangle, FaWhatsapp } from "react-icons/fa"; 
+import { FaExclamationTriangle, FaWhatsapp } from "react-icons/fa";
 
+// NEW: SpecsTable Component for displaying technical features
+const SpecsTable = ({ features }) => {
+  if (!features || features.length === 0) {
+    return null;
+  }
 
-const TechnicalFeaturesList = ({ features }) => (
-  <ul className="text-base space-y-1">
-    {features?.map((feature, index) => (
-      <li key={index} className="flex justify-between py-2 border-b border-graphite/50">
-        <span className="text-space">{feature.label}:</span>
-        <span className="font-semibold text-cloud text-right">{feature.value}</span>
-      </li>
-    ))}
-  </ul>
-);
+  return (
+    <div className="mt-8 border-t border-graphite/50 pt-6">
+      <h3 className="text-xl font-bold text-cloud mb-4">Specifications</h3>
+      <ul className="text-base space-y-1">
+        {features.map((feature) => (
+          <li key={feature.label} className="flex justify-between py-2 border-b border-graphite/50">
+            <span className="text-space">{feature.label}:</span>
+            <span className="font-semibold text-cloud text-right">{feature.value}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+// --- The other list components remain the same ---
 
 const IncludedInRentalList = ({ items }) => (
   <ul className="text-base space-y-2.5 text-steel">
@@ -42,54 +53,56 @@ const RequirementsList = ({ items, deposit, forfait }) => (
         </li>
       ))}
     </ul>
-    <div className="mt-4 text-sm text-steel flex items-center gap-2">
-      <p>
-        Forfait: Reduce security deposit to{" "}
-        <span className="font-semibold text-cloud">€{forfait.deposit}</span> for an additional
-        <span className="font-semibold text-cloud"> €{forfait.daily_cost.toFixed(2)}/day</span>.
-      </p>
-    </div>
+    {forfait && (
+      <div className="mt-4 text-sm text-steel flex items-center gap-2">
+        <p>
+          Forfait: Reduce security deposit to{" "}
+          <span className="font-semibold text-cloud">€{forfait.deposit}</span> for an additional
+          <span className="font-semibold text-cloud"> €{forfait.daily_cost.toFixed(2)}/day</span>.
+        </p>
+      </div>
+    )}
     <p className="mt-2 text-sm text-steel">
       Security Deposit: <span className="font-semibold text-cloud">€{deposit}</span>
     </p>
   </>
 );
 
-
 const MotorcyclePageSkeleton = () => (
-    <div className="container mx-auto px-4 py-12 animate-pulse">
-      <div className="h-6 bg-graphite/50 rounded w-48 mb-8"></div>
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-x-12 gap-y-10">
-        <div className="md:col-span-3">
-          <div className="w-full aspect-video bg-graphite/50 rounded-lg mb-12"></div>
-          <div className="space-y-2">
-            <div className="h-12 bg-graphite/50 rounded-lg"></div>
-            <div className="h-12 bg-graphite/50 rounded-lg"></div>
-            <div className="h-12 bg-graphite/50 rounded-lg"></div>
-          </div>
+  <div className="container mx-auto px-4 py-12 animate-pulse">
+    <div className="h-6 bg-graphite/50 rounded w-48 mb-8"></div>
+    <div className="grid grid-cols-1 md:grid-cols-5 gap-x-12 gap-y-10">
+      <div className="md:col-span-3">
+        <div className="w-full aspect-video bg-graphite/50 rounded-lg mb-12"></div>
+        <div className="space-y-2">
+          <div className="h-12 bg-graphite/50 rounded-lg"></div>
+          <div className="h-12 bg-graphite/50 rounded-lg"></div>
         </div>
-        <div className="md:col-span-2">
-          <div className="sticky top-24 space-y-6">
-            <div className="h-10 bg-graphite/50 rounded w-3/4"></div>
-            <div className="space-y-2">
-              <div className="h-4 bg-graphite/50 rounded"></div>
-              <div className="h-4 bg-graphite/50 rounded w-5/6"></div>
-            </div>
-            <div className="h-96 bg-graphite/50 rounded-lg"></div>
+      </div>
+      <div className="md:col-span-2">
+        <div className="sticky top-24 space-y-6">
+          <div className="h-10 bg-graphite/50 rounded w-3/4"></div>
+          <div className="space-y-2">
+            <div className="h-4 bg-graphite/50 rounded"></div>
+            <div className="h-4 bg-graphite/50 rounded w-5/6"></div>
+          </div>
+          <div className="h-12 bg-graphite/50 rounded-lg"></div>
+          <div className="mt-8 space-y-4 border-t border-graphite/50 pt-6">
+            <div className="h-6 w-1/2 rounded bg-graphite/50 mb-4"></div>
+            <div className="h-8 rounded bg-graphite/50"></div>
+            <div className="h-8 rounded bg-graphite/50"></div>
+            <div className="h-8 rounded bg-graphite/50"></div>
           </div>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 
 function MotorcyclePage() {
   const { slug } = useParams();
 
-  const {
-    data,
-    isLoading,
-    error,
-  } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["product", slug],
     queryFn: () => fetchProductBySlug(slug),
     enabled: !!slug,
@@ -110,11 +123,10 @@ function MotorcyclePage() {
   }
 
   const { bike, commonData } = data || {};
-  
+
   const whatsappNumber = "351920016794";
   const whatsappMessage = `Hello! I'm interested in renting the ${bike?.name}. Could you provide more information?`;
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-
 
   return (
     <>
@@ -137,12 +149,8 @@ function MotorcyclePage() {
             <div className="w-full aspect-video mb-12">
               <ImageCarousel images={bike?.image_urls} />
             </div>
+            {/* ACCORDIONS FOR GENERAL INFO */}
             <div className="space-y-2">
-              {bike?.technical_features?.length > 0 && (
-                <AccordionItem title="Technical Features">
-                  <TechnicalFeaturesList features={bike.technical_features} />
-                </AccordionItem>
-              )}
               <AccordionItem title="Included in Rental">
                 <IncludedInRentalList items={commonData?.included} />
               </AccordionItem>
@@ -163,22 +171,24 @@ function MotorcyclePage() {
                 <p className="mt-4 text-space">{bike?.description}</p>
               </div>
 
-              <div className="mt-8">
-                 <Button 
-                    as="a" 
-                    href={whatsappUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    variant="primary" 
-                    className="w-full py-3 text-lg"
-                    icon={FaWhatsapp}
+              <div className="pt-2">
+                <Button
+                  as="a"
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  variant="primary"
+                  className="w-full py-3 text-lg"
+                  icon={FaWhatsapp}
                 >
-                    Contact on WhatsApp
+                  Contact on WhatsApp
                 </Button>
                 <p className="text-center text-xs text-graphite mt-2">
-                    Click to open a chat with us for booking and inquiries.
+                  Click to open a chat with us for booking and inquiries.
                 </p>
               </div>
+
+              <SpecsTable features={bike?.technical_features} />
             </div>
           </div>
         </div>
