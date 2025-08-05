@@ -124,8 +124,8 @@ function MotorcycleCard({ bike, index }) {
                   : bike.status.charAt(0).toUpperCase() + bike.status.slice(1)}
               </span>
               <Button as="span" variant="primary" disabled={!isClickable} className="text-sm">
-                {isPlaceholder ? "Unavailable" : "Book Now"}
-              </Button>
+  {isPlaceholder ? "Unavailable" : "View Details"}
+</Button>
             </div>
           </div>
         </div>

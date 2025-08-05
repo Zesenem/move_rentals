@@ -15,8 +15,6 @@ import * as Sentry from "@sentry/react";
 import App from "./App.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import MotorcyclePage from "./pages/MotorcyclePage.jsx";
-import CheckoutPage from "./pages/CheckoutPage.jsx";
-import BookingSuccessPage from "./pages/BookingSuccessPage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 import TermsPage from "./pages/TermsPage.jsx";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage.jsx";
@@ -54,8 +52,6 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: "motorcycle/:slug", element: <MotorcyclePage /> },
-      { path: "checkout", element: <CheckoutPage /> },
-      { path: "booking-success", element: <BookingSuccessPage /> },
       { path: "terms-and-conditions", element: <TermsPage /> },
       { path: "privacy-policy", element: <PrivacyPolicyPage /> },
       { path: "contact", element: <ContactPage /> },

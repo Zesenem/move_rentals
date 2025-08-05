@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom"; // Import useNavigate
 import { FaBars, FaTimes, FaShoppingCart } from "react-icons/fa";
-import { useCartStore } from "../store/cartStore";
 import Logo from "./Logo";
 import Button from "./Button";
 
 function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const itemCount = useCartStore((state) => state.getItemCount());
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -35,7 +33,7 @@ function Header() {
       navigate("/");
       setTimeout(() => {
         document.getElementById("fleet-section")?.scrollIntoView({ behavior: "smooth" });
-      }, 100); 
+      }, 100);
     } else {
       document.getElementById("fleet-section")?.scrollIntoView({ behavior: "smooth" });
     }
@@ -44,7 +42,7 @@ function Header() {
   const navItems = [
     {
       name: "Our Fleet",
-      onClick: handleOurFleetClick, 
+      onClick: handleOurFleetClick,
     },
     { name: "Contact", to: "/contact" },
   ];
@@ -52,10 +50,10 @@ function Header() {
   const NavLinks = () => (
     <>
       {navItems.map((item) =>
-        item.onClick ? ( 
+        item.onClick ? (
           <button
             key={item.name}
-            onClick={item.onClick} 
+            onClick={item.onClick}
             className="rounded-md px-3 py-2 font-semibold text-steel transition-colors duration-300 hover:bg-arsenic"
           >
             {item.name}
@@ -83,15 +81,7 @@ function Header() {
             isActive ? "bg-cloud text-phantom" : "text-steel hover:bg-arsenic"
           }`
         }
-      >
-        <FaShoppingCart />
-        <span>Cart</span>
-        {itemCount > 0 && (
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cloud text-xs font-bold text-phantom">
-            {itemCount}
-          </span>
-        )}
-      </NavLink>
+      ></NavLink>
     </>
   );
 
