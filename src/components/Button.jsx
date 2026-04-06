@@ -8,6 +8,8 @@ function Button({ variant = "primary", as = "button", children, icon, className 
     primary: "bg-cloud text-phantom hover:scale-105 hover:brightness-95 focus:ring-cloud",
     ghost:
       "bg-transparent border border-cloud text-cloud hover:bg-cloud hover:text-phantom focus:ring-cloud",
+    danger:
+      "bg-red-600 text-white hover:brightness-110 focus:ring-red-500 disabled:bg-red-900/60 disabled:text-red-100",
   };
 
   const combinedClassName = `${baseStyles} ${variants[variant]} ${className}`;

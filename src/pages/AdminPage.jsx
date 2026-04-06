@@ -4,10 +4,14 @@ import { Helmet } from "react-helmet-async";
 import {
   FaCheckCircle,
   FaDatabase,
+  FaEye,
   FaExclamationTriangle,
+  FaInfoCircle,
+  FaListUl,
   FaMotorcycle,
   FaPlus,
   FaSave,
+  FaSlidersH,
   FaTag,
   FaTrash,
 } from "react-icons/fa";
@@ -29,6 +33,8 @@ const addButtonClassName =
   "inline-flex items-center gap-2 rounded-xl border border-cloud/40 bg-cloud/10 px-4 py-2 text-sm font-semibold text-cloud transition-colors hover:bg-cloud/20";
 const removeButtonClassName =
   "inline-flex h-[50px] w-[50px] items-center justify-center rounded-xl border border-red-500/40 bg-red-500/10 text-red-200 transition-colors hover:bg-red-500/20";
+const hintPillClassName =
+  "inline-flex items-center rounded-full border border-graphite/60 bg-phantom px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-space";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Use live/default status" },
@@ -309,6 +315,51 @@ const FieldGroup = ({ label, hint, children }) => (
   </div>
 );
 
+const HelperPill = ({ children }) => <span className={hintPillClassName}>{children}</span>;
+
+const SectionHeading = ({ icon, title, description, pills = [] }) => {
+  const Icon = icon;
+
+  return (
+    <div className="mb-5">
+      <div className="flex flex-wrap items-start gap-3">
+        {Icon && (
+          <div className="rounded-xl bg-arsenic p-3 text-cloud">
+            <Icon className="text-base" />
+          </div>
+        )}
+        <div className="flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-xl font-bold text-cloud">{title}</h2>
+            {pills.map((pill) => (
+              <HelperPill key={pill}>{pill}</HelperPill>
+            ))}
+          </div>
+          {description && <p className="mt-2 text-sm text-space">{description}</p>}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const GuidanceCard = ({ icon, title, description }) => {
+  const Icon = icon;
+
+  return (
+    <div className="rounded-2xl border border-graphite/50 bg-phantom/30 p-5">
+      <div className="flex items-start gap-3">
+        <div className="rounded-xl bg-arsenic p-3 text-cloud">
+          <Icon className="text-base" />
+        </div>
+        <div>
+          <h3 className="font-bold text-cloud">{title}</h3>
+          <p className="mt-2 text-sm text-space">{description}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const InlineActionButton = ({ icon, label, onClick, variant = "add" }) => {
   const className = variant === "remove" ? removeButtonClassName : addButtonClassName;
   const IconComponent = icon;
@@ -410,8 +461,20 @@ const StringListEditor = ({ items, placeholder, addLabel, onAdd, onChange, onRem
   </div>
 );
 
-const QuickGlanceEditor = ({ items, onAdd, onChange, onRemove }) => (
+const QuickGlanceEditor = ({
+  items,
+  onAdd,
+  onChange,
+  onRemove,
+  addLabel = "Add quick fact",
+  emptyMessage = "Add the three short facts shown on the vehicle card.",
+}) => (
   <div className="space-y-3">
+    <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite lg:grid lg:grid-cols-[1fr_220px_50px]">
+      <span>Text shown to customer</span>
+      <span>Icon style</span>
+      <span className="sr-only">Remove row</span>
+    </div>
     {items.length > 0 ? (
       items.map((item, index) => (
         <div key={`quick-glance-${index}`} className="grid gap-3 lg:grid-cols-[1fr_220px_50px]">
@@ -442,16 +505,28 @@ const QuickGlanceEditor = ({ items, onAdd, onChange, onRemove }) => (
       ))
     ) : (
       <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
-        Add the three short facts shown on the vehicle card.
+        {emptyMessage}
       </p>
     )}
 
-    <InlineActionButton icon={FaPlus} label="Add quick fact" onClick={onAdd} />
+    <InlineActionButton icon={FaPlus} label={addLabel} onClick={onAdd} />
   </div>
 );
 
-const FeatureEditor = ({ items, onAdd, onChange, onRemove }) => (
+const FeatureEditor = ({
+  items,
+  onAdd,
+  onChange,
+  onRemove,
+  addLabel = "Add specification",
+  emptyMessage = "No specifications added yet.",
+}) => (
   <div className="space-y-3">
+    <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite lg:grid lg:grid-cols-[220px_1fr_50px]">
+      <span>Label</span>
+      <span>Value shown to customer</span>
+      <span className="sr-only">Remove row</span>
+    </div>
     {items.length > 0 ? (
       items.map((item, index) => (
         <div key={`feature-${index}`} className="grid gap-3 lg:grid-cols-[220px_1fr_50px]">
@@ -477,23 +552,36 @@ const FeatureEditor = ({ items, onAdd, onChange, onRemove }) => (
       ))
     ) : (
       <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
-        No specifications added yet.
+        {emptyMessage}
       </p>
     )}
 
-    <InlineActionButton icon={FaPlus} label="Add specification" onClick={onAdd} />
+    <InlineActionButton icon={FaPlus} label={addLabel} onClick={onAdd} />
   </div>
 );
 
-const ItemWithIconEditor = ({ items, onAdd, onChange, onRemove }) => (
+const ItemWithIconEditor = ({
+  items,
+  onAdd,
+  onChange,
+  onRemove,
+  addLabel = "Add row",
+  emptyMessage = "No rows added yet.",
+  placeholder = "Item text",
+}) => (
   <div className="space-y-3">
+    <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite lg:grid lg:grid-cols-[1fr_220px_50px]">
+      <span>Text shown to customer</span>
+      <span>Icon style</span>
+      <span className="sr-only">Remove row</span>
+    </div>
     {items.length > 0 ? (
       items.map((item, index) => (
         <div key={`icon-item-${index}`} className="grid gap-3 lg:grid-cols-[1fr_220px_50px]">
           <input
             className={inputClassName}
             value={item.item}
-            placeholder="Item text"
+            placeholder={placeholder}
             onChange={(event) => onChange(index, "item", event.target.value)}
           />
           <select
@@ -517,11 +605,11 @@ const ItemWithIconEditor = ({ items, onAdd, onChange, onRemove }) => (
       ))
     ) : (
       <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
-        No rows added yet.
+        {emptyMessage}
       </p>
     )}
 
-    <InlineActionButton icon={FaPlus} label="Add row" onClick={onAdd} />
+    <InlineActionButton icon={FaPlus} label={addLabel} onClick={onAdd} />
   </div>
 );
 
@@ -963,6 +1051,45 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
     }
   };
 
+  const handleDeleteSelectedEntry = async () => {
+    if (!metadata || isCreatingNew || !selectedMetadataEntry || selectedMetadataIndex < 0) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Delete "${selectedMetadataEntry.name || "this vehicle"}" from the fleet metadata? This cannot be undone.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setFormError("");
+    setSaveMessage("");
+
+    try {
+      const nextEntries = metadataEntries.filter((_, index) => index !== selectedMetadataIndex);
+      const nextMetadata = {
+        ...metadata,
+        motorcycles_static_data: nextEntries,
+      };
+
+      await saveMutation.mutateAsync(nextMetadata);
+
+      if (nextEntries.length > 0) {
+        const nextSelectedIndex = Math.min(selectedMetadataIndex, nextEntries.length - 1);
+        setSelectedEntryKey(getEntryKey(nextEntries[nextSelectedIndex], nextSelectedIndex));
+      } else {
+        setSelectedEntryKey("");
+        setDraft(createVehicleDraft());
+      }
+
+      setSaveMessage("Vehicle metadata entry deleted.");
+    } catch (deleteError) {
+      setFormError(deleteError.message || "Could not delete the selected vehicle.");
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -984,8 +1111,8 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                 Fleet Metadata Editor
               </h1>
               <p className="mt-4 text-lg text-space">
-                Edit the website details for one vehicle at a time, create new vehicle metadata
-                entries, and save the full metadata document through Netlify Functions.
+                Edit the customer-facing website details for one vehicle at a time. Use this page
+                to adjust cards, descriptions, rental rules, and notes without touching code.
               </p>
             </div>
 
@@ -1033,13 +1160,41 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
           </div>
 
           <div className="mt-10 rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
-            <h2 className="text-xl font-bold text-cloud">How To Use This Page</h2>
-            <ol className="mt-4 space-y-2 text-space">
-              <li>1. Choose an existing vehicle or start a new metadata entry.</li>
-              <li>2. Edit the public website details using the form below.</li>
-              <li>3. Check the preview on the right before saving.</li>
-              <li>4. Save once to update the full metadata document in Netlify Blobs.</li>
-            </ol>
+            <SectionHeading
+              icon={FaInfoCircle}
+              title="Start Here"
+              description="The form below edits only the website presentation layer. Vehicles should still be created in Twice first whenever possible."
+              pills={["Guided workflow", "Non-technical"]}
+            />
+
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <GuidanceCard
+                icon={FaMotorcycle}
+                title="1. Pick a vehicle"
+                description="Open an existing record or create a new one from a live Twice vehicle."
+              />
+              <GuidanceCard
+                icon={FaSlidersH}
+                title="2. Edit the public details"
+                description="Most changes happen in the basic details, fleet card, and rental rules sections."
+              />
+              <GuidanceCard
+                icon={FaEye}
+                title="3. Check the preview"
+                description="The preview updates instantly so you can confirm what customers will see."
+              />
+              <GuidanceCard
+                icon={FaSave}
+                title="4. Save once"
+                description="Saving stores the current metadata document so the changes persist after refresh."
+              />
+            </div>
+
+            <div className="mt-5 rounded-xl border border-cloud/30 bg-cloud/10 px-4 py-3 text-sm text-space">
+              Most edits do not need Advanced Settings. Leave that section alone unless you are
+              matching a live Twice product, changing the public URL slug, or setting a custom
+              availability label.
+            </div>
           </div>
 
           {isLoading && (
@@ -1061,14 +1216,18 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
               <section className="rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
                 <div className="flex flex-col gap-6">
                   <div className={sectionCardClassName}>
+                    <SectionHeading
+                      icon={FaPlus}
+                      title="Create A New Vehicle"
+                      description="Use the live Twice option when the vehicle already exists there. Use static-only only for temporary or manual website entries."
+                      pills={["Step 1"]}
+                    />
+
                     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                       <div className="max-w-2xl">
-                        <p className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">
-                          Add New Vehicle Metadata
-                        </p>
-                        <p className="mt-2 text-sm text-space">
-                          Start from a live Twice vehicle if it already exists there, or create a
-                          static-only vehicle if it does not.
+                        <p className="text-sm text-space">
+                          Choose a vehicle from Twice below if it already exists in your booking
+                          system. That keeps the website linked to the correct live record.
                         </p>
                       </div>
                       {isCreatingNew && (
@@ -1079,27 +1238,32 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                     </div>
 
                     <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_auto]">
-                      <select
-                        className={inputClassName}
-                        value={newLiveVehicleId}
-                        onChange={(event) => setNewLiveVehicleId(event.target.value)}
-                        disabled={!liveVehiclesWithoutMetadata.length}
-                      >
-                        {liveVehiclesWithoutMetadata.length > 0 ? (
-                          liveVehiclesWithoutMetadata.map((vehicle) => (
-                            <option key={vehicle.id} value={vehicle.id}>
-                              {vehicle.name} ({vehicle.id})
-                            </option>
-                          ))
-                        ) : (
-                          <option value="">No live vehicles without metadata found</option>
-                        )}
-                      </select>
+                      <div>
+                        <label className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">
+                          Live vehicles from Twice
+                        </label>
+                        <select
+                          className="mt-3 w-full rounded-xl border border-graphite/60 bg-phantom px-4 py-3 text-steel outline-none transition-colors focus:border-cloud"
+                          value={newLiveVehicleId}
+                          onChange={(event) => setNewLiveVehicleId(event.target.value)}
+                          disabled={!liveVehiclesWithoutMetadata.length}
+                        >
+                          {liveVehiclesWithoutMetadata.length > 0 ? (
+                            liveVehiclesWithoutMetadata.map((vehicle) => (
+                              <option key={vehicle.id} value={vehicle.id}>
+                                {vehicle.name} ({vehicle.id})
+                              </option>
+                            ))
+                          ) : (
+                            <option value="">No live vehicles without metadata found</option>
+                          )}
+                        </select>
+                      </div>
 
                       <Button
                         onClick={handleStartNewLiveEntry}
                         disabled={!liveVehiclesWithoutMetadata.length}
-                        className="justify-center"
+                        className="justify-center self-end"
                       >
                         Create From Live Vehicle
                       </Button>
@@ -1113,56 +1277,78 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
 
                     {isCreatingNew && (
                       <div className="mt-5 rounded-xl border border-cloud/30 bg-cloud/10 px-4 py-3 text-sm text-space">
-                        You are creating a new metadata entry.
+                        You are creating a new metadata entry. Fill in the public website details
+                        below, then check the preview before saving.
                       </div>
                     )}
                   </div>
 
                   {!isCreatingNew && (
-                    <FieldGroup
-                      label="Selected Vehicle"
-                      hint="Choose which saved metadata record you want to edit."
-                    >
-                      {metadataEntries.length > 0 ? (
-                        <select
-                          className={inputClassName}
-                          value={selectedEntryKey}
-                          onChange={(event) => setSelectedEntryKey(event.target.value)}
-                        >
-                          {metadataEntries.map((entry, index) => {
-                            const key = getEntryKey(entry, index);
+                    <div className={sectionCardClassName}>
+                      <SectionHeading
+                        icon={FaMotorcycle}
+                        title="Open An Existing Vehicle"
+                        description="Use this dropdown to switch between saved website records."
+                        pills={["Step 1"]}
+                      />
 
-                            return (
-                              <option key={key} value={key}>
-                                {entry.name || "Unnamed entry"} ({entry.id || entry.slug || "no id"})
-                              </option>
-                            );
-                          })}
-                        </select>
-                      ) : (
-                        <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
-                          No saved metadata entries yet. Start by creating a new one above.
-                        </p>
-                      )}
-                    </FieldGroup>
+                      <FieldGroup
+                        label="Selected Vehicle"
+                        hint="Choose which saved metadata record you want to edit."
+                      >
+                        {metadataEntries.length > 0 ? (
+                          <select
+                            className={inputClassName}
+                            value={selectedEntryKey}
+                            onChange={(event) => setSelectedEntryKey(event.target.value)}
+                          >
+                            {metadataEntries.map((entry, index) => {
+                              const key = getEntryKey(entry, index);
+
+                              return (
+                                <option key={key} value={key}>
+                                  {entry.name || "Unnamed entry"} ({entry.id || entry.slug || "no id"})
+                                </option>
+                              );
+                            })}
+                          </select>
+                        ) : (
+                          <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
+                            No saved metadata entries yet. Start by creating a new one above.
+                          </p>
+                        )}
+                      </FieldGroup>
+                    </div>
                   )}
 
                   <div className={sectionCardClassName}>
+                    <SectionHeading
+                      icon={FaInfoCircle}
+                      title="Basic Details"
+                      description="These are the main public details customers read first on the site."
+                      pills={["Public website", "Step 2"]}
+                    />
+
                     <div className="grid gap-4 md:grid-cols-2">
-                      <FieldGroup label="Vehicle Name" hint="Shown on the website card and detail page.">
+                      <FieldGroup
+                        label="Vehicle Name"
+                        hint="Public title shown on the card and detail page."
+                      >
                         <input
                           className={inputClassName}
                           value={draft.name}
+                          placeholder="Example: Tesla Model 3"
                           onChange={handleDraftChange("name")}
                         />
                       </FieldGroup>
                       <FieldGroup
                         label="Security Deposit"
-                        hint="Usually a number in euros, but text is allowed if needed."
+                        hint="Shown on the detail page. Use only the number if possible, for example 500."
                       >
                         <input
                           className={inputClassName}
                           value={draft.securityDeposit}
+                          placeholder="Example: 500"
                           onChange={handleDraftChange("securityDeposit")}
                         />
                       </FieldGroup>
@@ -1170,21 +1356,13 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
 
                     <div className="mt-6">
                       <FieldGroup
-                        label="Badges"
-                        hint="Choose the small floating labels shown on the vehicle card."
-                      >
-                        <BadgeSelector value={draft.badges} onToggle={handleBadgeToggle} />
-                      </FieldGroup>
-                    </div>
-
-                    <div className="mt-6">
-                      <FieldGroup
                         label="Description"
-                        hint="Public description shown on the vehicle detail page."
+                        hint="Short public paragraph shown on the detail page."
                       >
                         <textarea
                           className={textareaClassName}
                           value={draft.description}
+                          placeholder="Write the short description customers should read on the vehicle page."
                           onChange={handleDraftChange("description")}
                         />
                       </FieldGroup>
@@ -1192,28 +1370,57 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                   </div>
 
                   <div className={sectionCardClassName}>
+                    <SectionHeading
+                      icon={FaTag}
+                      title="Fleet Card"
+                      description="These fields control the listing card that customers see before opening the vehicle page."
+                      pills={["Card preview", "Step 2"]}
+                    />
+
                     <FieldGroup
-                      label="Quick Glance"
-                      hint="These are the short facts shown on the fleet card."
+                      label="Badges"
+                      hint="Optional labels shown on the card. Use only the ones you want customers to notice instantly."
                     >
-                      <QuickGlanceEditor
-                        items={draft.quickGlance}
-                        onAdd={() => handleAddObjectListItem("quickGlance", EMPTY_QUICK_GLANCE_ITEM)}
-                        onChange={(index, key, value) =>
-                          handleObjectListChange("quickGlance", index, key, value)
-                        }
-                        onRemove={(index) => handleRemoveObjectListItem("quickGlance", index)}
-                      />
+                      <BadgeSelector value={draft.badges} onToggle={handleBadgeToggle} />
                     </FieldGroup>
+
+                    <div className="mt-6">
+                      <FieldGroup
+                        label="Quick Glance"
+                        hint="Keep this to three short facts. Example: 283 cv, Category B, 534 km WLTP."
+                      >
+                        <QuickGlanceEditor
+                          items={draft.quickGlance}
+                          addLabel="Add quick fact"
+                          emptyMessage="Add up to three short facts for the vehicle card."
+                          onAdd={() =>
+                            handleAddObjectListItem("quickGlance", EMPTY_QUICK_GLANCE_ITEM)
+                          }
+                          onChange={(index, key, value) =>
+                            handleObjectListChange("quickGlance", index, key, value)
+                          }
+                          onRemove={(index) => handleRemoveObjectListItem("quickGlance", index)}
+                        />
+                      </FieldGroup>
+                    </div>
                   </div>
 
                   <div className={sectionCardClassName}>
+                    <SectionHeading
+                      icon={FaListUl}
+                      title="Vehicle Detail Page"
+                      description="Use this section for the longer information customers read after opening a vehicle."
+                      pills={["Detail page", "Step 2"]}
+                    />
+
                     <FieldGroup
                       label="Specifications"
-                      hint="These rows appear in the Specifications section of the detail page."
+                      hint="Label and value rows shown in the Specifications section of the detail page."
                     >
                       <FeatureEditor
                         items={draft.technicalFeatures}
+                        addLabel="Add specification"
+                        emptyMessage="Add label and value rows such as Engine, Power, or Fuel Type."
                         onAdd={() =>
                           handleAddObjectListItem("technicalFeatures", EMPTY_FEATURE_ITEM)
                         }
@@ -1225,12 +1432,38 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                         }
                       />
                     </FieldGroup>
+
+                    <div className="mt-6">
+                      <FieldGroup
+                        label="Important Notes"
+                        hint="Use this for warnings, exceptions, or approval notes that customers must notice."
+                      >
+                        <ItemWithIconEditor
+                          items={draft.importantNotes}
+                          addLabel="Add important note"
+                          emptyMessage="Add short notes only when the vehicle needs extra warnings or exceptions."
+                          placeholder='Example: Reservation subject to approval'
+                          onAdd={() => handleAddObjectListItem("importantNotes", EMPTY_LIST_ITEM)}
+                          onChange={(index, key, value) =>
+                            handleObjectListChange("importantNotes", index, key, value)
+                          }
+                          onRemove={(index) => handleRemoveObjectListItem("importantNotes", index)}
+                        />
+                      </FieldGroup>
+                    </div>
                   </div>
 
                   <div className={sectionCardClassName}>
+                    <SectionHeading
+                      icon={FaCheckCircle}
+                      title="Rental Rules"
+                      description="Only switch these sections on when a vehicle needs different rental inclusions or requirements from the default shared rules."
+                      pills={["Defaults available", "Step 2"]}
+                    />
+
                     <FieldGroup
                       label="Included In Rental"
-                      hint="Turn this on only if this vehicle needs its own included list."
+                      hint="Leave this off to use the default included list shared across the website."
                     >
                       <label className="mb-4 flex items-center justify-between rounded-xl border border-graphite/60 bg-arsenic/70 px-4 py-3">
                         <div>
@@ -1250,6 +1483,9 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       {draft.hasIncludedOverride ? (
                         <ItemWithIconEditor
                           items={draft.included}
+                          addLabel="Add included item"
+                          emptyMessage="Add each item that is included specifically for this vehicle."
+                          placeholder="Example: 300 km included"
                           onAdd={() => handleAddObjectListItem("included", EMPTY_LIST_ITEM)}
                           onChange={(index, key, value) =>
                             handleObjectListChange("included", index, key, value)
@@ -1262,59 +1498,46 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                         </p>
                       )}
                     </FieldGroup>
-                  </div>
 
-                  <div className={sectionCardClassName}>
-                    <FieldGroup
-                      label="Requirements"
-                      hint="Turn this on only if this vehicle needs its own requirements list."
-                    >
-                      <label className="mb-4 flex items-center justify-between rounded-xl border border-graphite/60 bg-arsenic/70 px-4 py-3">
-                        <div>
-                          <p className="font-semibold text-cloud">Use vehicle-specific requirements</p>
-                          <p className="text-sm text-space">
-                            Turn this off to use the shared requirements list from the main metadata file.
+                    <div className="mt-8">
+                      <FieldGroup
+                        label="Requirements"
+                        hint="Leave this off to use the default driver requirements shared across the website."
+                      >
+                        <label className="mb-4 flex items-center justify-between rounded-xl border border-graphite/60 bg-arsenic/70 px-4 py-3">
+                          <div>
+                            <p className="font-semibold text-cloud">Use vehicle-specific requirements</p>
+                            <p className="text-sm text-space">
+                              Turn this off to use the shared requirements list from the main metadata file.
+                            </p>
+                          </div>
+                          <input
+                            type="checkbox"
+                            className="h-5 w-5 accent-cloud"
+                            checked={draft.hasRequirementsOverride}
+                            onChange={handleToggleDraftField("hasRequirementsOverride")}
+                          />
+                        </label>
+
+                        {draft.hasRequirementsOverride ? (
+                          <ItemWithIconEditor
+                            items={draft.requirements}
+                            addLabel="Add requirement"
+                            emptyMessage="Add only the special requirements that apply to this vehicle."
+                            placeholder="Example: Minimum age: 25 years"
+                            onAdd={() => handleAddObjectListItem("requirements", EMPTY_LIST_ITEM)}
+                            onChange={(index, key, value) =>
+                              handleObjectListChange("requirements", index, key, value)
+                            }
+                            onRemove={(index) => handleRemoveObjectListItem("requirements", index)}
+                          />
+                        ) : (
+                          <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
+                            This vehicle will use the shared requirements list.
                           </p>
-                        </div>
-                        <input
-                          type="checkbox"
-                          className="h-5 w-5 accent-cloud"
-                          checked={draft.hasRequirementsOverride}
-                          onChange={handleToggleDraftField("hasRequirementsOverride")}
-                        />
-                      </label>
-
-                      {draft.hasRequirementsOverride ? (
-                        <ItemWithIconEditor
-                          items={draft.requirements}
-                          onAdd={() => handleAddObjectListItem("requirements", EMPTY_LIST_ITEM)}
-                          onChange={(index, key, value) =>
-                            handleObjectListChange("requirements", index, key, value)
-                          }
-                          onRemove={(index) => handleRemoveObjectListItem("requirements", index)}
-                        />
-                      ) : (
-                        <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
-                          This vehicle will use the shared requirements list.
-                        </p>
-                      )}
-                    </FieldGroup>
-                  </div>
-
-                  <div className={sectionCardClassName}>
-                    <FieldGroup
-                      label="Important Notes"
-                      hint="Short notes shown in the Important Notes section on the detail page."
-                    >
-                      <ItemWithIconEditor
-                        items={draft.importantNotes}
-                        onAdd={() => handleAddObjectListItem("importantNotes", EMPTY_LIST_ITEM)}
-                        onChange={(index, key, value) =>
-                          handleObjectListChange("importantNotes", index, key, value)
-                        }
-                        onRemove={(index) => handleRemoveObjectListItem("importantNotes", index)}
-                      />
-                    </FieldGroup>
+                        )}
+                      </FieldGroup>
+                    </div>
                   </div>
 
                   <details className="rounded-2xl border border-graphite/50 bg-phantom/20 p-5">
@@ -1322,21 +1545,31 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       Advanced Settings
                     </summary>
                     <div className="mt-6 space-y-6">
+                      <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                        Only change these fields if you understand why the website needs them.
+                        Most day-to-day edits should be done in the sections above.
+                      </div>
+
                       <div className="grid gap-4 md:grid-cols-2">
                         <FieldGroup
                           label="Twice ID"
-                          hint="Leave blank only for static-only vehicles."
+                          hint="Leave blank only for static-only vehicles. This links the website entry to the live Twice product."
                         >
                           <input
                             className={inputClassName}
                             value={draft.id}
+                            placeholder="Live Twice product ID"
                             onChange={handleDraftChange("id")}
                           />
                         </FieldGroup>
-                        <FieldGroup label="Slug" hint="Used for the public detail page URL.">
+                        <FieldGroup
+                          label="Slug"
+                          hint="Used for the public detail page URL. Change this only if you need a different public link."
+                        >
                           <input
                             className={inputClassName}
                             value={draft.slug}
+                            placeholder="Example: tesla-model-3"
                             onChange={handleDraftChange("slug")}
                           />
                         </FieldGroup>
@@ -1374,11 +1607,12 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                         </FieldGroup>
                         <FieldGroup
                           label="Availability Label"
-                          hint='Optional custom label such as "On Demand".'
+                          hint='Optional custom badge text such as "On Demand".'
                         >
                           <input
                             className={inputClassName}
                             value={draft.availabilityLabel}
+                            placeholder="Example: On Demand"
                             onChange={handleDraftChange("availabilityLabel")}
                           />
                         </FieldGroup>
@@ -1386,7 +1620,7 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
 
                       <FieldGroup
                         label="Alternative Match Names"
-                        hint="Only use these if the live Twice product name does not match the public website name."
+                        hint="Only use these if the live Twice product name is different from the name shown on the website."
                       >
                         <StringListEditor
                           items={draft.matchNames}
@@ -1435,18 +1669,29 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                     >
                       Reset Changes
                     </Button>
+                    {!isCreatingNew && selectedMetadataEntry && (
+                      <Button
+                        variant="danger"
+                        icon={FaTrash}
+                        onClick={handleDeleteSelectedEntry}
+                        className="min-w-[160px]"
+                        disabled={saveMutation.isPending}
+                      >
+                        Delete Vehicle
+                      </Button>
+                    )}
                   </div>
                 </div>
               </section>
 
               <div className="space-y-6">
                 <section className="rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
-                  <h2 className="text-xl font-bold text-cloud">
-                    {isCreatingNew ? "New Record Preview" : "Selected Record Preview"}
-                  </h2>
-                  <p className="mt-2 text-sm text-space">
-                    This preview updates while you edit, before anything is saved.
-                  </p>
+                  <SectionHeading
+                    icon={FaEye}
+                    title={isCreatingNew ? "New Record Preview" : "Selected Record Preview"}
+                    description="This updates while you edit so you can check the customer-facing result before saving."
+                    pills={["Step 3"]}
+                  />
 
                   {!isCreatingNew && !selectedLiveVehicle && selectedMetadataEntry?.source !== "static" && (
                     <p className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
@@ -1472,22 +1717,25 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                 </section>
 
                 <section className="rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
-                  <div className="flex items-center gap-3 text-cloud">
-                    <FaCheckCircle />
-                    <h2 className="text-xl font-bold">Editor Notes</h2>
-                  </div>
+                  <SectionHeading
+                    icon={FaInfoCircle}
+                    title="Before You Save"
+                    description="A few practical rules keep the admin workflow predictable."
+                    pills={["Step 4"]}
+                  />
                   <ul className="mt-4 space-y-2 text-sm text-space">
-                    <li>The whole metadata document is saved on each submit.</li>
+                    <li>Saving updates the current metadata document used by the site.</li>
                     <li>
                       If Blobs has never been written before, the current local `db.json` data is
                       used as the starting point.
                     </li>
                     <li>Create from a live vehicle whenever the product already exists in Twice.</li>
+                    <li>Deleting a vehicle removes only its website metadata, not the live Twice product.</li>
                     <li>
-                      Turn off the Included or Requirements switch to use the shared default list
-                      instead of a vehicle-specific list.
+                      Leave Included or Requirements switched off when the default shared lists are
+                      correct for that vehicle.
                     </li>
-                    <li>Advanced settings are only needed for IDs, matching, or custom status labels.</li>
+                    <li>Advanced settings are usually only needed for IDs, matching, or custom status labels.</li>
                   </ul>
                 </section>
               </div>
