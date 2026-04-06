@@ -20,14 +20,13 @@
     {
       "id": "Rt7CgmbXQoMEfIwdsE8G",
       "name": "Yamaha NMAX 125",
-      "badges": ["Best Seller"],
+      "badges": [],
       "quick_glance": [
         { "label": "125 cc", "icon": "engine" },
         { "label": "A1 / B", "icon": "license" },
         { "label": "7.1 L", "icon": "gas" }
       ],
-      "security_deposit": 330,
-      "forfait": { "deposit": 140, "daily_cost": 6.5 },
+      "security_deposit": 150,
       "technical_features": [
         { "label": "Engine Type", "value": "4-stroke, Liquid-cooled, SOHC" },
         { "label": "Power", "value": "9.0 kW (12.2 PS) @ 8000 rpm" },
@@ -47,8 +46,7 @@
         { "label": "A1 / B", "icon": "license" },
         { "label": "5.2 L", "icon": "gas" }
       ],
-      "security_deposit": 290,
-      "forfait": { "deposit": 100, "daily_cost": 5.5 },
+      "security_deposit": 150,
       "technical_features": [
         { "label": "Engine Type", "value": "Air-cooled, 4-stroke, SOHC" },
         { "label": "Power", "value": "6.0 kW (8.2 PS) @ 6500 rpm" },
@@ -62,14 +60,13 @@
     {
       "id": "c0cxAwwBOEjg0R8PYsiy",
       "name": "Yamaha NMAX 125 Tech MAX",
-      "badges": ["Premium", "GPS"],
+      "badges": ["GPS"],
       "quick_glance": [
         { "label": "125 cc", "icon": "engine" },
         { "label": "A1 / B", "icon": "license" },
         { "label": "7.1 L", "icon": "gas" }
       ],
-      "security_deposit": 440,
-      "forfait": { "deposit": 180, "daily_cost": 7.5 },
+      "security_deposit": 225,
       "technical_features": [
         { "label": "Engine Type", "value": "4-stroke, Liquid-cooled, SOHC" },
         { "label": "Power", "value": "9.0 kW (12.2 PS) @ 8000 rpm" },
@@ -98,6 +95,107 @@
         { "label": "Fuel Consumption", "value": "3.0 L/100km" },
         { "label": "Seat Height", "value": "795 mm" },
         { "label": "Weight (Wet)", "value": "180 kg" }
+      ]
+    },
+    {
+      "source": "static",
+      "slug": "honda-vision-110",
+      "name": "Honda Vision 110",
+      "match_names": ["Honda Vision 110"],
+      "description": "A lightweight and economical scooter built for city riding. The Honda Vision 110 is easy to handle, fuel efficient, and a practical option for moving around Lisbon.",
+      "badges": ["ECO"],
+      "quick_glance": [
+        { "label": "110 cc", "icon": "engine" },
+        { "label": "A1 / B", "icon": "license" },
+        { "label": "5.2 L", "icon": "gas" }
+      ],
+      "security_deposit": 150,
+      "technical_features": [
+        { "label": "Engine Type", "value": "Air-cooled, 4-stroke, SOHC" },
+        { "label": "Power", "value": "6.4 kW (8.7 PS) @ 7500 rpm" },
+        { "label": "Torque", "value": "9.0 Nm @ 5750 rpm" },
+        { "label": "Transmission", "value": "V-Belt automatic" },
+        { "label": "Fuel Consumption", "value": "~1.9 L/100km" },
+        { "label": "Seat Height", "value": "785 mm" },
+        { "label": "Weight (Wet)", "value": "~100 kg" },
+        { "label": "Fuel Tank", "value": "5.2 L" },
+        { "label": "Fuel Type", "value": "Gasoline 95 or 98 (95 recommended)" }
+      ]
+    },
+    {
+      "id": "TlgOUVcZh6yQd2qqkn3b",
+      "slug": "bmw-s1000rr",
+      "name": "BMW S1000RR",
+      "match_names": ["BMW S1000RR", "BMW S1000 RR"],
+      "status": "on-demand",
+      "availability_label": "On Demand",
+      "description": "The BMW S1000RR is a high-performance superbike designed for track use. With race-derived technology and extreme power, it delivers a focused riding experience for customers seeking speed, control, and adrenaline in a controlled environment.",
+      "badges": ["Premium"],
+      "quick_glance": [
+        { "label": "999 cc", "icon": "engine" },
+        { "label": "A", "icon": "license" },
+        { "label": "16.5 L", "icon": "gas" }
+      ],
+      "security_deposit": 3500,
+      "technical_features": [
+        { "label": "Type", "value": "Sport motorcycle (superbike)" },
+        { "label": "Engine", "value": "Liquid-cooled, 4-stroke, inline 4-cylinder, DOHC" },
+        { "label": "Power", "value": "152 kW (207 PS) @ 13,500 rpm" },
+        { "label": "Torque", "value": "113 Nm @ 11,000 rpm" },
+        { "label": "Transmission", "value": "6-speed manual" },
+        { "label": "Top Speed", "value": "~299 km/h" },
+        { "label": "Included Mileage", "value": "300 km" },
+        {
+          "label": "Fuel Consumption",
+          "value": "~6.5 L/100km (up to ~20 L/100km in intensive use)"
+        },
+        { "label": "Seat Height", "value": "824 mm" },
+        { "label": "Weight (Wet)", "value": "~197 kg" },
+        { "label": "Fuel Tank", "value": "~16.5 L" },
+        { "label": "Fuel Type", "value": "Gasoline 98 (Premium)" }
+      ],
+      "included": [
+        { "item": "Helmet included", "icon": "helmet" },
+        { "item": "300 km included", "icon": "road" }
+      ],
+      "requirements": [
+        { "item": "Minimum age: 25 years old", "icon": "id-card" },
+        { "item": "Valid category A driving license", "icon": "license" },
+        { "item": "Proven experience with high-displacement motorcycles", "icon": "experience" }
+      ],
+      "important_notes": [
+        { "item": "Track use only", "icon": "road" },
+        { "item": "Insurance is not included", "icon": "shield" },
+        { "item": "Reservation subject to approval", "icon": "default-check" }
+      ]
+    },
+    {
+      "id": "v3QgyWRqpfeIXuBI9TER",
+      "slug": "tesla-model-3-rwd",
+      "name": "Tesla Model 3 (Base / RWD)",
+      "match_names": ["Tesla Model 3", "Tesla Model 3 RWD", "Tesla Model 3 Base"],
+      "description": "The Tesla Model 3 RWD combines instant electric torque with everyday usability. It is a practical option for customers who want a smooth, modern driving experience in and around Lisbon.",
+      "badges": ["Electric"],
+      "quick_glance": [
+        { "label": "283 cv", "icon": "power" },
+        { "label": " B ", "icon": "license" },
+        { "label": "534 km", "icon": "mileage" }
+      ],
+      "security_deposit": 500,
+      "technical_features": [
+        { "label": "Power", "value": "283 cv" },
+        { "label": "Torque", "value": "~420 Nm" },
+        { "label": "Drivetrain", "value": "Rear-wheel drive (RWD)" },
+        { "label": "Transmission", "value": "Automatic (1-speed)" }
+      ],
+      "included": [],
+      "requirements": [
+        { "item": "Minimum age: 25 years old", "icon": "id-card" },
+        { "item": "Valid category B driving license", "icon": "license" }
+      ],
+      "important_notes": [
+        { "item": "Legally classified as a standard passenger car", "icon": "default-check" },
+        { "item": "No special driving license is required", "icon": "default-check" }
       ]
     }
   ]

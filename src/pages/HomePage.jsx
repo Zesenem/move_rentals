@@ -6,10 +6,10 @@ function HomePage() {
   return (
     <>
       <Helmet>
-        <title>Move Rentals | Scooter & Motorcycle Rentals in Lisbon</title>
+        <title>Move Rentals | Scooter, Motorcycle & Car Rentals in Lisbon</title>
         <meta
           name="description"
-          content="Rent a scooter or motorcycle with ease from Move Rentals. We have the perfect ride for your adventure in Portugal, including the Yamaha NMAX and RayZR."
+          content="Rent a scooter, motorcycle, or selected car from Move Rentals. Find the right ride for your time in Lisbon."
         />
       </Helmet>
       <Hero />

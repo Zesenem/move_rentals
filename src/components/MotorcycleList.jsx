@@ -5,10 +5,8 @@ import { fetchProducts } from "../services/twice.js";
 import MotorcycleCard from "./MotorcycleCard";
 import ComingSoonCard from "./ComingSoonCard";
 import MotorcycleCardSkeleton from "./MotorcycleCardSkeleton.jsx";
-import useIsMobile from "../hooks/useIsMobile";
 
 function MotorcycleList() {
-  const isMobile = useIsMobile();
   const {
     data: motorcycles = [],
     isLoading,
@@ -20,14 +18,21 @@ function MotorcycleList() {
   });
 
   const filteredAndSortedMotorcycles = useMemo(() => {
-    let bikesToShow = motorcycles;
+    const getSortValue = (bike) =>
+      typeof bike.price_per_day === "number" && bike.price_per_day > 0
+        ? bike.price_per_day
+        : Number.POSITIVE_INFINITY;
 
-    if (isMobile) {
-      bikesToShow = bikesToShow.filter((bike) => bike.price_per_day <= 998);
-    }
+    return [...motorcycles].sort((a, b) => {
+      const priceDifference = getSortValue(a) - getSortValue(b);
 
-    return [...bikesToShow].sort((a, b) => a.price_per_day - b.price_per_day);
-  }, [motorcycles, isMobile]);
+      if (priceDifference !== 0) {
+        return priceDifference;
+      }
+
+      return a.name.localeCompare(b.name);
+    });
+  }, [motorcycles]);
 
   const renderContent = () => {
     if (isLoading) {
@@ -59,7 +64,7 @@ function MotorcycleList() {
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-4xl font-extrabold text-steel">Our Fleet</h2>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-space">
-          Affordable, reliable, and ready for your Lisbon adventure. Pick your ride.
+          From city scooters to premium bikes and special vehicles, pick the ride that fits your plan.
         </p>
 
         <div className="mt-12 flex flex-wrap justify-center gap-8">{renderContent()}</div>

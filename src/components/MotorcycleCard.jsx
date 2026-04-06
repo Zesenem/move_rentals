@@ -1,12 +1,27 @@
 import { Link } from "react-router-dom";
-import { FaTachometerAlt, FaLeaf, FaStar, FaGem } from "react-icons/fa";
+import {
+  FaBolt,
+  FaCogs,
+  FaFlagCheckered,
+  FaGem,
+  FaLeaf,
+  FaRoad,
+  FaStar,
+  FaTachometerAlt,
+} from "react-icons/fa";
 import { PiSteeringWheelFill, PiGasCanFill } from "react-icons/pi";
 import Button from "./Button";
 
 const glanceIconMap = {
   engine: <FaTachometerAlt />,
+  power: <FaBolt />,
   license: <PiSteeringWheelFill />,
   gas: <PiGasCanFill />,
+  mileage: <FaRoad />,
+  transmission: <FaCogs />,
+  drivetrain: <FaRoad />,
+  speed: <FaTachometerAlt />,
+  track: <FaFlagCheckered />,
 };
 
 const badgeMap = {
@@ -14,6 +29,7 @@ const badgeMap = {
   "Best Seller": { icon: FaStar, color: "bg-yellow-500" },
   "Best Value": { icon: FaStar, color: "bg-yellow-500" },
   Premium: { icon: FaGem, color: "bg-purple-500" },
+  Electric: { icon: FaBolt, color: "bg-cyan-500" },
   GPS: {
     icon: function GPSIcon(props) {
       return (
@@ -28,6 +44,21 @@ const badgeMap = {
       );
     },
     color: "bg-blue-500",
+  },
+};
+
+const statusConfig = {
+  available: {
+    label: "Available",
+    className: "bg-status-bg-available text-status-available",
+  },
+  unavailable: {
+    label: "Unavailable",
+    className: "bg-status-bg-booked text-steel",
+  },
+  "on-demand": {
+    label: "On Demand",
+    className: "bg-amber-500/15 text-amber-300",
   },
 };
 
@@ -64,9 +95,11 @@ const Badges = ({ badges }) => (
 );
 
 function MotorcycleCard({ bike, index }) {
-  const isAvailable = bike.status === "available";
-  const isPlaceholder = bike.price_per_day > 998;
-  const isClickable = isAvailable && !isPlaceholder;
+  const hasPrice = typeof bike.price_per_day === "number" && bike.price_per_day > 0;
+  const isClickable = bike.status !== "unavailable" && bike.status !== "coming-soon";
+  const statusInfo = statusConfig[bike.status] || statusConfig.available;
+  const statusLabel = bike.availability_label || statusInfo.label;
+  const ctaLabel = bike.status === "on-demand" || !hasPrice ? "Request Details" : "View Details";
 
   const CardWrapper = isClickable ? Link : "div";
 
@@ -74,7 +107,7 @@ function MotorcycleCard({ bike, index }) {
     bike.image_urls?.[0] || `https://placehold.co/600x400/2A2D35/EDEFF7?text=${bike.name}`;
 
   const wrapperProps = {
-    className: `card-animate block w-full max-w-sm ${isPlaceholder ? "hidden sm:block" : ""}`,
+    className: "card-animate block w-full max-w-sm",
     style: { animationDelay: `${index * 150}ms` },
     ...(isClickable && { to: `/motorcycle/${bike.slug}` }),
   };
@@ -107,24 +140,16 @@ function MotorcycleCard({ bike, index }) {
           <div className="mt-auto space-y-4 border-t border-graphite/30 pt-4">
             <div className="flex items-baseline text-cloud">
               <span className="text-3xl font-bold tracking-tight">
-                {isPlaceholder ? "€ --.-" : `€${bike.price_per_day.toFixed(2)}`}
+                {hasPrice ? `€${bike.price_per_day.toFixed(2)}` : "Price on request"}
               </span>
-              <span className="ml-1 text-sm font-semibold text-space">/day</span>
+              {hasPrice && <span className="ml-1 text-sm font-semibold text-space">/day</span>}
             </div>
             <div className="flex items-center justify-between">
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                  isAvailable
-                    ? "bg-status-bg-available text-status-available"
-                    : "bg-status-bg-booked"
-                }`}
-              >
-                {isPlaceholder
-                  ? "Coming Soon"
-                  : bike.status.charAt(0).toUpperCase() + bike.status.slice(1)}
+              <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusInfo.className}`}>
+                {statusLabel}
               </span>
               <Button as="span" variant="primary" disabled={!isClickable} className="text-sm">
-                {isPlaceholder ? "Unavailable" : "View Details"}
+                {isClickable ? ctaLabel : "Unavailable"}
               </Button>
             </div>
           </div>

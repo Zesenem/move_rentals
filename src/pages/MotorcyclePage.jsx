@@ -9,7 +9,16 @@ import Button from "../components/Button";
 import { iconMap } from "../utils/iconMap.jsx";
 import { FaExclamationTriangle, FaWhatsapp } from "react-icons/fa";
 
-// NEW: SpecsTable Component for displaying technical features
+const formatDisplayValue = (value) => {
+  if (typeof value === "number") {
+    return `€${value.toFixed(0)}`;
+  }
+
+  return value;
+};
+
+const getListIcon = (icon) => iconMap[icon] || iconMap["default-check"];
+
 const SpecsTable = ({ features }) => {
   if (!features || features.length === 0) {
     return null;
@@ -20,7 +29,10 @@ const SpecsTable = ({ features }) => {
       <h3 className="text-xl font-bold text-cloud mb-4">Specifications</h3>
       <ul className="text-base space-y-1">
         {features.map((feature) => (
-          <li key={feature.label} className="flex justify-between py-2 border-b border-graphite/50">
+          <li
+            key={feature.label}
+            className="flex justify-between py-2 border-b border-graphite/50"
+          >
             <span className="text-space">{feature.label}:</span>
             <span className="font-semibold text-cloud text-right">{feature.value}</span>
           </li>
@@ -30,42 +42,47 @@ const SpecsTable = ({ features }) => {
   );
 };
 
-// --- The other list components remain the same ---
-
 const IncludedInRentalList = ({ items }) => (
   <ul className="text-base space-y-2.5 text-steel">
     {items?.map((item, index) => (
       <li key={index} className="flex items-center gap-2">
-        {iconMap[item.icon] || iconMap["default-check"]}
+        {getListIcon(item.icon)}
         {item.item}
       </li>
     ))}
   </ul>
 );
 
-const RequirementsList = ({ items, deposit, forfait }) => (
+const RequirementsList = ({ items, deposit }) => (
   <>
-    <ul className="text-base space-y-2.5 text-steel">
-      {items?.map((req, index) => (
-        <li key={index} className="flex items-center gap-2">
-          {iconMap[req.icon]}
-          {req.item}
-        </li>
-      ))}
-    </ul>
-    {forfait && (
-      <div className="mt-4 text-sm text-steel flex items-center gap-2">
-        <p>
-          Forfait: Reduce security deposit to{" "}
-          <span className="font-semibold text-cloud">€{forfait.deposit}</span> for an additional
-          <span className="font-semibold text-cloud"> €{forfait.daily_cost.toFixed(2)}/day</span>.
-        </p>
-      </div>
+    {items?.length > 0 && (
+      <ul className="text-base space-y-2.5 text-steel">
+        {items.map((req, index) => (
+          <li key={index} className="flex items-center gap-2">
+            {getListIcon(req.icon)}
+            {req.item}
+          </li>
+        ))}
+      </ul>
     )}
-    <p className="mt-2 text-sm text-steel">
-      Security Deposit: <span className="font-semibold text-cloud">€{deposit}</span>
-    </p>
+    {deposit !== undefined && deposit !== null && deposit !== "" && (
+      <p className="mt-2 text-sm text-steel">
+        Security Deposit:{" "}
+        <span className="font-semibold text-cloud">{formatDisplayValue(deposit)}</span>
+      </p>
+    )}
   </>
+);
+
+const ImportantNotesList = ({ items }) => (
+  <ul className="text-base space-y-2.5 text-steel">
+    {items?.map((note, index) => (
+      <li key={index} className="flex items-center gap-2">
+        {getListIcon(note.icon)}
+        {note.item}
+      </li>
+    ))}
+  </ul>
 );
 
 const MotorcyclePageSkeleton = () => (
@@ -127,16 +144,20 @@ function MotorcyclePage() {
   const whatsappNumber = "351920016794";
   const whatsappMessage = `Hello! I'm interested in renting the ${bike?.name}. Could you provide more information?`;
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+  const includedItems = Array.isArray(bike?.included) ? bike.included : commonData?.included || [];
+  const requirementItems = Array.isArray(bike?.requirements)
+    ? bike.requirements
+    : commonData?.requirements || [];
+  const importantNotes = bike?.important_notes || [];
+  const hasDeposit = bike?.security_deposit !== undefined && bike?.security_deposit !== null;
 
   return (
     <>
       <Helmet>
-        <title>
-          {bike?.name ? `${bike.name} | Move Rentals` : "Motorcycle Details | Move Rentals"}
-        </title>
+        <title>{bike?.name ? `${bike.name} | Move Rentals` : "Vehicle Details | Move Rentals"}</title>
         <meta
           name="description"
-          content={bike?.description || "Find details and book your motorcycle rental in Lisbon."}
+          content={bike?.description || "Find details and book your vehicle rental in Lisbon."}
         />
       </Helmet>
       <div className="container mx-auto px-4 py-12">
@@ -149,18 +170,22 @@ function MotorcyclePage() {
             <div className="w-full aspect-video mb-12">
               <ImageCarousel images={bike?.image_urls} />
             </div>
-            {/* ACCORDIONS FOR GENERAL INFO */}
             <div className="space-y-2">
-              <AccordionItem title="Included in Rental">
-                <IncludedInRentalList items={commonData?.included} />
-              </AccordionItem>
-              <AccordionItem title="Requirements">
-                <RequirementsList
-                  items={commonData?.requirements}
-                  deposit={bike?.security_deposit}
-                  forfait={bike?.forfait}
-                />
-              </AccordionItem>
+              {includedItems.length > 0 && (
+                <AccordionItem title="Included in Rental">
+                  <IncludedInRentalList items={includedItems} />
+                </AccordionItem>
+              )}
+              {(requirementItems.length > 0 || hasDeposit) && (
+                <AccordionItem title="Requirements">
+                  <RequirementsList items={requirementItems} deposit={bike?.security_deposit} />
+                </AccordionItem>
+              )}
+              {importantNotes.length > 0 && (
+                <AccordionItem title="Important Notes">
+                  <ImportantNotesList items={importantNotes} />
+                </AccordionItem>
+              )}
             </div>
           </div>
 
