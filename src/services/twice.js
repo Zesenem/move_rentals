@@ -1,39 +1,9 @@
-const normalizeString = (value = "") => value.trim().toLowerCase();
-
-const slugify = (value = "") =>
-  value
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-const getStaticVehicleKey = (vehicle = {}) =>
-  vehicle.id || vehicle.slug || `name:${normalizeString(vehicle.name)}`;
-
-const matchesStaticVehicle = (staticVehicle, liveProduct) => {
-  if (staticVehicle.id && staticVehicle.id === liveProduct.id) {
-    return true;
-  }
-
-  if (staticVehicle.slug && staticVehicle.slug === liveProduct.slug) {
-    return true;
-  }
-
-  const directNameMatch =
-    Boolean(staticVehicle.name) &&
-    (normalizeString(staticVehicle.name) === normalizeString(liveProduct.name) ||
-      slugify(staticVehicle.name) === slugify(liveProduct.name));
-
-  if (directNameMatch) {
-    return true;
-  }
-
-  return staticVehicle.match_names?.some(
-    (name) =>
-      normalizeString(name) === normalizeString(liveProduct.name) ||
-      slugify(name) === slugify(liveProduct.name)
-  );
-};
+import { fetchFleetMetadata } from "./fleetMetadata.js";
+import {
+  getVehicleMetadataKey,
+  matchesVehicleMetadata,
+  slugify,
+} from "./fleetMatching.js";
 
 const mergeVehicleData = (baseProduct, staticVehicle = {}) => ({
   ...baseProduct,
@@ -83,19 +53,8 @@ function mapApiProductToAppProduct(apiProduct) {
   };
 }
 
-const fetchStaticData = async () => {
-  try {
-    const response = await fetch("/db.json");
-    if (!response.ok) throw new Error("Could not fetch the static data file.");
-    return await response.json();
-  } catch (error) {
-    console.error("Failed to fetch db.json:", error);
-    throw error;
-  }
-};
-
 export const fetchProducts = async () => {
-  const staticData = await fetchStaticData();
+  const staticData = await fetchFleetMetadata();
   const staticVehicles = staticData.motorcycles_static_data || [];
 
   let liveProducts = [];
@@ -119,11 +78,11 @@ export const fetchProducts = async () => {
   const matchedStaticKeys = new Set();
   const mergedLiveProducts = liveProducts.map((liveProduct) => {
     const staticVehicle = staticVehicles.find((vehicle) =>
-      matchesStaticVehicle(vehicle, liveProduct)
+      matchesVehicleMetadata(vehicle, liveProduct)
     );
 
     if (staticVehicle) {
-      matchedStaticKeys.add(getStaticVehicleKey(staticVehicle));
+      matchedStaticKeys.add(getVehicleMetadataKey(staticVehicle));
     }
 
     return mergeVehicleData(liveProduct, staticVehicle);
@@ -131,7 +90,7 @@ export const fetchProducts = async () => {
 
   const staticOnlyVehicles = staticVehicles
     .filter((vehicle) => vehicle.source === "static")
-    .filter((vehicle) => !matchedStaticKeys.has(getStaticVehicleKey(vehicle)))
+    .filter((vehicle) => !matchedStaticKeys.has(getVehicleMetadataKey(vehicle)))
     .map(createStaticOnlyVehicle);
 
   const allVehicles = [...mergedLiveProducts, ...staticOnlyVehicles];
@@ -150,7 +109,7 @@ export const fetchProductBySlug = async (slug) => {
     if (!bike) {
       throw new Error("Vehicle not found by slug");
     }
-    const staticData = await fetchStaticData();
+    const staticData = await fetchFleetMetadata();
     return {
       bike: bike,
       commonData: staticData.common_data,

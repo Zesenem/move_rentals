@@ -19,6 +19,7 @@ import NotFoundPage from "./pages/NotFoundPage.jsx";
 import TermsPage from "./pages/TermsPage.jsx";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
+import AdminWorkspacePage from "./pages/AdminWorkspacePage.jsx";
 
 import "./index.css";
 
@@ -55,6 +56,7 @@ const router = createBrowserRouter([
       { path: "terms-and-conditions", element: <TermsPage /> },
       { path: "privacy-policy", element: <PrivacyPolicyPage /> },
       { path: "contact", element: <ContactPage /> },
+      { path: "admin", element: <AdminWorkspacePage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

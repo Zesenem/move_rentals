@@ -1,9 +1,12 @@
 import { useEffect } from "react";
-import { Outlet, ScrollRestoration } from "react-router-dom";
+import { Outlet, ScrollRestoration, useLocation, useNavigate } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 
 function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   useEffect(() => {
     if (window.cookieconsent) {
       window.cookieconsent.initialise({
@@ -28,6 +31,23 @@ function App() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    const hash = window.location.hash || "";
+    const hasIdentityInviteToken = hash.includes("invite_token=");
+
+    if (!hasIdentityInviteToken || location.pathname === "/admin") {
+      return;
+    }
+
+    navigate(
+      {
+        pathname: "/admin",
+        hash,
+      },
+      { replace: true }
+    );
+  }, [location.pathname, navigate]);
 
   return (
     <>
