@@ -60,7 +60,6 @@ function AdminWorkspacePage() {
 
   useEffect(() => {
     const handleInit = () => {
-      setIsIdentityReady(true);
       queryClient.invalidateQueries({ queryKey: ["admin", "session"] });
     };
 
@@ -88,6 +87,8 @@ function AdminWorkspacePage() {
     const removeErrorListener = onAdminIdentityEvent("error", handleError);
 
     initAdminIdentity();
+    setIsIdentityReady(true);
+    queryClient.invalidateQueries({ queryKey: ["admin", "session"] });
 
     return () => {
       removeInitListener();
