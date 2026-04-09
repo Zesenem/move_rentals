@@ -29,10 +29,7 @@ const SpecsTable = ({ features }) => {
       <h3 className="text-xl font-bold text-cloud mb-4">Specifications</h3>
       <ul className="text-base space-y-1">
         {features.map((feature) => (
-          <li
-            key={feature.label}
-            className="flex justify-between py-2 border-b border-graphite/50"
-          >
+          <li key={feature.label} className="flex justify-between py-2 border-b border-graphite/50">
             <span className="text-space">{feature.label}:</span>
             <span className="font-semibold text-cloud text-right">{feature.value}</span>
           </li>
@@ -172,7 +169,9 @@ function MotorcyclePage() {
   return (
     <>
       <Helmet>
-        <title>{bike?.name ? `${bike.name} | Move Rentals` : "Vehicle Details | Move Rentals"}</title>
+        <title>
+          {bike?.name ? `${bike.name} | Move Rentals` : "Vehicle Details | Move Rentals"}
+        </title>
         <meta
           name="description"
           content={bike?.description || "Find details and book your vehicle rental in Lisbon."}
@@ -216,9 +215,7 @@ function MotorcyclePage() {
                 <p className="mt-4 text-space">{bike?.description}</p>
               </div>
 
-              <div className="hidden md:block">
-                {whatsappCallToAction}
-              </div>
+              <div className="hidden md:block">{whatsappCallToAction}</div>
 
               <SpecsTable features={bike?.technical_features} />
             </div>

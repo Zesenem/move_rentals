@@ -11,7 +11,6 @@ import {
   FaMotorcycle,
   FaPlus,
   FaSave,
-  FaSlidersH,
   FaTag,
   FaTrash,
 } from "react-icons/fa";
@@ -159,6 +158,11 @@ const createStaticVehicleMetadataTemplate = () => ({
   important_notes: [],
 });
 
+const createCommonDataDraft = (commonData = {}) => ({
+  requirements: cloneObjectList(commonData.requirements, EMPTY_LIST_ITEM),
+  included: cloneObjectList(commonData.included, EMPTY_LIST_ITEM),
+});
+
 const sanitizeStringList = (items) =>
   items
     .map((item) => item.trim())
@@ -187,6 +191,11 @@ const sanitizeIconListItems = (items) =>
       icon: item.icon || "default-check",
     }))
     .filter((item) => item.item);
+
+const buildUpdatedCommonData = (draft) => ({
+  requirements: sanitizeIconListItems(draft.requirements),
+  included: sanitizeIconListItems(draft.included),
+});
 
 const parseSecurityDeposit = (value) => {
   const trimmedValue = value.trim();
@@ -336,24 +345,6 @@ const SectionHeading = ({ icon, title, description, pills = [] }) => {
             ))}
           </div>
           {description && <p className="mt-2 text-sm text-space">{description}</p>}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const GuidanceCard = ({ icon, title, description }) => {
-  const Icon = icon;
-
-  return (
-    <div className="rounded-2xl border border-graphite/50 bg-phantom/30 p-5">
-      <div className="flex items-start gap-3">
-        <div className="rounded-xl bg-arsenic p-3 text-cloud">
-          <Icon className="text-base" />
-        </div>
-        <div>
-          <h3 className="font-bold text-cloud">{title}</h3>
-          <p className="mt-2 text-sm text-space">{description}</p>
         </div>
       </div>
     </div>
@@ -676,10 +667,51 @@ const VehicleRecordCard = ({ vehicle }) => (
   </article>
 );
 
+const SaveActionBar = ({
+  title,
+  description,
+  isSaving,
+  isCreatingNew,
+  canDelete,
+  onSave,
+  onReset,
+  onDelete,
+}) => (
+  <div className="rounded-2xl border border-graphite/50 bg-arsenic/95 p-5 shadow-lg backdrop-blur lg:sticky lg:top-24 lg:z-20">
+    <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+      <div>
+        <p className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">{title}</p>
+        <p className="mt-2 text-sm text-space">{description}</p>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <Button onClick={onSave} icon={FaSave} className="min-w-[170px]" disabled={isSaving}>
+          {isSaving ? "Saving..." : isCreatingNew ? "Create And Save" : "Save Changes"}
+        </Button>
+        <Button variant="ghost" onClick={onReset} className="min-w-[150px]" disabled={isSaving}>
+          Reset
+        </Button>
+        {canDelete && (
+          <Button
+            variant="danger"
+            icon={FaTrash}
+            onClick={onDelete}
+            className="min-w-[150px]"
+            disabled={isSaving}
+          >
+            Delete Vehicle
+          </Button>
+        )}
+      </div>
+    </div>
+  </div>
+);
+
 function AdminPage({ adminUser, getAuthToken, onLogout }) {
   const queryClient = useQueryClient();
   const [selectedEntryKey, setSelectedEntryKey] = useState("");
   const [draft, setDraft] = useState(() => createVehicleDraft());
+  const [commonDataDraft, setCommonDataDraft] = useState(() => createCommonDataDraft());
   const [formError, setFormError] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
   const [isCreatingNew, setIsCreatingNew] = useState(false);
@@ -833,12 +865,17 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
     setSaveMessage("");
   }, [isCreatingNew, selectedMetadataEntry]);
 
+  useEffect(() => {
+    setCommonDataDraft(createCommonDataDraft(metadata?.common_data));
+  }, [metadata]);
+
   const adminSummary = useMemo(() => {
     return {
       metadataEntries: metadataEntries.length,
       liveVehicles: vehicles.filter((vehicle) => !String(vehicle.id).startsWith("static-")).length,
       staticOnlyVehicles: metadataEntries.filter((vehicle) => vehicle.source === "static").length,
       commonIncluded: metadata?.common_data?.included?.length || 0,
+      commonRequirements: metadata?.common_data?.requirements?.length || 0,
     };
   }, [metadata, metadataEntries, vehicles]);
 
@@ -862,6 +899,12 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
 
   const updateDraft = (updater) => {
     setDraft((currentDraft) => updater(currentDraft));
+    setFormError("");
+    setSaveMessage("");
+  };
+
+  const updateCommonDataDraft = (updater) => {
+    setCommonDataDraft((currentDraft) => updater(currentDraft));
     setFormError("");
     setSaveMessage("");
   };
@@ -944,6 +987,34 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
     }));
   };
 
+  const handleCommonDataObjectListChange = (field, index, key, value) => {
+    updateCommonDataDraft((currentDraft) => ({
+      ...currentDraft,
+      [field]: currentDraft[field].map((item, itemIndex) =>
+        itemIndex === index
+          ? {
+              ...item,
+              [key]: value,
+            }
+          : item
+      ),
+    }));
+  };
+
+  const handleAddCommonDataObjectListItem = (field, template) => {
+    updateCommonDataDraft((currentDraft) => ({
+      ...currentDraft,
+      [field]: [...currentDraft[field], { ...template }],
+    }));
+  };
+
+  const handleRemoveCommonDataObjectListItem = (field, index) => {
+    updateCommonDataDraft((currentDraft) => ({
+      ...currentDraft,
+      [field]: currentDraft[field].filter((_, itemIndex) => itemIndex !== index),
+    }));
+  };
+
   const handleStartNewLiveEntry = () => {
     if (!selectedNewLiveVehicle) {
       return;
@@ -978,7 +1049,9 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
     setDraft(createVehicleDraft());
   };
 
-  const handleResetSelectedEntry = () => {
+  const handleResetChanges = () => {
+    setCommonDataDraft(createCommonDataDraft(metadata?.common_data));
+
     if (isCreatingNew) {
       setDraft(
         createVehicleDraft(
@@ -1001,8 +1074,8 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
     setSaveMessage("");
   };
 
-  const handleSaveSelectedEntry = async () => {
-    if (!metadata || !activeMetadataBase) {
+  const handleSaveChanges = async () => {
+    if (!metadata) {
       return;
     }
 
@@ -1010,44 +1083,58 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
     setSaveMessage("");
 
     try {
-      const updatedEntry = buildUpdatedVehicleEntry(activeMetadataBase, draft);
-      const conflictingEntryIndex = metadataEntries.findIndex((entry, index) => {
-        if (!isCreatingNew && index === selectedMetadataIndex) {
-          return false;
+      const nextCommonData = buildUpdatedCommonData(commonDataDraft);
+      let nextEntries = metadataEntries;
+      let updatedEntry = null;
+
+      if (activeMetadataBase) {
+        updatedEntry = buildUpdatedVehicleEntry(activeMetadataBase, draft);
+        const conflictingEntryIndex = metadataEntries.findIndex((entry, index) => {
+          if (!isCreatingNew && index === selectedMetadataIndex) {
+            return false;
+          }
+
+          return hasVehicleEntryConflict(entry, updatedEntry);
+        });
+
+        if (conflictingEntryIndex >= 0) {
+          throw new Error(
+            "Another metadata entry already uses the same vehicle ID, slug, or name."
+          );
         }
 
-        return hasVehicleEntryConflict(entry, updatedEntry);
-      });
-
-      if (conflictingEntryIndex >= 0) {
-        throw new Error(
-          "Another metadata entry already uses the same vehicle ID, slug, or name."
-        );
+        nextEntries = isCreatingNew
+          ? [...metadataEntries, updatedEntry]
+          : metadataEntries.map((entry, index) =>
+              index === selectedMetadataIndex ? updatedEntry : entry
+            );
       }
 
-      const nextEntries = isCreatingNew
-        ? [...metadataEntries, updatedEntry]
-        : metadataEntries.map((entry, index) =>
-            index === selectedMetadataIndex ? updatedEntry : entry
-          );
       const nextMetadata = {
         ...metadata,
+        common_data: nextCommonData,
         motorcycles_static_data: nextEntries,
       };
 
       await saveMutation.mutateAsync(nextMetadata);
-      setIsCreatingNew(false);
-      setNewEntryKind(null);
-      setSelectedEntryKey(
-        getEntryKey(updatedEntry, isCreatingNew ? nextEntries.length - 1 : selectedMetadataIndex)
-      );
+
+      if (updatedEntry) {
+        setIsCreatingNew(false);
+        setNewEntryKind(null);
+        setSelectedEntryKey(
+          getEntryKey(updatedEntry, isCreatingNew ? nextEntries.length - 1 : selectedMetadataIndex)
+        );
+      }
+
       setSaveMessage(
-        isCreatingNew
-          ? "New vehicle metadata entry saved to Netlify Blobs."
-          : "Vehicle metadata saved to Netlify Blobs."
+        updatedEntry && isCreatingNew
+          ? "New vehicle and shared rental defaults saved."
+          : updatedEntry
+            ? "Vehicle details and shared rental defaults saved."
+            : "Shared rental defaults saved."
       );
     } catch (saveError) {
-      setFormError(saveError.message || "Could not save the selected vehicle.");
+      setFormError(saveError.message || "Could not save the current changes.");
     }
   };
 
@@ -1071,6 +1158,7 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
       const nextEntries = metadataEntries.filter((_, index) => index !== selectedMetadataIndex);
       const nextMetadata = {
         ...metadata,
+        common_data: buildUpdatedCommonData(commonDataDraft),
         motorcycles_static_data: nextEntries,
       };
 
@@ -1153,48 +1241,10 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
             />
             <StatCard
               icon={FaDatabase}
-              label="Common Included"
-              value={adminSummary.commonIncluded}
-              helper="Shared included-in-rental items reused across vehicles."
+              label="Shared Defaults"
+              value={`${adminSummary.commonIncluded} / ${adminSummary.commonRequirements}`}
+              helper="Included items / requirements reused across vehicles."
             />
-          </div>
-
-          <div className="mt-10 rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
-            <SectionHeading
-              icon={FaInfoCircle}
-              title="Start Here"
-              description="The form below edits only the website presentation layer. Vehicles should still be created in Twice first whenever possible."
-              pills={["Guided workflow", "Non-technical"]}
-            />
-
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <GuidanceCard
-                icon={FaMotorcycle}
-                title="1. Pick a vehicle"
-                description="Open an existing record or create a new one from a live Twice vehicle."
-              />
-              <GuidanceCard
-                icon={FaSlidersH}
-                title="2. Edit the public details"
-                description="Most changes happen in the basic details, fleet card, and rental rules sections."
-              />
-              <GuidanceCard
-                icon={FaEye}
-                title="3. Check the preview"
-                description="The preview updates instantly so you can confirm what customers will see."
-              />
-              <GuidanceCard
-                icon={FaSave}
-                title="4. Save once"
-                description="Saving stores the current metadata document so the changes persist after refresh."
-              />
-            </div>
-
-            <div className="mt-5 rounded-xl border border-cloud/30 bg-cloud/10 px-4 py-3 text-sm text-space">
-              Most edits do not need Advanced Settings. Leave that section alone unless you are
-              matching a live Twice product, changing the public URL slug, or setting a custom
-              availability label.
-            </div>
           </div>
 
           {isLoading && (
@@ -1215,92 +1265,63 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
             <div className="mt-10 grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
               <section className="rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
                 <div className="flex flex-col gap-6">
-                  <div className={sectionCardClassName}>
-                    <SectionHeading
-                      icon={FaPlus}
-                      title="Create A New Vehicle"
-                      description="Use the live Twice option when the vehicle already exists there. Use static-only only for temporary or manual website entries."
-                      pills={["Step 1"]}
-                    />
+                  <SaveActionBar
+                    title={
+                      isCreatingNew
+                        ? newEntryKind === "static"
+                          ? "Creating a static-only vehicle"
+                          : "Creating a live-linked vehicle"
+                        : selectedMetadataEntry
+                          ? `Editing ${selectedMetadataEntry.name}`
+                          : "Editing shared rental defaults"
+                    }
+                    description={
+                      isCreatingNew
+                        ? "Save when the new vehicle is ready. Shared rental defaults are saved at the same time."
+                        : "Use Save Changes at any time. Vehicle details and shared rental defaults are saved together."
+                    }
+                    isSaving={saveMutation.isPending}
+                    isCreatingNew={isCreatingNew}
+                    canDelete={!isCreatingNew && Boolean(selectedMetadataEntry)}
+                    onSave={handleSaveChanges}
+                    onReset={handleResetChanges}
+                    onDelete={handleDeleteSelectedEntry}
+                  />
 
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                      <div className="max-w-2xl">
-                        <p className="text-sm text-space">
-                          Choose a vehicle from Twice below if it already exists in your booking
-                          system. That keeps the website linked to the correct live record.
-                        </p>
-                      </div>
-                      {isCreatingNew && (
-                        <Button variant="ghost" onClick={handleCancelNewEntry}>
-                          Cancel New Entry
-                        </Button>
-                      )}
+                  {(formError || saveMessage) && (
+                    <div
+                      className={`rounded-xl border p-4 text-sm ${
+                        formError
+                          ? "border-red-500/40 bg-red-500/10 text-red-200"
+                          : "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
+                      }`}
+                    >
+                      {formError ? formError : saveMessage}
                     </div>
+                  )}
 
-                    <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_auto]">
-                      <div>
-                        <label className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">
-                          Live vehicles from Twice
-                        </label>
-                        <select
-                          className="mt-3 w-full rounded-xl border border-graphite/60 bg-phantom px-4 py-3 text-steel outline-none transition-colors focus:border-cloud"
-                          value={newLiveVehicleId}
-                          onChange={(event) => setNewLiveVehicleId(event.target.value)}
-                          disabled={!liveVehiclesWithoutMetadata.length}
-                        >
-                          {liveVehiclesWithoutMetadata.length > 0 ? (
-                            liveVehiclesWithoutMetadata.map((vehicle) => (
-                              <option key={vehicle.id} value={vehicle.id}>
-                                {vehicle.name} ({vehicle.id})
-                              </option>
-                            ))
-                          ) : (
-                            <option value="">No live vehicles without metadata found</option>
-                          )}
-                        </select>
-                      </div>
-
-                      <Button
-                        onClick={handleStartNewLiveEntry}
-                        disabled={!liveVehiclesWithoutMetadata.length}
-                        className="justify-center self-end"
-                      >
-                        Create From Live Vehicle
-                      </Button>
-                    </div>
-
-                    <div className="mt-4">
-                      <Button variant="ghost" onClick={handleStartNewStaticEntry}>
-                        Create Static-Only Vehicle
-                      </Button>
-                    </div>
-
-                    {isCreatingNew && (
-                      <div className="mt-5 rounded-xl border border-cloud/30 bg-cloud/10 px-4 py-3 text-sm text-space">
-                        You are creating a new metadata entry. Fill in the public website details
-                        below, then check the preview before saving.
-                      </div>
-                    )}
-                  </div>
-
-                  {!isCreatingNew && (
+                  <div className="grid gap-6 xl:grid-cols-2">
                     <div className={sectionCardClassName}>
                       <SectionHeading
                         icon={FaMotorcycle}
-                        title="Open An Existing Vehicle"
-                        description="Use this dropdown to switch between saved website records."
-                        pills={["Step 1"]}
+                        title="Edit Existing Vehicle"
+                        description="Open one of the saved website records and update its public content."
                       />
 
                       <FieldGroup
                         label="Selected Vehicle"
-                        hint="Choose which saved metadata record you want to edit."
+                        hint={
+                          isCreatingNew
+                            ? "Finish or cancel the new vehicle first if you want to switch back to an existing one."
+                            : "Choose which saved metadata record you want to edit."
+                        }
                       >
                         {metadataEntries.length > 0 ? (
                           <select
                             className={inputClassName}
                             value={selectedEntryKey}
                             onChange={(event) => setSelectedEntryKey(event.target.value)}
+                            disabled={isCreatingNew}
                           >
                             {metadataEntries.map((entry, index) => {
                               const key = getEntryKey(entry, index);
@@ -1314,19 +1335,75 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                           </select>
                         ) : (
                           <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
-                            No saved metadata entries yet. Start by creating a new one above.
+                            No saved metadata entries yet. Create the first vehicle on the right.
                           </p>
                         )}
                       </FieldGroup>
                     </div>
-                  )}
+
+                    <div className={sectionCardClassName}>
+                      <SectionHeading
+                        icon={FaPlus}
+                        title="Create New Vehicle"
+                        description="Start from a live Twice vehicle when possible. Use static-only only when the vehicle is not available in Twice."
+                      />
+
+                      <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+                        <div>
+                          <label className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">
+                            Live vehicles from Twice
+                          </label>
+                          <select
+                            className="mt-3 w-full rounded-xl border border-graphite/60 bg-phantom px-4 py-3 text-steel outline-none transition-colors focus:border-cloud"
+                            value={newLiveVehicleId}
+                            onChange={(event) => setNewLiveVehicleId(event.target.value)}
+                            disabled={!liveVehiclesWithoutMetadata.length}
+                          >
+                            {liveVehiclesWithoutMetadata.length > 0 ? (
+                              liveVehiclesWithoutMetadata.map((vehicle) => (
+                                <option key={vehicle.id} value={vehicle.id}>
+                                  {vehicle.name} ({vehicle.id})
+                                </option>
+                              ))
+                            ) : (
+                              <option value="">No live vehicles without metadata found</option>
+                            )}
+                          </select>
+                        </div>
+
+                        <Button
+                          onClick={handleStartNewLiveEntry}
+                          disabled={!liveVehiclesWithoutMetadata.length}
+                          className="justify-center self-end"
+                        >
+                          Create From Live Vehicle
+                        </Button>
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap items-center gap-3">
+                        <Button variant="ghost" onClick={handleStartNewStaticEntry}>
+                          Create Static-Only Vehicle
+                        </Button>
+                        {isCreatingNew && (
+                          <Button variant="ghost" onClick={handleCancelNewEntry}>
+                            Cancel New Vehicle
+                          </Button>
+                        )}
+                      </div>
+
+                      <p className="mt-4 text-sm text-space">
+                        A live-linked vehicle stays connected to the existing Twice product. A
+                        static-only vehicle exists only on the website.
+                      </p>
+                    </div>
+                  </div>
 
                   <div className={sectionCardClassName}>
                     <SectionHeading
                       icon={FaInfoCircle}
                       title="Basic Details"
                       description="These are the main public details customers read first on the site."
-                      pills={["Public website", "Step 2"]}
+                      pills={["Public website"]}
                     />
 
                     <div className="grid gap-4 md:grid-cols-2">
@@ -1374,7 +1451,7 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       icon={FaTag}
                       title="Fleet Card"
                       description="These fields control the listing card that customers see before opening the vehicle page."
-                      pills={["Card preview", "Step 2"]}
+                      pills={["Card preview"]}
                     />
 
                     <FieldGroup
@@ -1410,7 +1487,7 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       icon={FaListUl}
                       title="Vehicle Detail Page"
                       description="Use this section for the longer information customers read after opening a vehicle."
-                      pills={["Detail page", "Step 2"]}
+                      pills={["Detail page"]}
                     />
 
                     <FieldGroup
@@ -1458,7 +1535,7 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       icon={FaCheckCircle}
                       title="Rental Rules"
                       description="Only switch these sections on when a vehicle needs different rental inclusions or requirements from the default shared rules."
-                      pills={["Defaults available", "Step 2"]}
+                      pills={["Vehicle-specific overrides"]}
                     />
 
                     <FieldGroup
@@ -1536,6 +1613,55 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                             This vehicle will use the shared requirements list.
                           </p>
                         )}
+                      </FieldGroup>
+                    </div>
+                  </div>
+
+                  <div className={sectionCardClassName}>
+                    <SectionHeading
+                      icon={FaDatabase}
+                      title="Shared Rental Defaults"
+                      description="These lists are used across the website whenever a vehicle does not have its own Included or Requirements rows."
+                      pills={["Shared across vehicles"]}
+                    />
+
+                    <FieldGroup
+                      label="Default Included In Rental"
+                      hint="These items are reused on vehicles where the Included switch stays off."
+                    >
+                      <ItemWithIconEditor
+                        items={commonDataDraft.included}
+                        addLabel="Add shared included item"
+                        emptyMessage="Add the default included items that apply to most vehicles."
+                        placeholder="Example: Road assistance"
+                        onAdd={() => handleAddCommonDataObjectListItem("included", EMPTY_LIST_ITEM)}
+                        onChange={(index, key, value) =>
+                          handleCommonDataObjectListChange("included", index, key, value)
+                        }
+                        onRemove={(index) => handleRemoveCommonDataObjectListItem("included", index)}
+                      />
+                    </FieldGroup>
+
+                    <div className="mt-8">
+                      <FieldGroup
+                        label="Default Requirements"
+                        hint="These requirements are reused on vehicles where the Requirements switch stays off."
+                      >
+                        <ItemWithIconEditor
+                          items={commonDataDraft.requirements}
+                          addLabel="Add shared requirement"
+                          emptyMessage="Add the default driver requirements that apply to most vehicles."
+                          placeholder="Example: Identity card or valid passport"
+                          onAdd={() =>
+                            handleAddCommonDataObjectListItem("requirements", EMPTY_LIST_ITEM)
+                          }
+                          onChange={(index, key, value) =>
+                            handleCommonDataObjectListChange("requirements", index, key, value)
+                          }
+                          onRemove={(index) =>
+                            handleRemoveCommonDataObjectListItem("requirements", index)
+                          }
+                        />
                       </FieldGroup>
                     </div>
                   </div>
@@ -1635,62 +1761,15 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       </FieldGroup>
                     </div>
                   </details>
-
-                  {(formError || saveMessage) && (
-                    <div
-                      className={`rounded-xl border p-4 text-sm ${
-                        formError
-                          ? "border-red-500/40 bg-red-500/10 text-red-200"
-                          : "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
-                      }`}
-                    >
-                      {formError ? formError : saveMessage}
-                    </div>
-                  )}
-
-                  <div className="flex flex-wrap gap-3">
-                    <Button
-                      onClick={handleSaveSelectedEntry}
-                      icon={FaSave}
-                      className="min-w-[180px]"
-                      disabled={saveMutation.isPending}
-                    >
-                      {saveMutation.isPending
-                        ? "Saving..."
-                        : isCreatingNew
-                          ? "Create Vehicle Metadata"
-                          : "Save Selected Vehicle"}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onClick={handleResetSelectedEntry}
-                      className="min-w-[160px]"
-                      disabled={saveMutation.isPending}
-                    >
-                      Reset Changes
-                    </Button>
-                    {!isCreatingNew && selectedMetadataEntry && (
-                      <Button
-                        variant="danger"
-                        icon={FaTrash}
-                        onClick={handleDeleteSelectedEntry}
-                        className="min-w-[160px]"
-                        disabled={saveMutation.isPending}
-                      >
-                        Delete Vehicle
-                      </Button>
-                    )}
-                  </div>
                 </div>
               </section>
 
-              <div className="space-y-6">
+              <div className="xl:sticky xl:top-24 xl:self-start">
                 <section className="rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
                   <SectionHeading
                     icon={FaEye}
                     title={isCreatingNew ? "New Record Preview" : "Selected Record Preview"}
                     description="This updates while you edit so you can check the customer-facing result before saving."
-                    pills={["Step 3"]}
                   />
 
                   {!isCreatingNew && !selectedLiveVehicle && selectedMetadataEntry?.source !== "static" && (
@@ -1714,29 +1793,6 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       <p className="text-space">Select a vehicle to preview it.</p>
                     )}
                   </div>
-                </section>
-
-                <section className="rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
-                  <SectionHeading
-                    icon={FaInfoCircle}
-                    title="Before You Save"
-                    description="A few practical rules keep the admin workflow predictable."
-                    pills={["Step 4"]}
-                  />
-                  <ul className="mt-4 space-y-2 text-sm text-space">
-                    <li>Saving updates the current metadata document used by the site.</li>
-                    <li>
-                      If Blobs has never been written before, the current local `db.json` data is
-                      used as the starting point.
-                    </li>
-                    <li>Create from a live vehicle whenever the product already exists in Twice.</li>
-                    <li>Deleting a vehicle removes only its website metadata, not the live Twice product.</li>
-                    <li>
-                      Leave Included or Requirements switched off when the default shared lists are
-                      correct for that vehicle.
-                    </li>
-                    <li>Advanced settings are usually only needed for IDs, matching, or custom status labels.</li>
-                  </ul>
                 </section>
               </div>
             </div>
