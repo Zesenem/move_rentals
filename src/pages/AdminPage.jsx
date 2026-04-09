@@ -25,15 +25,17 @@ import { fetchProducts } from "../services/twice.js";
 import { fetchFleetMetadata, saveFleetMetadata } from "../services/fleetMetadata.js";
 
 const inputClassName =
-  "w-full rounded-xl border border-graphite/60 bg-phantom px-4 py-3 text-steel outline-none transition-colors focus:border-cloud";
+  "min-h-[52px] w-full rounded-xl border border-graphite/60 bg-phantom px-4 py-3 text-sm text-steel outline-none transition-colors focus:border-cloud sm:text-base";
 const textareaClassName = `${inputClassName} min-h-[120px]`;
-const sectionCardClassName = "rounded-2xl border border-graphite/50 bg-phantom/40 p-5";
+const sectionCardClassName = "rounded-2xl border border-graphite/50 bg-phantom/40 p-6 shadow-sm";
 const addButtonClassName =
-  "inline-flex items-center gap-2 rounded-xl border border-cloud/40 bg-cloud/10 px-4 py-2 text-sm font-semibold text-cloud transition-colors hover:bg-cloud/20";
+  "inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl border border-cloud/40 bg-cloud/10 px-4 py-3 text-sm font-semibold text-cloud transition-colors hover:bg-cloud/20 sm:w-auto whitespace-nowrap";
 const removeButtonClassName =
-  "inline-flex h-[50px] w-[50px] items-center justify-center rounded-xl border border-red-500/40 bg-red-500/10 text-red-200 transition-colors hover:bg-red-500/20";
+  "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-red-500/40 bg-red-500/10 text-red-200 transition-colors hover:bg-red-500/20";
 const hintPillClassName =
   "inline-flex items-center rounded-full border border-graphite/60 bg-phantom px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-space";
+const adminButtonClassName =
+  "min-h-[48px] rounded-xl px-5 text-sm whitespace-nowrap sm:w-auto";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Use live/default status" },
@@ -301,17 +303,17 @@ const StatCard = ({ icon, label, value, helper }) => {
   const Icon = icon;
 
   return (
-    <div className="rounded-2xl border border-graphite/50 bg-arsenic p-5 shadow-lg">
+    <div className="min-h-[164px] rounded-2xl border border-graphite/50 bg-arsenic p-5 shadow-lg">
       <div className="flex items-center gap-3">
-        <div className="rounded-xl bg-phantom p-3 text-cloud">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-phantom text-cloud">
           <Icon className="text-lg" />
         </div>
-        <div>
+        <div className="min-w-0">
           <p className="text-sm uppercase tracking-[0.18em] text-graphite">{label}</p>
-          <p className="text-2xl font-extrabold text-cloud">{value}</p>
+          <p className="break-words text-xl font-extrabold text-cloud sm:text-2xl">{value}</p>
         </div>
       </div>
-      {helper && <p className="mt-4 text-sm text-space">{helper}</p>}
+      {helper && <p className="mt-4 text-sm leading-relaxed text-space">{helper}</p>}
     </div>
   );
 };
@@ -331,20 +333,20 @@ const SectionHeading = ({ icon, title, description, pills = [] }) => {
 
   return (
     <div className="mb-5">
-      <div className="flex flex-wrap items-start gap-3">
+      <div className="flex items-start gap-3">
         {Icon && (
-          <div className="rounded-xl bg-arsenic p-3 text-cloud">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-arsenic text-cloud">
             <Icon className="text-base" />
           </div>
         )}
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-xl font-bold text-cloud">{title}</h2>
+            <h2 className="break-words text-xl font-bold text-cloud">{title}</h2>
             {pills.map((pill) => (
               <HelperPill key={pill}>{pill}</HelperPill>
             ))}
           </div>
-          {description && <p className="mt-2 text-sm text-space">{description}</p>}
+          {description && <p className="mt-2 text-sm leading-relaxed text-space">{description}</p>}
         </div>
       </div>
     </div>
@@ -427,7 +429,7 @@ const StringListEditor = ({ items, placeholder, addLabel, onAdd, onChange, onRem
   <div className="space-y-3">
     {items.length > 0 ? (
       items.map((item, index) => (
-        <div key={`text-item-${index}`} className="flex gap-3">
+        <div key={`text-item-${index}`} className="grid gap-3 sm:grid-cols-[1fr_48px]">
           <input
             className={inputClassName}
             value={item}
@@ -616,10 +618,12 @@ const describeCustomList = (items, usesSharedFallback = false) => {
 const VehicleRecordCard = ({ vehicle }) => (
   <article className="rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-      <div>
-        <p className="text-xs uppercase tracking-[0.18em] text-graphite">{vehicle.id}</p>
-        <h2 className="mt-2 text-2xl font-extrabold text-cloud">{vehicle.name}</h2>
-        <p className="mt-1 text-sm text-space">Slug: {vehicle.slug}</p>
+      <div className="min-w-0">
+        <p className="break-all text-xs uppercase tracking-[0.18em] text-graphite">
+          {vehicle.id}
+        </p>
+        <h2 className="mt-2 break-words text-2xl font-extrabold text-cloud">{vehicle.name}</h2>
+        <p className="mt-1 break-all text-sm text-space">Slug: {vehicle.slug}</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -679,16 +683,28 @@ const SaveActionBar = ({
 }) => (
   <div className="rounded-2xl border border-graphite/50 bg-arsenic/95 p-5 shadow-lg backdrop-blur lg:sticky lg:top-24 lg:z-20">
     <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-      <div>
-        <p className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">{title}</p>
-        <p className="mt-2 text-sm text-space">{description}</p>
+      <div className="min-w-0">
+        <p className="break-words text-sm font-bold uppercase tracking-[0.18em] text-graphite">
+          {title}
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-space">{description}</p>
       </div>
 
-      <div className="flex flex-wrap gap-3">
-        <Button onClick={onSave} icon={FaSave} className="min-w-[170px]" disabled={isSaving}>
+      <div className="grid gap-3 sm:grid-cols-2 xl:flex">
+        <Button
+          onClick={onSave}
+          icon={FaSave}
+          className={`w-full ${adminButtonClassName}`}
+          disabled={isSaving}
+        >
           {isSaving ? "Saving..." : isCreatingNew ? "Create And Save" : "Save Changes"}
         </Button>
-        <Button variant="ghost" onClick={onReset} className="min-w-[150px]" disabled={isSaving}>
+        <Button
+          variant="ghost"
+          onClick={onReset}
+          className={`w-full ${adminButtonClassName}`}
+          disabled={isSaving}
+        >
           Reset
         </Button>
         {canDelete && (
@@ -696,7 +712,7 @@ const SaveActionBar = ({
             variant="danger"
             icon={FaTrash}
             onClick={onDelete}
-            className="min-w-[150px]"
+            className={`w-full sm:col-span-2 xl:col-auto ${adminButtonClassName}`}
             disabled={isSaving}
           >
             Delete Vehicle
@@ -1208,13 +1224,17 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">
                 Signed In
               </p>
-              <p className="mt-2 text-lg font-semibold text-cloud">
+              <p className="mt-2 break-all text-lg font-semibold text-cloud">
                 {adminUser?.email || "Admin user"}
               </p>
               <p className="mt-2 text-sm text-space">
                 This account can create and update vehicle metadata entries.
               </p>
-              <Button variant="ghost" onClick={onLogout} className="mt-5 w-full justify-center">
+              <Button
+                variant="ghost"
+                onClick={onLogout}
+                className={`mt-5 w-full justify-center ${adminButtonClassName}`}
+              >
                 Log Out
               </Button>
             </div>
@@ -1374,18 +1394,26 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                         <Button
                           onClick={handleStartNewLiveEntry}
                           disabled={!liveVehiclesWithoutMetadata.length}
-                          className="justify-center self-end"
+                          className={`w-full justify-center self-end ${adminButtonClassName}`}
                         >
                           Create From Live Vehicle
                         </Button>
                       </div>
 
-                      <div className="mt-4 flex flex-wrap items-center gap-3">
-                        <Button variant="ghost" onClick={handleStartNewStaticEntry}>
+                      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                        <Button
+                          variant="ghost"
+                          onClick={handleStartNewStaticEntry}
+                          className={`w-full ${adminButtonClassName}`}
+                        >
                           Create Static-Only Vehicle
                         </Button>
                         {isCreatingNew && (
-                          <Button variant="ghost" onClick={handleCancelNewEntry}>
+                          <Button
+                            variant="ghost"
+                            onClick={handleCancelNewEntry}
+                            className={`w-full ${adminButtonClassName}`}
+                          >
                             Cancel New Vehicle
                           </Button>
                         )}
@@ -1403,7 +1431,6 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       icon={FaInfoCircle}
                       title="Basic Details"
                       description="These are the main public details customers read first on the site."
-                      pills={["Public website"]}
                     />
 
                     <div className="grid gap-4 md:grid-cols-2">
@@ -1451,7 +1478,6 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       icon={FaTag}
                       title="Fleet Card"
                       description="These fields control the listing card that customers see before opening the vehicle page."
-                      pills={["Card preview"]}
                     />
 
                     <FieldGroup
@@ -1487,7 +1513,6 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       icon={FaListUl}
                       title="Vehicle Detail Page"
                       description="Use this section for the longer information customers read after opening a vehicle."
-                      pills={["Detail page"]}
                     />
 
                     <FieldGroup
@@ -1535,7 +1560,6 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       icon={FaCheckCircle}
                       title="Rental Rules"
                       description="Only switch these sections on when a vehicle needs different rental inclusions or requirements from the default shared rules."
-                      pills={["Vehicle-specific overrides"]}
                     />
 
                     <FieldGroup
@@ -1622,7 +1646,6 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       icon={FaDatabase}
                       title="Shared Rental Defaults"
                       description="These lists are used across the website whenever a vehicle does not have its own Included or Requirements rows."
-                      pills={["Shared across vehicles"]}
                     />
 
                     <FieldGroup
