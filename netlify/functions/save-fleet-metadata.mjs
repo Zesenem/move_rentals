@@ -1,8 +1,5 @@
 import { writeFleetMetadata } from "./utils/fleet-metadata-store.mjs";
-import {
-  createAdminAccessResponse,
-  getAdminAccessState,
-} from "./utils/admin-access.mjs";
+import { createAdminAccessResponse, getAdminAccessState } from "./utils/admin-access.mjs";
 
 const isObject = (value) => typeof value === "object" && value !== null && !Array.isArray(value);
 

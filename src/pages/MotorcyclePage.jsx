@@ -150,6 +150,24 @@ function MotorcyclePage() {
     : commonData?.requirements || [];
   const importantNotes = bike?.important_notes || [];
   const hasDeposit = bike?.security_deposit !== undefined && bike?.security_deposit !== null;
+  const whatsappCallToAction = (
+    <div className="pt-2">
+      <Button
+        as="a"
+        href={whatsappUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        variant="primary"
+        className="w-full py-3 text-lg"
+        icon={FaWhatsapp}
+      >
+        Contact on WhatsApp
+      </Button>
+      <p className="text-center text-xs text-graphite mt-2">
+        Click to open a chat with us for booking and inquiries.
+      </p>
+    </div>
+  );
 
   return (
     <>
@@ -164,6 +182,8 @@ function MotorcyclePage() {
         <Link to="/" className="text-steel hover:text-cloud mb-8 inline-block font-semibold">
           &larr; Back to Our Fleet
         </Link>
+
+        <div className="mb-6 md:hidden">{whatsappCallToAction}</div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-x-12 gap-y-10">
           <div className="md:col-span-3">
@@ -196,21 +216,8 @@ function MotorcyclePage() {
                 <p className="mt-4 text-space">{bike?.description}</p>
               </div>
 
-              <div className="pt-2">
-                <Button
-                  as="a"
-                  href={whatsappUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  variant="primary"
-                  className="w-full py-3 text-lg"
-                  icon={FaWhatsapp}
-                >
-                  Contact on WhatsApp
-                </Button>
-                <p className="text-center text-xs text-graphite mt-2">
-                  Click to open a chat with us for booking and inquiries.
-                </p>
+              <div className="hidden md:block">
+                {whatsappCallToAction}
               </div>
 
               <SpecsTable features={bike?.technical_features} />
