@@ -25,17 +25,18 @@ import { fetchProducts } from "../services/twice.js";
 import { fetchFleetMetadata, saveFleetMetadata } from "../services/fleetMetadata.js";
 
 const inputClassName =
-  "min-h-[52px] w-full rounded-xl border border-graphite/60 bg-phantom px-4 py-3 text-sm text-steel outline-none transition-colors focus:border-cloud sm:text-base";
-const textareaClassName = `${inputClassName} min-h-[120px]`;
-const sectionCardClassName = "rounded-2xl border border-graphite/50 bg-phantom/40 p-6 shadow-sm";
+  "min-h-[52px] w-full min-w-0 rounded-xl border border-graphite/60 bg-phantom px-4 py-3 text-sm text-steel outline-none transition-colors focus:border-cloud sm:text-base";
+const textareaClassName = `${inputClassName} min-h-[140px] resize-y`;
+const sectionCardClassName =
+  "min-w-0 rounded-2xl border border-graphite/50 bg-phantom/40 p-5 shadow-sm lg:p-6";
 const addButtonClassName =
-  "inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl border border-cloud/40 bg-cloud/10 px-4 py-3 text-sm font-semibold text-cloud transition-colors hover:bg-cloud/20 sm:w-auto whitespace-nowrap";
+  "inline-flex min-h-[48px] w-full max-w-full items-center justify-center gap-2 rounded-xl border border-cloud/40 bg-cloud/10 px-4 py-3 text-center text-sm font-semibold leading-snug text-cloud transition-colors hover:bg-cloud/20 whitespace-normal break-words sm:w-auto";
 const removeButtonClassName =
   "inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-red-500/40 bg-red-500/10 text-red-200 transition-colors hover:bg-red-500/20";
 const hintPillClassName =
   "inline-flex items-center rounded-full border border-graphite/60 bg-phantom px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-space";
 const adminButtonClassName =
-  "min-h-[48px] rounded-xl px-5 text-sm whitespace-nowrap sm:w-auto";
+  "min-h-[52px] max-w-full rounded-xl px-5 py-3 text-center text-sm leading-snug whitespace-normal break-words sm:w-full xl:w-auto";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Use live/default status" },
@@ -319,10 +320,12 @@ const StatCard = ({ icon, label, value, helper }) => {
 };
 
 const FieldGroup = ({ label, hint, children }) => (
-  <div>
-    <label className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">{label}</label>
-    {hint && <p className="mt-1 text-sm text-space">{hint}</p>}
-    <div className="mt-3">{children}</div>
+  <div className="min-w-0">
+    <label className="block break-words text-sm font-bold uppercase tracking-[0.18em] text-graphite">
+      {label}
+    </label>
+    {hint && <p className="mt-1 break-words text-sm text-space">{hint}</p>}
+    <div className="mt-3 min-w-0">{children}</div>
   </div>
 );
 
@@ -360,7 +363,7 @@ const InlineActionButton = ({ icon, label, onClick, variant = "add" }) => {
   return (
     <button type="button" className={className} onClick={onClick} title={label} aria-label={label}>
       <IconComponent className="text-sm" />
-      {variant !== "remove" && <span>{label}</span>}
+      {variant !== "remove" && <span className="min-w-0 break-words">{label}</span>}
     </button>
   );
 };
@@ -414,8 +417,8 @@ const BadgeSelector = ({ value, onToggle }) => (
           onClick={() => onToggle(badge)}
           className={`rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${
             isSelected
-              ? "border-cloud bg-cloud text-phantom"
-              : "border-graphite/60 bg-phantom text-steel hover:border-cloud/50 hover:text-cloud"
+              ? "border-cloud bg-cloud text-center leading-snug text-phantom"
+              : "border-graphite/60 bg-phantom text-center leading-snug text-steel hover:border-cloud/50 hover:text-cloud"
           }`}
         >
           {badge}
@@ -429,7 +432,7 @@ const StringListEditor = ({ items, placeholder, addLabel, onAdd, onChange, onRem
   <div className="space-y-3">
     {items.length > 0 ? (
       items.map((item, index) => (
-        <div key={`text-item-${index}`} className="grid gap-3 sm:grid-cols-[1fr_48px]">
+        <div key={`text-item-${index}`} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_48px]">
           <input
             className={inputClassName}
             value={item}
@@ -463,14 +466,17 @@ const QuickGlanceEditor = ({
   emptyMessage = "Add the three short facts shown on the vehicle card.",
 }) => (
   <div className="space-y-3">
-    <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite lg:grid lg:grid-cols-[1fr_220px_50px]">
+    <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(180px,220px)_50px]">
       <span>Text shown to customer</span>
       <span>Icon style</span>
       <span className="sr-only">Remove row</span>
     </div>
     {items.length > 0 ? (
       items.map((item, index) => (
-        <div key={`quick-glance-${index}`} className="grid gap-3 lg:grid-cols-[1fr_220px_50px]">
+        <div
+          key={`quick-glance-${index}`}
+          className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(180px,220px)_50px]"
+        >
           <input
             className={inputClassName}
             value={item.label}
@@ -515,14 +521,17 @@ const FeatureEditor = ({
   emptyMessage = "No specifications added yet.",
 }) => (
   <div className="space-y-3">
-    <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite lg:grid lg:grid-cols-[220px_1fr_50px]">
+    <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite xl:grid xl:grid-cols-[minmax(180px,220px)_minmax(0,1fr)_50px]">
       <span>Label</span>
       <span>Value shown to customer</span>
       <span className="sr-only">Remove row</span>
     </div>
     {items.length > 0 ? (
       items.map((item, index) => (
-        <div key={`feature-${index}`} className="grid gap-3 lg:grid-cols-[220px_1fr_50px]">
+        <div
+          key={`feature-${index}`}
+          className="grid gap-3 xl:grid-cols-[minmax(180px,220px)_minmax(0,1fr)_50px]"
+        >
           <input
             className={inputClassName}
             value={item.label}
@@ -563,14 +572,17 @@ const ItemWithIconEditor = ({
   placeholder = "Item text",
 }) => (
   <div className="space-y-3">
-    <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite lg:grid lg:grid-cols-[1fr_220px_50px]">
+    <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(180px,220px)_50px]">
       <span>Text shown to customer</span>
       <span>Icon style</span>
       <span className="sr-only">Remove row</span>
     </div>
     {items.length > 0 ? (
       items.map((item, index) => (
-        <div key={`icon-item-${index}`} className="grid gap-3 lg:grid-cols-[1fr_220px_50px]">
+        <div
+          key={`icon-item-${index}`}
+          className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(180px,220px)_50px]"
+        >
           <input
             className={inputClassName}
             value={item.item}
@@ -616,7 +628,7 @@ const describeCustomList = (items, usesSharedFallback = false) => {
 };
 
 const VehicleRecordCard = ({ vehicle }) => (
-  <article className="rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
+  <article className="min-w-0 overflow-hidden rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
     <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
       <div className="min-w-0">
         <p className="break-all text-xs uppercase tracking-[0.18em] text-graphite">
@@ -626,7 +638,7 @@ const VehicleRecordCard = ({ vehicle }) => (
         <p className="mt-1 break-all text-sm text-space">Slug: {vehicle.slug}</p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="min-w-0 flex flex-wrap gap-2">
         <span className="rounded-full bg-phantom px-3 py-1 text-xs font-semibold text-steel">
           Status: {vehicle.availability_label || vehicle.status || "available"}
         </span>
@@ -690,7 +702,7 @@ const SaveActionBar = ({
         <p className="mt-2 text-sm leading-relaxed text-space">{description}</p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:flex">
+      <div className="grid gap-3 sm:grid-cols-2 xl:flex xl:flex-wrap xl:justify-end">
         <Button
           onClick={onSave}
           icon={FaSave}
@@ -1204,10 +1216,10 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
         />
       </Helmet>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="mx-auto max-w-7xl">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-3xl">
+      <div className="w-full px-4 py-8 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
+        <div className="mx-auto w-full max-w-[1800px]">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] xl:items-start">
+            <div className="min-w-0 max-w-4xl">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-cloud">
                 Admin Workspace
               </p>
@@ -1220,7 +1232,7 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-graphite/50 bg-arsenic p-5 shadow-lg lg:min-w-[280px]">
+            <div className="min-w-0 rounded-2xl border border-graphite/50 bg-arsenic p-5 shadow-lg">
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">
                 Signed In
               </p>
@@ -1282,35 +1294,37 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
           )}
 
           {!isLoading && !isVehiclesError && !isMetadataError && (
-            <div className="mt-10 grid gap-8 xl:grid-cols-[1.15fr_0.85fr]">
-              <section className="rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
-                <div className="flex flex-col gap-6">
-                  <SaveActionBar
-                    title={
-                      isCreatingNew
-                        ? newEntryKind === "static"
-                          ? "Creating a static-only vehicle"
-                          : "Creating a live-linked vehicle"
-                        : selectedMetadataEntry
-                          ? `Editing ${selectedMetadataEntry.name}`
-                          : "Editing shared rental defaults"
-                    }
-                    description={
-                      isCreatingNew
-                        ? "Save when the new vehicle is ready. Shared rental defaults are saved at the same time."
-                        : "Use Save Changes at any time. Vehicle details and shared rental defaults are saved together."
-                    }
-                    isSaving={saveMutation.isPending}
-                    isCreatingNew={isCreatingNew}
-                    canDelete={!isCreatingNew && Boolean(selectedMetadataEntry)}
-                    onSave={handleSaveChanges}
-                    onReset={handleResetChanges}
-                    onDelete={handleDeleteSelectedEntry}
-                  />
+            <div className="mt-10 grid gap-8 xl:grid-cols-[minmax(0,1.4fr)_minmax(360px,0.95fr)] 2xl:grid-cols-[minmax(0,1.55fr)_minmax(400px,0.9fr)]">
+              <section className="min-w-0 rounded-2xl border border-graphite/50 bg-arsenic p-5 shadow-lg lg:p-6">
+                <div className="grid gap-6 2xl:grid-cols-2">
+                  <div className="2xl:col-span-2">
+                    <SaveActionBar
+                      title={
+                        isCreatingNew
+                          ? newEntryKind === "static"
+                            ? "Creating a static-only vehicle"
+                            : "Creating a live-linked vehicle"
+                          : selectedMetadataEntry
+                            ? `Editing ${selectedMetadataEntry.name}`
+                            : "Editing shared rental defaults"
+                      }
+                      description={
+                        isCreatingNew
+                          ? "Save when the new vehicle is ready. Shared rental defaults are saved at the same time."
+                          : "Use Save Changes at any time. Vehicle details and shared rental defaults are saved together."
+                      }
+                      isSaving={saveMutation.isPending}
+                      isCreatingNew={isCreatingNew}
+                      canDelete={!isCreatingNew && Boolean(selectedMetadataEntry)}
+                      onSave={handleSaveChanges}
+                      onReset={handleResetChanges}
+                      onDelete={handleDeleteSelectedEntry}
+                    />
+                  </div>
 
                   {(formError || saveMessage) && (
                     <div
-                      className={`rounded-xl border p-4 text-sm ${
+                      className={`2xl:col-span-2 rounded-xl border p-4 text-sm ${
                         formError
                           ? "border-red-500/40 bg-red-500/10 text-red-200"
                           : "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
@@ -1320,7 +1334,7 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                     </div>
                   )}
 
-                  <div className="grid gap-6 xl:grid-cols-2">
+                  <div className="grid gap-6 xl:grid-cols-2 2xl:col-span-2">
                     <div className={sectionCardClassName}>
                       <SectionHeading
                         icon={FaMotorcycle}
@@ -1368,7 +1382,7 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                         description="Start from a live Twice vehicle when possible. Use static-only only when the vehicle is not available in Twice."
                       />
 
-                      <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+                      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto]">
                         <div>
                           <label className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">
                             Live vehicles from Twice
@@ -1566,16 +1580,18 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                       label="Included In Rental"
                       hint="Leave this off to use the default included list shared across the website."
                     >
-                      <label className="mb-4 flex items-center justify-between rounded-xl border border-graphite/60 bg-arsenic/70 px-4 py-3">
-                        <div>
-                          <p className="font-semibold text-cloud">Use vehicle-specific included items</p>
+                      <label className="mb-4 flex items-start gap-4 rounded-xl border border-graphite/60 bg-arsenic/70 px-4 py-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="break-words font-semibold text-cloud">
+                            Use vehicle-specific included items
+                          </p>
                           <p className="text-sm text-space">
                             Turn this off to use the shared included list from the main metadata file.
                           </p>
                         </div>
                         <input
                           type="checkbox"
-                          className="h-5 w-5 accent-cloud"
+                          className="mt-1 h-5 w-5 shrink-0 accent-cloud"
                           checked={draft.hasIncludedOverride}
                           onChange={handleToggleDraftField("hasIncludedOverride")}
                         />
@@ -1605,16 +1621,18 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                         label="Requirements"
                         hint="Leave this off to use the default driver requirements shared across the website."
                       >
-                        <label className="mb-4 flex items-center justify-between rounded-xl border border-graphite/60 bg-arsenic/70 px-4 py-3">
-                          <div>
-                            <p className="font-semibold text-cloud">Use vehicle-specific requirements</p>
+                        <label className="mb-4 flex items-start gap-4 rounded-xl border border-graphite/60 bg-arsenic/70 px-4 py-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="break-words font-semibold text-cloud">
+                              Use vehicle-specific requirements
+                            </p>
                             <p className="text-sm text-space">
                               Turn this off to use the shared requirements list from the main metadata file.
                             </p>
                           </div>
                           <input
                             type="checkbox"
-                            className="h-5 w-5 accent-cloud"
+                            className="mt-1 h-5 w-5 shrink-0 accent-cloud"
                             checked={draft.hasRequirementsOverride}
                             onChange={handleToggleDraftField("hasRequirementsOverride")}
                           />
@@ -1787,8 +1805,8 @@ function AdminPage({ adminUser, getAuthToken, onLogout }) {
                 </div>
               </section>
 
-              <div className="xl:sticky xl:top-24 xl:self-start">
-                <section className="rounded-2xl border border-graphite/50 bg-arsenic p-6 shadow-lg">
+              <div className="min-w-0 xl:sticky xl:top-24 xl:self-start">
+                <section className="min-w-0 rounded-2xl border border-graphite/50 bg-arsenic p-5 shadow-lg lg:p-6">
                   <SectionHeading
                     icon={FaEye}
                     title={isCreatingNew ? "New Record Preview" : "Selected Record Preview"}
