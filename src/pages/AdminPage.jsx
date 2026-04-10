@@ -378,7 +378,7 @@ const MetaList = ({ items, emptyLabel }) => {
       {items.map((item, index) => (
         <span
           key={`${item}-${index}`}
-          className="rounded-full border border-graphite/60 bg-phantom px-3 py-1 text-sm text-steel"
+          className="rounded-full border border-graphite/60 bg-phantom px-3 py-1 text-center text-sm leading-snug text-steel break-words"
         >
           {item}
         </span>
@@ -395,7 +395,7 @@ const QuickGlanceList = ({ items }) => {
   return (
     <ul className="space-y-1 text-sm text-space">
       {items.map((item, index) => (
-        <li key={`${item.icon}-${item.label}-${index}`}>
+        <li key={`${item.icon}-${item.label}-${index}`} className="break-words">
           <span className="font-semibold text-cloud">{item.label}</span>
           <span className="text-graphite"> / </span>
           <span>{item.icon}</span>

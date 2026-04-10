@@ -5,8 +5,8 @@ import OpeningHours from "../components/OpeningHours";
 const ContactInfoCard = ({ icon, title, children }) => {
   const IconComponent = icon;
   return (
-    <div className="flex items-start gap-4 rounded-lg bg-arsenic p-6 h-full">
-      <IconComponent className="mt-1 text-2xl text-cloud flex-shrink-0" />
+    <div className="flex h-full items-start gap-4 rounded-lg bg-arsenic p-6">
+      <IconComponent className="mt-1 flex-shrink-0 text-2xl text-cloud" />
       <div>
         <h3 className="text-xl font-bold text-cloud">{title}</h3>
         <div className="mt-1 text-space">{children}</div>
@@ -16,7 +16,7 @@ const ContactInfoCard = ({ icon, title, children }) => {
 };
 
 const contactInfo = {
-  address: "Rua da Beneficência 44D, Lisboa, Portugal",
+  address: "Rua da Beneficencia 44D, Lisboa, Portugal",
   phone: "+351 920 016 794",
   email: "move@move-rentals.com",
   get whatsappUrl() {
@@ -25,14 +25,12 @@ const contactInfo = {
   get directionsUrl() {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(this.address)}`;
   },
+  get embedMapUrl() {
+    return `https://www.google.com/maps?output=embed&q=${encodeURIComponent(this.address)}`;
+  },
 };
 
 function ContactPage() {
-  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-  const embedMapUrl = `https://www.google.com/maps/embed/v1/place?key=${googleMapsApiKey}&q=${encodeURIComponent(
-    contactInfo.address
-  )}`;
-
   const contactMethods = [
     {
       icon: FaMapMarkerAlt,
@@ -118,7 +116,7 @@ function ContactPage() {
 
           <div className="aspect-video w-full overflow-hidden rounded-lg border-2 border-graphite/50">
             <iframe
-              src={embedMapUrl}
+              src={contactInfo.embedMapUrl}
               width="100%"
               height="100%"
               style={{ border: 0 }}
