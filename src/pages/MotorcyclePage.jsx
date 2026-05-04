@@ -147,6 +147,12 @@ function MotorcyclePage() {
     : commonData?.requirements || [];
   const importantNotes = bike?.important_notes || [];
   const hasDeposit = bike?.security_deposit !== undefined && bike?.security_deposit !== null;
+  const titleAndDescription = (
+    <div>
+      <h1 className="text-4xl font-extrabold text-cloud tracking-tight">{bike?.name}</h1>
+      <p className="mt-4 text-space">{bike?.description}</p>
+    </div>
+  );
   const whatsappCallToAction = (
     <div className="pt-2">
       <Button
@@ -182,13 +188,16 @@ function MotorcyclePage() {
           &larr; Back to Our Fleet
         </Link>
 
-        <div className="mb-6 md:hidden">{whatsappCallToAction}</div>
+        <div className="mb-8 md:hidden">{titleAndDescription}</div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-x-12 gap-y-10">
           <div className="md:col-span-3">
             <div className="w-full aspect-video mb-12">
               <ImageCarousel images={bike?.image_urls} />
             </div>
+
+            <div className="mb-8 md:hidden">{whatsappCallToAction}</div>
+
             <div className="space-y-2">
               {includedItems.length > 0 && (
                 <AccordionItem title="Included in Rental">
@@ -210,10 +219,7 @@ function MotorcyclePage() {
 
           <div className="md:col-span-2">
             <div className="sticky top-24 space-y-6">
-              <div>
-                <h1 className="text-4xl font-extrabold text-cloud tracking-tight">{bike?.name}</h1>
-                <p className="mt-4 text-space">{bike?.description}</p>
-              </div>
+              <div className="hidden md:block">{titleAndDescription}</div>
 
               <div className="hidden md:block">{whatsappCallToAction}</div>
 
