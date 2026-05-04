@@ -6,6 +6,7 @@ import { fetchProductBySlug } from "../services/twice.js";
 import AccordionItem from "../components/AccordionItem";
 import ImageCarousel from "../components/ImageCarousel";
 import Button from "../components/Button";
+import { trackWhatsAppClick } from "../services/analytics.js";
 import { iconMap } from "../utils/iconMap.jsx";
 import { FaExclamationTriangle, FaWhatsapp } from "react-icons/fa";
 
@@ -160,6 +161,13 @@ function MotorcyclePage() {
         href={whatsappUrl}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() =>
+          trackWhatsAppClick({
+            placement: "motorcycle_page_cta",
+            url: whatsappUrl,
+            vehicleName: bike?.name,
+          })
+        }
         variant="primary"
         className="w-full py-3 text-lg"
         icon={FaWhatsapp}

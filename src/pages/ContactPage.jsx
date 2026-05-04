@@ -1,6 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaClock } from "react-icons/fa";
 import OpeningHours from "../components/OpeningHours";
+import { trackWhatsAppClick } from "../services/analytics.js";
 
 const ContactInfoCard = ({ icon, title, children }) => {
   const IconComponent = icon;
@@ -64,6 +65,12 @@ function ContactPage() {
             href={contactInfo.whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() =>
+              trackWhatsAppClick({
+                placement: "contact_page_whatsapp",
+                url: contactInfo.whatsappUrl,
+              })
+            }
             className="mt-2 inline-block text-emerald-400 hover:underline"
           >
             Send a Message

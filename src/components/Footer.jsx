@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { FaWhatsapp, FaInstagram, FaEnvelope } from "react-icons/fa";
 import OpeningHours from "./OpeningHours";
+import { trackWhatsAppClick } from "../services/analytics.js";
 
 const contactInfo = {
   email: "move@move-rentals.com",
@@ -15,7 +16,7 @@ const quickLinks = [
   { name: "Privacy Policy", to: "/privacy-policy" },
 ];
 
-const SocialLink = ({ href, ariaLabel, icon }) => {
+const SocialLink = ({ href, ariaLabel, icon, onClick }) => {
   const IconComponent = icon;
   return (
     <a
@@ -23,6 +24,7 @@ const SocialLink = ({ href, ariaLabel, icon }) => {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={ariaLabel}
+      onClick={onClick}
       className="text-steel transition-transform duration-300 hover:scale-110 hover:text-cloud"
     >
       <IconComponent size={22} />
@@ -90,7 +92,17 @@ function Footer() {
 
         <div className="flex flex-col items-center justify-between gap-4 border-t border-arsenic py-6 sm:flex-row">
           <div className="flex items-center space-x-6">
-            <SocialLink href={contactInfo.whatsappUrl} ariaLabel="WhatsApp" icon={FaWhatsapp} />
+            <SocialLink
+              href={contactInfo.whatsappUrl}
+              ariaLabel="WhatsApp"
+              icon={FaWhatsapp}
+              onClick={() =>
+                trackWhatsAppClick({
+                  placement: "footer_whatsapp",
+                  url: contactInfo.whatsappUrl,
+                })
+              }
+            />
             <SocialLink href={contactInfo.instagramUrl} ariaLabel="Instagram" icon={FaInstagram} />
             <SocialLink href={`mailto:${contactInfo.email}`} ariaLabel="Email" icon={FaEnvelope} />
           </div>
