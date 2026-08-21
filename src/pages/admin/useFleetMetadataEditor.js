@@ -399,7 +399,7 @@ function useFleetMetadataEditor() {
 
         if (conflictingEntryIndex >= 0) {
           throw new Error(
-            "Another metadata entry already uses the same vehicle ID, slug, or name.",
+            "Já existe outro registo com o mesmo ID, slug ou nome de veículo.",
           );
         }
 
@@ -428,13 +428,13 @@ function useFleetMetadataEditor() {
 
       setSaveMessage(
         updatedEntry && isCreatingNew
-          ? "New vehicle and shared rental defaults saved."
+          ? "Novo veículo e regras gerais de aluguer guardados."
           : updatedEntry
-            ? "Vehicle details and shared rental defaults saved."
-            : "Shared rental defaults saved.",
+            ? "Detalhes do veículo e regras gerais de aluguer guardados."
+            : "Regras gerais de aluguer guardadas.",
       );
     } catch (saveError) {
-      setFormError(saveError.message || "Could not save the current changes.");
+      setFormError(saveError.message || "Não foi possível guardar as alterações.");
     }
   };
 
@@ -444,7 +444,7 @@ function useFleetMetadataEditor() {
     }
 
     const confirmed = window.confirm(
-      `Delete "${selectedMetadataEntry.name || "this vehicle"}" from the fleet metadata? This cannot be undone.`,
+      `Eliminar "${selectedMetadataEntry.name || "este veículo"}" dos dados da frota? Esta ação não pode ser anulada.`,
     );
 
     if (!confirmed) {
@@ -472,9 +472,9 @@ function useFleetMetadataEditor() {
         setDraft(createVehicleDraft());
       }
 
-      setSaveMessage("Vehicle metadata entry deleted.");
+      setSaveMessage("Registo do veículo eliminado.");
     } catch (deleteError) {
-      setFormError(deleteError.message || "Could not delete the selected vehicle.");
+      setFormError(deleteError.message || "Não foi possível eliminar o veículo selecionado.");
     }
   };
 

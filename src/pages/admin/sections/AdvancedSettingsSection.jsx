@@ -12,40 +12,40 @@ function AdvancedSettingsSection({
   return (
     <details className="rounded-2xl border border-graphite/50 bg-phantom/20 p-5">
       <summary className="cursor-pointer list-none text-sm font-bold uppercase tracking-[0.18em] text-graphite">
-        Advanced Settings
+        Definições avançadas
       </summary>
       <div className="mt-6 space-y-6">
         <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-          Only change these fields if you understand why the website needs them. Most day-to-day
-          edits should be done in the sections above.
+          Altere estes campos apenas se souber porque são necessários. A maioria das alterações do
+          dia a dia deve ser feita nas secções acima.
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
           <FieldGroup
-            label="Twice ID"
-            hint="Leave blank only for static-only vehicles. This links the website entry to the live Twice product."
+            label="ID da Twice"
+            hint="Deixe vazio apenas para veículos apenas do site. Liga este registo ao produto em direto da Twice."
           >
             <input
               className={inputClassName}
               value={draft.id}
-              placeholder="Live Twice product ID"
+              placeholder="ID do produto na Twice"
               onChange={onDraftChange("id")}
             />
           </FieldGroup>
           <FieldGroup
             label="Slug"
-            hint="Used for the public detail page URL. Change this only if you need a different public link."
+            hint="Usado no URL público da página de detalhe. Altere apenas se precisar de um link diferente."
           >
             <input
               className={inputClassName}
               value={draft.slug}
-              placeholder="Example: tesla-model-3"
+              placeholder="Exemplo: tesla-model-3"
               onChange={onDraftChange("slug")}
             />
           </FieldGroup>
           <FieldGroup
-            label="Source"
-            hint="Choose static only if the vehicle should appear without a live Twice record."
+            label="Origem"
+            hint="Escolha apenas do site se o veículo deve aparecer sem um registo em direto da Twice."
           >
             <select
               className={inputClassName}
@@ -59,7 +59,7 @@ function AdvancedSettingsSection({
               ))}
             </select>
           </FieldGroup>
-          <FieldGroup label="Status" hint="Optional status override for the card and details page.">
+          <FieldGroup label="Estado" hint="Estado opcional para o cartão e a página de detalhe.">
             <select
               className={inputClassName}
               value={draft.status}
@@ -73,26 +73,26 @@ function AdvancedSettingsSection({
             </select>
           </FieldGroup>
           <FieldGroup
-            label="Availability Label"
-            hint='Optional custom badge text such as "On Demand".'
+            label="Etiqueta de disponibilidade"
+            hint='Texto opcional para a etiqueta, por exemplo "Por pedido".'
           >
             <input
               className={inputClassName}
               value={draft.availabilityLabel}
-              placeholder="Example: On Demand"
+              placeholder="Exemplo: Por pedido"
               onChange={onDraftChange("availabilityLabel")}
             />
           </FieldGroup>
         </div>
 
         <FieldGroup
-          label="Alternative Match Names"
-          hint="Only use these if the live Twice product name is different from the name shown on the website."
+          label="Nomes alternativos para correspondência"
+          hint="Use apenas se o nome do produto na Twice for diferente do nome apresentado no site."
         >
           <StringListEditor
             items={draft.matchNames}
-            placeholder="Alternative live product name"
-            addLabel="Add alternative name"
+            placeholder="Nome alternativo do produto na Twice"
+            addLabel="Adicionar nome alternativo"
             onAdd={() => onAddStringListItem("matchNames")}
             onChange={(index, value) => onStringListChange("matchNames", index, value)}
             onRemove={(index) => onRemoveStringListItem("matchNames", index)}

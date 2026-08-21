@@ -8,38 +8,38 @@ function BasicDetailsSection({ draft, onDraftChange }) {
     <div className={sectionCardClassName}>
       <SectionHeading
         icon={FaInfoCircle}
-        title="Basic Details"
-        description="These are the main public details customers read first on the site."
+        title="Informações principais"
+        description="Estes são os dados públicos que os clientes veem primeiro no site."
       />
 
       <div className="grid gap-4 md:grid-cols-2">
-        <FieldGroup label="Vehicle Name" hint="Public title shown on the card and detail page.">
+        <FieldGroup label="Nome do veículo" hint="Título público apresentado no cartão e na página de detalhe.">
           <input
             className={inputClassName}
             value={draft.name}
-            placeholder="Example: Tesla Model 3"
+            placeholder="Exemplo: Tesla Model 3"
             onChange={onDraftChange("name")}
           />
         </FieldGroup>
         <FieldGroup
-          label="Security Deposit"
-          hint="Shown on the detail page. Use only the number if possible, for example 500."
+          label="Caução"
+          hint="Apresentada na página de detalhe. Use apenas o número, por exemplo 500."
         >
           <input
             className={inputClassName}
             value={draft.securityDeposit}
-            placeholder="Example: 500"
+            placeholder="Exemplo: 500"
             onChange={onDraftChange("securityDeposit")}
           />
         </FieldGroup>
       </div>
 
       <div className="mt-6">
-        <FieldGroup label="Description" hint="Short public paragraph shown on the detail page.">
+        <FieldGroup label="Descrição" hint="Pequeno texto público apresentado na página de detalhe.">
           <textarea
             className={textareaClassName}
             value={draft.description}
-            placeholder="Write the short description customers should read on the vehicle page."
+            placeholder="Escreva a pequena descrição que os clientes devem ler na página do veículo."
             onChange={onDraftChange("description")}
           />
         </FieldGroup>

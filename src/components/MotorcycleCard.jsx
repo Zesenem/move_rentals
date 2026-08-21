@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import {
   FaBolt,
+  FaAnchor,
   FaCogs,
   FaFlagCheckered,
   FaGem,
@@ -30,6 +31,7 @@ const badgeMap = {
   "Best Value": { icon: FaStar, color: "bg-yellow-500" },
   Premium: { icon: FaGem, color: "bg-purple-500" },
   Electric: { icon: FaBolt, color: "bg-cyan-500" },
+  Anchor: { icon: FaAnchor, color: "bg-sky-500" },
   GPS: {
     icon: function GPSIcon(props) {
       return (

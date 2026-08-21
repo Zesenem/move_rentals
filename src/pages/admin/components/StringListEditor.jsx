@@ -16,7 +16,7 @@ function StringListEditor({ items, placeholder, addLabel, onAdd, onChange, onRem
             />
             <InlineActionButton
               icon={FaTrash}
-              label="Remove row"
+              label="Remover linha"
               onClick={() => onRemove(index)}
               variant="remove"
             />
@@ -24,7 +24,7 @@ function StringListEditor({ items, placeholder, addLabel, onAdd, onChange, onRem
         ))
       ) : (
         <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
-          No rows added yet.
+          Ainda não foram adicionadas linhas.
         </p>
       )}
 

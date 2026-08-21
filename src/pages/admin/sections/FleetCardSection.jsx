@@ -16,26 +16,26 @@ function FleetCardSection({
     <div className={sectionCardClassName}>
       <SectionHeading
         icon={FaTag}
-        title="Fleet Card"
-        description="These fields control the listing card that customers see before opening the vehicle page."
+        title="Cartão da frota"
+        description="Estes campos controlam o cartão que os clientes veem antes de abrir a página do veículo."
       />
 
       <FieldGroup
-        label="Badges"
-        hint="Optional labels shown on the card. Use only the ones you want customers to notice instantly."
+        label="Destaques"
+        hint="Etiquetas opcionais apresentadas no cartão. Use apenas as que devem ser vistas de imediato."
       >
         <BadgeSelector value={draft.badges} onToggle={onBadgeToggle} />
       </FieldGroup>
 
       <div className="mt-6">
         <FieldGroup
-          label="Quick Glance"
-          hint="Keep this to three short facts. Example: 283 cv, Category B, 534 km WLTP."
+          label="Informações rápidas"
+          hint="Mantenha até três factos curtos. Exemplo: 283 cv, categoria B, 534 km WLTP."
         >
           <QuickGlanceEditor
             items={draft.quickGlance}
-            addLabel="Add quick fact"
-            emptyMessage="Add up to three short facts for the vehicle card."
+            addLabel="Adicionar informação rápida"
+            emptyMessage="Adicione até três informações curtas para o cartão do veículo."
             onAdd={() => onAddObjectListItem("quickGlance", EMPTY_QUICK_GLANCE_ITEM)}
             onChange={(index, key, value) => onObjectListChange("quickGlance", index, key, value)}
             onRemove={(index) => onRemoveObjectListItem("quickGlance", index)}

@@ -13,51 +13,59 @@ export const adminButtonClassName =
   "min-h-[52px] max-w-full rounded-xl px-5 py-3 text-center text-sm leading-snug whitespace-normal break-words sm:w-full xl:w-auto";
 
 export const STATUS_OPTIONS = [
-  { value: "", label: "Use live/default status" },
-  { value: "available", label: "Available" },
-  { value: "unavailable", label: "Unavailable" },
-  { value: "on-demand", label: "On Demand" },
+  { value: "", label: "Usar estado padrão/ao vivo" },
+  { value: "available", label: "Disponível" },
+  { value: "unavailable", label: "Indisponível" },
+  { value: "on-demand", label: "Por pedido" },
 ];
 
 export const SOURCE_OPTIONS = [
-  { value: "", label: "Live product from Twice" },
-  { value: "static", label: "Static-only vehicle" },
+  { value: "", label: "Produto em direto da Twice" },
+  { value: "static", label: "Veículo apenas do site" },
 ];
 
-export const BADGE_OPTIONS = ["ECO", "Premium", "GPS", "Electric", "Best Seller", "Best Value"];
+export const BADGE_OPTIONS = [
+  { value: "ECO", label: "Económico" },
+  { value: "Premium", label: "Premium" },
+  { value: "GPS", label: "GPS" },
+  { value: "Electric", label: "Elétrico" },
+  { value: "Anchor", label: "Âncora" },
+  { value: "Best Seller", label: "Mais popular" },
+  { value: "Best Value", label: "Melhor preço" },
+];
 
 export const QUICK_GLANCE_ICON_OPTIONS = [
-  { value: "engine", label: "Engine / CC" },
-  { value: "power", label: "Power" },
-  { value: "license", label: "License" },
-  { value: "gas", label: "Fuel / Tank" },
-  { value: "mileage", label: "Mileage / Range" },
-  { value: "transmission", label: "Transmission" },
-  { value: "drivetrain", label: "Drivetrain" },
-  { value: "speed", label: "Speed" },
-  { value: "track", label: "Track use" },
+  { value: "engine", label: "Motor / cilindrada" },
+  { value: "power", label: "Potência" },
+  { value: "license", label: "Carta de condução" },
+  { value: "gas", label: "Combustível / depósito" },
+  { value: "mileage", label: "Quilometragem / autonomia" },
+  { value: "transmission", label: "Transmissão" },
+  { value: "drivetrain", label: "Tração" },
+  { value: "speed", label: "Velocidade" },
+  { value: "track", label: "Utilização em pista" },
 ];
 
 export const LIST_ICON_OPTIONS = [
-  { value: "default-check", label: "Check" },
-  { value: "id-card", label: "Identity card" },
-  { value: "license", label: "Driving license" },
-  { value: "credit-card", label: "Card / Deposit" },
-  { value: "experience", label: "Experience" },
-  { value: "helmet", label: "Helmet" },
-  { value: "gloves", label: "Gloves" },
-  { value: "jacket", label: "Jacket" },
-  { value: "trousers", label: "Trousers" },
-  { value: "boots", label: "Boots" },
-  { value: "lock", label: "Locker / Lock" },
-  { value: "tax", label: "Tax" },
-  { value: "shield", label: "Insurance" },
-  { value: "users", label: "Third-party" },
-  { value: "road", label: "Road / Mileage" },
-  { value: "infinity", label: "Unlimited" },
-  { value: "airport", label: "Airport" },
-  { value: "delivery", label: "Delivery" },
-  { value: "toll", label: "Toll" },
+  { value: "default-check", label: "Confirmação" },
+  { value: "id-card", label: "Documento de identificação" },
+  { value: "license", label: "Carta de condução" },
+  { value: "credit-card", label: "Cartão / caução" },
+  { value: "experience", label: "Experiência" },
+  { value: "helmet", label: "Capacete" },
+  { value: "gloves", label: "Luvas" },
+  { value: "jacket", label: "Casaco" },
+  { value: "trousers", label: "Calças" },
+  { value: "boots", label: "Botas" },
+  { value: "lock", label: "Cacifo / cadeado" },
+  { value: "tax", label: "Impostos" },
+  { value: "shield", label: "Seguro" },
+  { value: "users", label: "Terceiros" },
+  { value: "road", label: "Estrada / quilometragem" },
+  { value: "infinity", label: "Ilimitado" },
+  { value: "airport", label: "Aeroporto" },
+  { value: "delivery", label: "Entrega" },
+  { value: "toll", label: "Portagens" },
 ];
 
 export const EMPTY_QUICK_GLANCE_ITEM = { label: "", icon: "engine" };

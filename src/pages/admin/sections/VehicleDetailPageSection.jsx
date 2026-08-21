@@ -15,18 +15,18 @@ function VehicleDetailPageSection({
     <div className={sectionCardClassName}>
       <SectionHeading
         icon={FaListUl}
-        title="Vehicle Detail Page"
-        description="Use this section for the longer information customers read after opening a vehicle."
+        title="Página de detalhe do veículo"
+        description="Use esta secção para a informação mais detalhada que os clientes leem depois de abrir um veículo."
       />
 
       <FieldGroup
-        label="Specifications"
-        hint="Label and value rows shown in the Specifications section of the detail page."
+        label="Especificações"
+        hint="Linhas de título e valor apresentadas na secção de especificações da página de detalhe."
       >
         <FeatureEditor
           items={draft.technicalFeatures}
-          addLabel="Add specification"
-          emptyMessage="Add label and value rows such as Engine, Power, or Fuel Type."
+          addLabel="Adicionar especificação"
+          emptyMessage="Adicione linhas como Motor, Potência ou Tipo de combustível."
           onAdd={() => onAddObjectListItem("technicalFeatures", EMPTY_FEATURE_ITEM)}
           onChange={(index, key, value) =>
             onObjectListChange("technicalFeatures", index, key, value)
@@ -37,14 +37,14 @@ function VehicleDetailPageSection({
 
       <div className="mt-6">
         <FieldGroup
-          label="Important Notes"
-          hint="Use this for warnings, exceptions, or approval notes that customers must notice."
+          label="Notas importantes"
+          hint="Use para avisos, exceções ou notas de aprovação que os clientes devem ver."
         >
           <ItemWithIconEditor
             items={draft.importantNotes}
-            addLabel="Add important note"
-            emptyMessage="Add short notes only when the vehicle needs extra warnings or exceptions."
-            placeholder="Example: Reservation subject to approval"
+            addLabel="Adicionar nota importante"
+            emptyMessage="Adicione notas curtas apenas quando o veículo precisa de avisos ou exceções."
+            placeholder="Exemplo: Reserva sujeita a aprovação"
             onAdd={() => onAddObjectListItem("importantNotes", EMPTY_LIST_ITEM)}
             onChange={(index, key, value) =>
               onObjectListChange("importantNotes", index, key, value)

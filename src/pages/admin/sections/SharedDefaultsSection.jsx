@@ -14,19 +14,19 @@ function SharedDefaultsSection({
     <div className={sectionCardClassName}>
       <SectionHeading
         icon={FaDatabase}
-        title="Shared Rental Defaults"
-        description="These lists are used across the website whenever a vehicle does not have its own Included or Requirements rows."
+        title="Regras gerais de aluguer"
+        description="Estas listas são usadas no site quando um veículo não tem itens incluídos ou requisitos próprios."
       />
 
       <FieldGroup
-        label="Default Included In Rental"
-        hint="These items are reused on vehicles where the Included switch stays off."
+        label="Itens gerais incluídos no aluguer"
+        hint="Estes itens são usados nos veículos onde a opção de itens específicos está desligada."
       >
         <ItemWithIconEditor
           items={commonDataDraft.included}
-          addLabel="Add shared included item"
-          emptyMessage="Add the default included items that apply to most vehicles."
-          placeholder="Example: Road assistance"
+          addLabel="Adicionar item geral incluído"
+          emptyMessage="Adicione os itens incluídos que se aplicam à maioria dos veículos."
+          placeholder="Exemplo: Assistência em viagem"
           onAdd={() => onAddCommonDataObjectListItem("included", EMPTY_LIST_ITEM)}
           onChange={(index, key, value) =>
             onCommonDataObjectListChange("included", index, key, value)
@@ -37,14 +37,14 @@ function SharedDefaultsSection({
 
       <div className="mt-8">
         <FieldGroup
-          label="Default Requirements"
-          hint="These requirements are reused on vehicles where the Requirements switch stays off."
+          label="Requisitos gerais"
+          hint="Estes requisitos são usados nos veículos onde os requisitos específicos estão desligados."
         >
           <ItemWithIconEditor
             items={commonDataDraft.requirements}
-            addLabel="Add shared requirement"
-            emptyMessage="Add the default driver requirements that apply to most vehicles."
-            placeholder="Example: Identity card or valid passport"
+            addLabel="Adicionar requisito geral"
+            emptyMessage="Adicione os requisitos do condutor que se aplicam à maioria dos veículos."
+            placeholder="Exemplo: Documento de identificação ou passaporte válido"
             onAdd={() => onAddCommonDataObjectListItem("requirements", EMPTY_LIST_ITEM)}
             onChange={(index, key, value) =>
               onCommonDataObjectListChange("requirements", index, key, value)

@@ -15,21 +15,21 @@ function PreviewPanel({
       <section className="min-w-0 rounded-2xl border border-graphite/50 bg-arsenic p-5 shadow-lg lg:p-6">
         <SectionHeading
           icon={FaEye}
-          title={isCreatingNew ? "New Record Preview" : "Selected Record Preview"}
-          description="This updates while you edit so you can check the customer-facing result before saving."
+          title={isCreatingNew ? "Pré-visualização do novo registo" : "Pré-visualização do registo"}
+          description="Atualiza enquanto edita para poder confirmar o resultado apresentado ao cliente antes de guardar."
         />
 
         {!isCreatingNew && !selectedLiveVehicle && selectedMetadataEntry?.source !== "static" && (
           <p className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-            The live Twice vehicle was not found in the current fetch, so this preview is based only
-            on the saved metadata fields.
+            O veículo da Twice não foi encontrado na atualização atual, por isso esta pré-visualização
+            baseia-se apenas nos dados guardados.
           </p>
         )}
 
         {isCreatingNew && !selectedNewLiveVehicle && draft.source !== "static" && (
           <p className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-            This new entry is not linked to a live Twice vehicle yet, so the preview uses metadata
-            values only.
+            Este novo registo ainda não está ligado a um veículo da Twice, por isso a pré-visualização
+            usa apenas os dados introduzidos.
           </p>
         )}
 
@@ -37,7 +37,7 @@ function PreviewPanel({
           {selectedVehiclePreview ? (
             <VehicleRecordCard vehicle={selectedVehiclePreview} />
           ) : (
-            <p className="text-space">Select a vehicle to preview it.</p>
+            <p className="text-space">Selecione um veículo para pré-visualizar.</p>
           )}
         </div>
       </section>

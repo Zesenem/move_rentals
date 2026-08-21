@@ -14,16 +14,16 @@ function EditExistingVehicleCard({
     <div className={sectionCardClassName}>
       <SectionHeading
         icon={FaMotorcycle}
-        title="Edit Existing Vehicle"
-        description="Open one of the saved website records and update its public content."
+        title="Editar veículo existente"
+        description="Abra um dos registos guardados no site e atualize o seu conteúdo público."
       />
 
       <FieldGroup
-        label="Selected Vehicle"
+        label="Veículo selecionado"
         hint={
           isCreatingNew
-            ? "Finish or cancel the new vehicle first if you want to switch back to an existing one."
-            : "Choose which saved metadata record you want to edit."
+            ? "Conclua ou cancele primeiro o novo veículo se quiser voltar a um existente."
+            : "Escolha o registo guardado que pretende editar."
         }
       >
         {metadataEntries.length > 0 ? (
@@ -38,14 +38,14 @@ function EditExistingVehicleCard({
 
               return (
                 <option key={key} value={key}>
-                  {entry.name || "Unnamed entry"} ({entry.id || entry.slug || "no id"})
+                  {entry.name || "Registo sem nome"} ({entry.id || entry.slug || "sem ID"})
                 </option>
               );
             })}
           </select>
         ) : (
           <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
-            No saved metadata entries yet. Create the first vehicle on the right.
+            Ainda não existem registos guardados. Crie o primeiro veículo à direita.
           </p>
         )}
       </FieldGroup>

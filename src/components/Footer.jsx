@@ -44,7 +44,7 @@ function Footer() {
             <h3 className="mb-4 text-lg font-bold text-steel">About Us</h3>
             <div className="mx-auto max-w-xs space-y-4 text-space md:mx-0">
               <p>
-                MOVE is Lisbon's go-to mobility company - combining unbeatable prices, friendly
+                MOVE is Lisbon's go-to mobility company, combining unbeatable prices, friendly
                 service, and the freedom to ride your way.
               </p>
 

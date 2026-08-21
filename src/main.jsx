@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
@@ -21,11 +21,18 @@ import NotFoundPage from "./pages/NotFoundPage.jsx";
 import TermsPage from "./pages/TermsPage.jsx";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage.jsx";
 import ContactPage from "./pages/ContactPage.jsx";
-import AdminWorkspacePage from "./pages/AdminWorkspacePage.jsx";
 
 import "./index.css";
 
-// --- Sentry Initialization ---
+const AdminWorkspacePage = lazy(() => import("./pages/AdminWorkspacePage.jsx"));
+
+const adminRouteFallback = (
+  <div className="container mx-auto flex min-h-[70vh] items-center justify-center px-4 py-16">
+    <div className="h-10 w-10 animate-spin rounded-full border-4 border-graphite border-t-cloud" />
+    <span className="sr-only">Loading admin workspace</span>
+  </div>
+);
+
 Sentry.init({
   dsn: "https://63e09e83dc19c7365dd42385009bc409@o4509673502736384.ingest.de.sentry.io/4509673504505936",
   integrations: [
@@ -44,7 +51,6 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
 });
 
-// --- TanStack Query Client ---
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -54,7 +60,6 @@ const queryClient = new QueryClient({
   },
 });
 
-// --- React Router ---
 const router = createBrowserRouter([
   {
     path: "/",
@@ -66,13 +71,19 @@ const router = createBrowserRouter([
       { path: "terms-and-conditions", element: <TermsPage /> },
       { path: "privacy-policy", element: <PrivacyPolicyPage /> },
       { path: "contact", element: <ContactPage /> },
-      { path: "admin", element: <AdminWorkspacePage /> },
+      {
+        path: "admin",
+        element: (
+          <Suspense fallback={adminRouteFallback}>
+            <AdminWorkspacePage />
+          </Suspense>
+        ),
+      },
       { path: "*", element: <NotFoundPage /> },
     ],
   },
 ]);
 
-// --- App Rendering ---
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Sentry.ErrorBoundary fallback={ErrorFallback}>

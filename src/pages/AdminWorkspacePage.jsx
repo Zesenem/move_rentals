@@ -40,7 +40,7 @@ const LoginForm = ({ onSubmit, onForgotPassword, isSubmitting, errorMessage }) =
         type="email"
         required
         autoComplete="username"
-        placeholder="Email address"
+        placeholder="Endereço de email"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         className={inputClassName}
@@ -49,21 +49,21 @@ const LoginForm = ({ onSubmit, onForgotPassword, isSubmitting, errorMessage }) =
         type="password"
         required
         autoComplete="current-password"
-        placeholder="Password"
+        placeholder="Palavra-passe"
         value={password}
         onChange={(event) => setPassword(event.target.value)}
         className={inputClassName}
       />
       <ErrorNotice message={errorMessage} />
       <Button type="submit" disabled={isSubmitting} className="w-full justify-center py-3">
-        {isSubmitting ? "Signing in..." : "Sign In"}
+        {isSubmitting ? "A iniciar sessão..." : "Iniciar sessão"}
       </Button>
       <button
         type="button"
         onClick={onForgotPassword}
         className="block w-full text-center text-sm text-space hover:text-cloud"
       >
-        Forgot your password?
+        Esqueceu-se da palavra-passe?
       </button>
     </form>
   );
@@ -80,13 +80,13 @@ const RecoveryRequestForm = ({ onSubmit, onCancel, isSubmitting, statusMessage, 
   return (
     <form onSubmit={handleSubmit} className="mt-8 space-y-4">
       <p className="text-sm text-space">
-        Enter your admin email and we'll send you a password reset link.
+        Introduza o email de administrador e enviaremos uma ligação para repor a palavra-passe.
       </p>
       <input
         type="email"
         required
         autoComplete="username"
-        placeholder="Email address"
+        placeholder="Endereço de email"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
         className={inputClassName}
@@ -94,14 +94,14 @@ const RecoveryRequestForm = ({ onSubmit, onCancel, isSubmitting, statusMessage, 
       {statusMessage && <p className="text-sm text-emerald-400">{statusMessage}</p>}
       <ErrorNotice message={errorMessage} />
       <Button type="submit" disabled={isSubmitting} className="w-full justify-center py-3">
-        {isSubmitting ? "Sending..." : "Send Reset Link"}
+        {isSubmitting ? "A enviar..." : "Enviar ligação de reposição"}
       </Button>
       <button
         type="button"
         onClick={onCancel}
         className="block w-full text-center text-sm text-space hover:text-cloud"
       >
-        Back to login
+        Voltar ao início de sessão
       </button>
     </form>
   );
@@ -125,18 +125,18 @@ const LoginCard = ({
         </div>
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.24em] text-graphite">
-            Protected Area
+            Área protegida
           </p>
           <h1 className="mt-1 text-3xl font-extrabold">
-            {view === "recovery" ? "Reset Password" : "Admin Login"}
+            {view === "recovery" ? "Repor palavra-passe" : "Início de sessão"}
           </h1>
         </div>
       </div>
 
       <p className="mt-6 text-space">
         {view === "recovery"
-          ? "We'll email you a link to reset your password."
-          : "Sign in with the invited admin account to edit fleet metadata. This route is not public."}
+          ? "Enviaremos uma ligação por email para repor a palavra-passe."
+          : "Inicie sessão com a conta de administrador para gerir os dados da frota. Esta página não é pública."}
       </p>
 
       {view === "recovery" ? (
@@ -168,12 +168,12 @@ const SetPasswordCard = ({ title, description, onSubmit, isSubmitting, errorMess
     event.preventDefault();
 
     if (password.length < 8) {
-      setValidationError("Password must be at least 8 characters.");
+      setValidationError("A palavra-passe deve ter pelo menos 8 caracteres.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setValidationError("Passwords do not match.");
+      setValidationError("As palavras-passe não coincidem.");
       return;
     }
 
@@ -191,7 +191,7 @@ const SetPasswordCard = ({ title, description, onSubmit, isSubmitting, errorMess
             type="password"
             required
             autoComplete="new-password"
-            placeholder="New password"
+            placeholder="Nova palavra-passe"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             className={inputClassName}
@@ -200,14 +200,14 @@ const SetPasswordCard = ({ title, description, onSubmit, isSubmitting, errorMess
             type="password"
             required
             autoComplete="new-password"
-            placeholder="Confirm new password"
+            placeholder="Confirmar nova palavra-passe"
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
             className={inputClassName}
           />
           <ErrorNotice message={validationError || errorMessage} />
           <Button type="submit" disabled={isSubmitting} className="w-full justify-center py-3">
-            {isSubmitting ? "Saving..." : "Set Password"}
+            {isSubmitting ? "A guardar..." : "Definir palavra-passe"}
           </Button>
         </form>
       </div>
@@ -241,7 +241,7 @@ function AdminWorkspacePage() {
       })
       .catch((error) => {
         if (isMounted) {
-          setAuthError(error?.message || "Could not process the authentication link.");
+          setAuthError(error?.message || "Não foi possível processar a ligação de autenticação.");
         }
       })
       .finally(() => {
@@ -271,7 +271,7 @@ function AdminWorkspacePage() {
       await loginAdmin(email, password);
       queryClient.invalidateQueries({ queryKey: ["admin", "session"] });
     } catch (error) {
-      setAuthError(error?.message || "Could not sign in with those credentials.");
+      setAuthError(error?.message || "Não foi possível iniciar sessão com estes dados.");
     } finally {
       setIsSubmitting(false);
     }
@@ -284,9 +284,9 @@ function AdminWorkspacePage() {
 
     try {
       await requestAdminPasswordRecovery(email);
-      setRecoveryStatusMessage("Check your email for a password reset link.");
+      setRecoveryStatusMessage("Verifique o seu email para encontrar a ligação de reposição.");
     } catch (error) {
-      setAuthError(error?.message || "Could not send the password reset email.");
+      setAuthError(error?.message || "Não foi possível enviar o email de reposição.");
     } finally {
       setIsSubmitting(false);
     }
@@ -301,7 +301,7 @@ function AdminWorkspacePage() {
       setPendingCallback(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "session"] });
     } catch (error) {
-      setAuthError(error?.message || "Could not set your password.");
+      setAuthError(error?.message || "Não foi possível definir a palavra-passe.");
     } finally {
       setIsSubmitting(false);
     }
@@ -316,7 +316,7 @@ function AdminWorkspacePage() {
       setPendingCallback(null);
       queryClient.invalidateQueries({ queryKey: ["admin", "session"] });
     } catch (error) {
-      setAuthError(error?.message || "Could not set your password.");
+      setAuthError(error?.message || "Não foi possível definir a palavra-passe.");
     } finally {
       setIsSubmitting(false);
     }
@@ -336,10 +336,10 @@ function AdminWorkspacePage() {
   return (
     <>
       <Helmet>
-        <title>Admin Workspace | Move Rentals</title>
+        <title>Área de Administração | Move Rentals</title>
         <meta
           name="description"
-          content="Protected admin workspace for editing Move Rentals fleet metadata."
+          content="Área protegida para gerir os dados da frota da Move Rentals."
         />
         <meta name="robots" content="noindex, nofollow" />
       </Helmet>
@@ -347,15 +347,15 @@ function AdminWorkspacePage() {
       {!isCallbackProcessed && (
         <div className="container mx-auto px-4 py-16">
           <div className="rounded-3xl border border-graphite/50 bg-arsenic p-8 text-space shadow-xl">
-            Preparing admin login...
+            A preparar o início de sessão...
           </div>
         </div>
       )}
 
       {isCallbackProcessed && pendingCallback?.type === "invite" && (
         <SetPasswordCard
-          title="Set Your Password"
-          description="Choose a password to finish setting up your admin account."
+          title="Definir palavra-passe"
+          description="Escolha uma palavra-passe para concluir a configuração da conta de administrador."
           onSubmit={handleSetInvitePassword}
           isSubmitting={isSubmitting}
           errorMessage={authError}
@@ -364,8 +364,8 @@ function AdminWorkspacePage() {
 
       {isCallbackProcessed && pendingCallback?.type === "recovery" && (
         <SetPasswordCard
-          title="Reset Your Password"
-          description="Choose a new password for your admin account."
+          title="Repor palavra-passe"
+          description="Escolha uma nova palavra-passe para a conta de administrador."
           onSubmit={handleSetRecoveryPassword}
           isSubmitting={isSubmitting}
           errorMessage={authError}
@@ -375,7 +375,7 @@ function AdminWorkspacePage() {
       {isCallbackProcessed && !pendingCallback && sessionQuery.isLoading && (
         <div className="container mx-auto px-4 py-16">
           <div className="rounded-3xl border border-graphite/50 bg-arsenic p-8 text-space shadow-xl">
-            Checking admin access...
+            A confirmar o acesso de administrador...
           </div>
         </div>
       )}
@@ -385,9 +385,9 @@ function AdminWorkspacePage() {
           <div className="mx-auto max-w-xl rounded-3xl border border-red-500/40 bg-red-500/10 p-8 shadow-xl">
             <FaExclamationTriangle className="text-3xl text-red-300" />
             <h1 className="mt-4 text-2xl font-extrabold text-cloud">
-              Could Not Verify Admin Access
+              Não foi possível confirmar o acesso de administrador
             </h1>
-            <p className="mt-2 text-space">{sessionQuery.error?.message || "Unknown error"}</p>
+            <p className="mt-2 text-space">{sessionQuery.error?.message || "Erro desconhecido"}</p>
           </div>
         </div>
       )}

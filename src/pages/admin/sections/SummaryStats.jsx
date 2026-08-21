@@ -6,27 +6,27 @@ function SummaryStats({ vehicleCount, adminSummary }) {
     <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       <StatCard
         icon={FaMotorcycle}
-        label="Fleet Records"
+        label="Registos da frota"
         value={vehicleCount}
-        helper="Vehicles currently visible to the app after the Twice + metadata merge."
+        helper="Veículos atualmente visíveis no site depois de combinar Twice e dados do site."
       />
       <StatCard
         icon={FaDatabase}
-        label="Metadata Entries"
+        label="Registos de dados"
         value={adminSummary.metadataEntries}
-        helper="Records currently stored in the metadata document."
+        helper="Registos atualmente guardados no documento de dados."
       />
       <StatCard
         icon={FaTag}
-        label="Static-Only"
+        label="Apenas do site"
         value={adminSummary.staticOnlyVehicles}
-        helper="Entries that exist locally even if they are not yet present in Twice."
+        helper="Registos que existem no site mesmo que ainda não estejam presentes na Twice."
       />
       <StatCard
         icon={FaDatabase}
-        label="Shared Defaults"
+        label="Regras gerais"
         value={`${adminSummary.commonIncluded} / ${adminSummary.commonRequirements}`}
-        helper="Included items / requirements reused across vehicles."
+        helper="Itens incluídos / requisitos reutilizados nos veículos."
       />
     </div>
   );

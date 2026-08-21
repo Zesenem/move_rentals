@@ -1,9 +1,14 @@
-import { useState, useMemo, useCallback } from "react";
-import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
+import { lazy, Suspense, useState, useMemo, useCallback } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const EMPTY_IMAGES = [];
+const Lightbox = lazy(async () => {
+  const [lightbox] = await Promise.all([
+    import("yet-another-react-lightbox"),
+    import("yet-another-react-lightbox/styles.css"),
+  ]);
+  return lightbox;
+});
 const getImageAlt = (vehicleName, index) => `${vehicleName} rental in Lisbon — image ${index + 1}`;
 
 const CarouselArrow = ({ direction, onClick }) => {
@@ -101,14 +106,18 @@ function ImageCarousel({ images, vehicleName }) {
         )}
       </div>
 
-      <Lightbox
-        open={open}
-        close={() => setOpen(false)}
-        slides={slides}
-        index={currentIndex}
-        on={{ view: ({ index: newIndex }) => setCurrentIndex(newIndex) }}
-        styles={{ container: { backgroundColor: "rgba(30, 30, 36, .9)" } }}
-      />
+      {open && (
+        <Suspense fallback={null}>
+          <Lightbox
+            open={open}
+            close={() => setOpen(false)}
+            slides={slides}
+            index={currentIndex}
+            on={{ view: ({ index: newIndex }) => setCurrentIndex(newIndex) }}
+            styles={{ container: { backgroundColor: "rgba(30, 30, 36, .9)" } }}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

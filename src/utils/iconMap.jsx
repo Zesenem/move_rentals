@@ -2,11 +2,15 @@ import {
   FaIdCard,
   FaCreditCard,
   FaCheckCircle,
+  FaBolt,
+  FaCogs,
   FaShieldAlt,
   FaUsers,
   FaInfinity,
+  FaFlagCheckered,
   FaLock,
   FaRoad,
+  FaTachometerAlt,
   FaPlaneDeparture,
   FaHandshake,
 } from "react-icons/fa";
@@ -16,6 +20,7 @@ import {
   PiPantsFill,
   PiPercentFill,
   PiCoatHangerBold,
+  PiGasCanFill,
 } from "react-icons/pi";
 import { GiFullMotorcycleHelmet, GiGloves, GiLeatherBoot } from "react-icons/gi";
 import { GrTag } from "react-icons/gr";
@@ -26,6 +31,14 @@ const createIcon = (IconComponent, colorClass = "text-steel") => {
 };
 
 export const iconMap = {
+  engine: createIcon(FaTachometerAlt),
+  power: createIcon(FaBolt),
+  gas: createIcon(PiGasCanFill),
+  mileage: createIcon(FaRoad),
+  transmission: createIcon(FaCogs),
+  drivetrain: createIcon(FaRoad),
+  speed: createIcon(FaTachometerAlt),
+  track: createIcon(FaFlagCheckered),
   forfait: createIcon(FaHandshake),
   "id-card": createIcon(FaIdCard),
   license: createIcon(PiSteeringWheelFill),

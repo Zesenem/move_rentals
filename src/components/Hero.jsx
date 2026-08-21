@@ -21,12 +21,12 @@ function Hero() {
           </p>
           <p>
             Located in the heart of the city, we offer reliable, well-maintained scooters,
-            motorcycles, and selected vehicles for rent - perfect for exploring Lisbon on your own
+            motorcycles, and selected vehicles for rent, perfect for exploring Lisbon on your own
             terms.
           </p>
           <p>
             Whether you are here for a day or a week, our local team is here to help you travel
-            safely and smoothly. No hidden fees, no hassle -{" "}
+            safely and smoothly. No hidden fees, no hassle,{" "}
             <strong>just the right vehicle for the trip.</strong>
           </p>
         </div>

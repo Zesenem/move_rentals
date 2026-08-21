@@ -16,28 +16,28 @@ function VehicleRecordCard({ vehicle }) {
 
         <div className="min-w-0 flex flex-wrap gap-2">
           <span className="rounded-full bg-phantom px-3 py-1 text-xs font-semibold text-steel">
-            Status: {vehicle.availability_label || vehicle.status || "available"}
+            Estado: {vehicle.availability_label || vehicle.status || "disponível"}
           </span>
           <span className="rounded-full bg-phantom px-3 py-1 text-xs font-semibold text-steel">
-            Deposit:{" "}
+            Caução:{" "}
             {typeof vehicle.security_deposit === "number"
               ? `EUR ${vehicle.security_deposit}`
-              : vehicle.security_deposit || "Not set"}
+              : vehicle.security_deposit || "Não definida"}
           </span>
         </div>
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <div>
-          <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">Badges</h3>
+          <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">Destaques</h3>
           <div className="mt-3">
-            <MetaList items={vehicle.badges} emptyLabel="No badges" />
+            <MetaList items={vehicle.badges} emptyLabel="Sem destaques" />
           </div>
         </div>
 
         <div>
           <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">
-            Quick Glance
+            Informações rápidas
           </h3>
           <div className="mt-3">
             <QuickGlanceList items={vehicle.quick_glance} />
@@ -45,17 +45,17 @@ function VehicleRecordCard({ vehicle }) {
         </div>
 
         <div>
-          <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">Overrides</h3>
+          <h3 className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">Exceções</h3>
           <ul className="mt-3 space-y-1 text-sm text-space">
             <li>
-              Included: {describeCustomList(vehicle.included, !Array.isArray(vehicle.included))}
+              Incluídos: {describeCustomList(vehicle.included, !Array.isArray(vehicle.included))}
             </li>
             <li>
-              Requirements:{" "}
+              Requisitos:{" "}
               {describeCustomList(vehicle.requirements, !Array.isArray(vehicle.requirements))}
             </li>
-            <li>Important notes: {vehicle.important_notes?.length || 0}</li>
-            <li>Specifications: {vehicle.technical_features?.length || 0}</li>
+            <li>Notas importantes: {vehicle.important_notes?.length || 0}</li>
+            <li>Especificações: {vehicle.technical_features?.length || 0}</li>
           </ul>
         </div>
       </div>

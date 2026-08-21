@@ -220,12 +220,21 @@ function MotorcyclePage() {
     : commonData?.requirements || [];
   const importantNotes = bike?.important_notes || [];
   const hasDeposit = bike?.security_deposit !== undefined && bike?.security_deposit !== null;
+  const hasDailyPrice = typeof bike?.price_per_day === "number" && bike.price_per_day > 0;
   const vehiclePath = `/motorcycle/${encodeURIComponent(slug)}`;
   const vehicleStructuredData = getVehicleStructuredData(bike, vehiclePath);
   const titleAndDescription = (
     <div>
       <h1 className="text-4xl font-extrabold text-cloud tracking-tight">{bike?.name}</h1>
       <p className="mt-4 text-space">{bike?.description}</p>
+      {hasDailyPrice && (
+        <div className="mt-5 flex items-baseline gap-1.5 border-l-2 border-emerald-400 pl-3">
+          <span className="text-3xl font-extrabold tracking-tight text-cloud">
+            &euro;{bike.price_per_day.toFixed(2)}
+          </span>
+          <span className="text-sm font-semibold text-space">/ day</span>
+        </div>
+      )}
     </div>
   );
   const whatsappCallToAction = (

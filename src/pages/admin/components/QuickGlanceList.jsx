@@ -1,6 +1,6 @@
 function QuickGlanceList({ items }) {
   if (!items?.length) {
-    return <span className="text-graphite">No quick glance items</span>;
+    return <span className="text-graphite">Sem informações rápidas</span>;
   }
 
   return (

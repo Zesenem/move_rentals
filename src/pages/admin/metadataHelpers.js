@@ -195,9 +195,9 @@ export const buildUpdatedVehicleEntry = (currentVehicle, draft) => {
 
 export const describeCustomList = (items, usesSharedFallback = false) => {
   if (usesSharedFallback) {
-    return "Shared list";
+    return "Lista geral";
   }
 
   const itemCount = items?.length || 0;
-  return `${itemCount} custom ${itemCount === 1 ? "item" : "items"}`;
+  return `${itemCount} ${itemCount === 1 ? "item personalizado" : "itens personalizados"}`;
 };

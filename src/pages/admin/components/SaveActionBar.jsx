@@ -29,7 +29,7 @@ function SaveActionBar({
             className={`w-full ${adminButtonClassName}`}
             disabled={isSaving}
           >
-            {isSaving ? "Saving..." : isCreatingNew ? "Create And Save" : "Save Changes"}
+            {isSaving ? "A guardar..." : isCreatingNew ? "Criar e guardar" : "Guardar alterações"}
           </Button>
           <Button
             variant="ghost"
@@ -37,7 +37,7 @@ function SaveActionBar({
             className={`w-full ${adminButtonClassName}`}
             disabled={isSaving}
           >
-            Reset
+            Repor
           </Button>
           {canDelete && (
             <Button
@@ -47,7 +47,7 @@ function SaveActionBar({
               className={`w-full sm:col-span-2 xl:col-auto ${adminButtonClassName}`}
               disabled={isSaving}
             >
-              Delete Vehicle
+            Eliminar veículo
             </Button>
           )}
         </div>

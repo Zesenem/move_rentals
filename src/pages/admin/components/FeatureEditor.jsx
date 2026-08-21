@@ -7,15 +7,15 @@ function FeatureEditor({
   onAdd,
   onChange,
   onRemove,
-  addLabel = "Add specification",
-  emptyMessage = "No specifications added yet.",
+  addLabel = "Adicionar especificação",
+  emptyMessage = "Ainda não foram adicionadas especificações.",
 }) {
   return (
     <div className="space-y-3">
       <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite xl:grid xl:grid-cols-[minmax(180px,220px)_minmax(0,1fr)_50px]">
-        <span>Label</span>
-        <span>Value shown to customer</span>
-        <span className="sr-only">Remove row</span>
+        <span>Título</span>
+        <span>Valor apresentado ao cliente</span>
+        <span className="sr-only">Remover linha</span>
       </div>
       {items.length > 0 ? (
         items.map((item, index) => (
@@ -26,18 +26,18 @@ function FeatureEditor({
             <input
               className={inputClassName}
               value={item.label}
-              placeholder="Label"
+              placeholder="Título"
               onChange={(event) => onChange(index, "label", event.target.value)}
             />
             <input
               className={inputClassName}
               value={item.value}
-              placeholder="Value"
+              placeholder="Valor"
               onChange={(event) => onChange(index, "value", event.target.value)}
             />
             <InlineActionButton
               icon={FaTrash}
-              label="Remove row"
+              label="Remover linha"
               onClick={() => onRemove(index)}
               variant="remove"
             />

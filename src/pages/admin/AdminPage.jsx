@@ -63,52 +63,52 @@ function AdminPage({ adminUser, onLogout }) {
   return (
     <>
       <Helmet>
-        <title>Admin Workspace | Move Rentals</title>
+        <title>Área de Administração | Move Rentals</title>
         <meta
           name="description"
-          content="Edit the fleet metadata document that powers the Move Rentals admin tools."
+          content="Área protegida para gerir os dados da frota da Move Rentals."
         />
       </Helmet>
 
-      <div className="w-full px-4 py-8 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
-        <div className="mx-auto w-full max-w-[1800px]">
+      <div className="w-full px-4 py-8 sm:px-6 lg:px-8 xl:px-10 2xl:px-14">
+        <div className="mx-auto w-full max-w-[1920px]">
           <WorkspaceHeader adminUser={adminUser} onLogout={onLogout} />
 
           <SummaryStats vehicleCount={vehicles.length} adminSummary={adminSummary} />
 
           {isLoading && (
             <div className="mt-10 rounded-2xl border border-graphite/50 bg-arsenic p-8 text-space">
-              Loading admin workspace...
+              A carregar a área de administração...
             </div>
           )}
 
           {!isLoading && (isVehiclesError || isMetadataError) && (
             <div className="mt-10 rounded-2xl border border-red-500/40 bg-red-500/10 p-8 text-space">
               <FaExclamationTriangle className="mb-4 text-3xl text-red-400" />
-              <h2 className="text-xl font-bold text-cloud">Could Not Load Admin Workspace</h2>
-              <p className="mt-2">{error?.message || "Unknown error"}</p>
+              <h2 className="text-xl font-bold text-cloud">Não foi possível carregar a administração</h2>
+              <p className="mt-2">{error?.message || "Erro desconhecido"}</p>
             </div>
           )}
 
           {!isLoading && !isVehiclesError && !isMetadataError && (
-            <div className="mt-10 grid gap-8 xl:grid-cols-[minmax(0,1.4fr)_minmax(360px,0.95fr)] 2xl:grid-cols-[minmax(0,1.55fr)_minmax(400px,0.9fr)]">
-              <section className="min-w-0 rounded-2xl border border-graphite/50 bg-arsenic p-5 shadow-lg lg:p-6">
+            <div className="mt-10 grid gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(380px,460px)] 2xl:grid-cols-[minmax(0,1fr)_minmax(420px,500px)]">
+              <section className="min-w-0">
                 <div className="grid gap-6 2xl:grid-cols-2">
                   <div className="2xl:col-span-2">
                     <SaveActionBar
                       title={
                         isCreatingNew
                           ? newEntryKind === "static"
-                            ? "Creating a static-only vehicle"
-                            : "Creating a live-linked vehicle"
+                            ? "A criar um veículo apenas do site"
+                            : "A criar um veículo ligado à Twice"
                           : selectedMetadataEntry
-                            ? `Editing ${selectedMetadataEntry.name}`
-                            : "Editing shared rental defaults"
+                            ? `A editar ${selectedMetadataEntry.name}`
+                            : "A editar regras gerais de aluguer"
                       }
                       description={
                         isCreatingNew
-                          ? "Save when the new vehicle is ready. Shared rental defaults are saved at the same time."
-                          : "Use Save Changes at any time. Vehicle details and shared rental defaults are saved together."
+                          ? "Guarde quando o novo veículo estiver pronto. As regras gerais também são guardadas."
+                          : "Guarde as alterações quando quiser. Os detalhes do veículo e as regras gerais são guardados juntos."
                       }
                       isSaving={saveMutation.isPending}
                       isCreatingNew={isCreatingNew}

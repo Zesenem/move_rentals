@@ -15,21 +15,21 @@ function RentalRulesSection({
     <div className={sectionCardClassName}>
       <SectionHeading
         icon={FaCheckCircle}
-        title="Rental Rules"
-        description="Only switch these sections on when a vehicle needs different rental inclusions or requirements from the default shared rules."
+        title="Regras de aluguer"
+        description="Ative estas secções apenas quando um veículo precisa de inclusões ou requisitos diferentes das regras gerais."
       />
 
       <FieldGroup
-        label="Included In Rental"
-        hint="Leave this off to use the default included list shared across the website."
+        label="Incluído no aluguer"
+        hint="Deixe desligado para usar a lista geral de itens incluídos no site."
       >
         <label className="mb-4 flex items-start gap-4 rounded-xl border border-graphite/60 bg-arsenic/70 px-4 py-3">
           <div className="min-w-0 flex-1">
             <p className="break-words font-semibold text-cloud">
-              Use vehicle-specific included items
+              Usar itens incluídos específicos deste veículo
             </p>
             <p className="text-sm text-space">
-              Turn this off to use the shared included list from the main metadata file.
+              Desligue para usar a lista geral de itens incluídos.
             </p>
           </div>
           <input
@@ -43,32 +43,32 @@ function RentalRulesSection({
         {draft.hasIncludedOverride ? (
           <ItemWithIconEditor
             items={draft.included}
-            addLabel="Add included item"
-            emptyMessage="Add each item that is included specifically for this vehicle."
-            placeholder="Example: 300 km included"
+            addLabel="Adicionar item incluído"
+            emptyMessage="Adicione cada item incluído especificamente neste veículo."
+            placeholder="Exemplo: 300 km incluídos"
             onAdd={() => onAddObjectListItem("included", EMPTY_LIST_ITEM)}
             onChange={(index, key, value) => onObjectListChange("included", index, key, value)}
             onRemove={(index) => onRemoveObjectListItem("included", index)}
           />
         ) : (
           <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
-            This vehicle will use the shared included list.
+            Este veículo usará a lista geral de itens incluídos.
           </p>
         )}
       </FieldGroup>
 
       <div className="mt-8">
         <FieldGroup
-          label="Requirements"
-          hint="Leave this off to use the default driver requirements shared across the website."
+          label="Requisitos"
+          hint="Deixe desligado para usar os requisitos gerais dos condutores."
         >
           <label className="mb-4 flex items-start gap-4 rounded-xl border border-graphite/60 bg-arsenic/70 px-4 py-3">
             <div className="min-w-0 flex-1">
               <p className="break-words font-semibold text-cloud">
-                Use vehicle-specific requirements
+                Usar requisitos específicos deste veículo
               </p>
               <p className="text-sm text-space">
-                Turn this off to use the shared requirements list from the main metadata file.
+                Desligue para usar a lista geral de requisitos.
               </p>
             </div>
             <input
@@ -82,9 +82,9 @@ function RentalRulesSection({
           {draft.hasRequirementsOverride ? (
             <ItemWithIconEditor
               items={draft.requirements}
-              addLabel="Add requirement"
-              emptyMessage="Add only the special requirements that apply to this vehicle."
-              placeholder="Example: Minimum age: 25 years"
+            addLabel="Adicionar requisito"
+            emptyMessage="Adicione apenas os requisitos especiais aplicáveis a este veículo."
+            placeholder="Exemplo: Idade mínima: 25 anos"
               onAdd={() => onAddObjectListItem("requirements", EMPTY_LIST_ITEM)}
               onChange={(index, key, value) =>
                 onObjectListChange("requirements", index, key, value)
@@ -93,7 +93,7 @@ function RentalRulesSection({
             />
           ) : (
             <p className="rounded-xl border border-dashed border-graphite/60 px-4 py-3 text-sm text-space">
-              This vehicle will use the shared requirements list.
+              Este veículo usará a lista geral de requisitos.
             </p>
           )}
         </FieldGroup>

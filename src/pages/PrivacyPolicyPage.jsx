@@ -117,7 +117,10 @@ function PrivacyPolicyPage() {
               <h2 className="text-2xl font-bold text-steel mb-3">6. Contact Us</h2>
               <p>
                 For any questions or concerns regarding your privacy, you may contact us using the
-                following details: [Your Contact Email Address]
+                following details:{" "}
+                <a href="mailto:move@move-rentals.com" className="text-steel hover:text-cloud">
+                  move@move-rentals.com
+                </a>
               </p>
             </section>
 

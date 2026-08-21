@@ -16,14 +16,14 @@ function CreateNewVehicleCard({
     <div className={sectionCardClassName}>
       <SectionHeading
         icon={FaPlus}
-        title="Create New Vehicle"
-        description="Start from a live Twice vehicle when possible. Use static-only only when the vehicle is not available in Twice."
+        title="Criar novo veículo"
+        description="Sempre que possível, comece com um veículo da Twice. Use apenas do site quando o veículo não existir na Twice."
       />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto]">
         <div>
           <label className="text-sm font-bold uppercase tracking-[0.18em] text-graphite">
-            Live vehicles from Twice
+            Veículos em direto da Twice
           </label>
           <select
             className="mt-3 w-full rounded-xl border border-graphite/60 bg-phantom px-4 py-3 text-steel outline-none transition-colors focus:border-cloud"
@@ -38,7 +38,7 @@ function CreateNewVehicleCard({
                 </option>
               ))
             ) : (
-              <option value="">No live vehicles without metadata found</option>
+              <option value="">Não foram encontrados veículos da Twice sem dados do site</option>
             )}
           </select>
         </div>
@@ -48,7 +48,7 @@ function CreateNewVehicleCard({
           disabled={!liveVehiclesWithoutMetadata.length}
           className={`w-full justify-center self-end ${adminButtonClassName}`}
         >
-          Create From Live Vehicle
+          Criar a partir de veículo da Twice
         </Button>
       </div>
 
@@ -58,7 +58,7 @@ function CreateNewVehicleCard({
           onClick={onStartNewStaticEntry}
           className={`w-full ${adminButtonClassName}`}
         >
-          Create Static-Only Vehicle
+          Criar veículo apenas do site
         </Button>
         {isCreatingNew && (
           <Button
@@ -66,14 +66,14 @@ function CreateNewVehicleCard({
             onClick={onCancelNewEntry}
             className={`w-full ${adminButtonClassName}`}
           >
-            Cancel New Vehicle
+            Cancelar novo veículo
           </Button>
         )}
       </div>
 
       <p className="mt-4 text-sm text-space">
-        A live-linked vehicle stays connected to the existing Twice product. A static-only vehicle
-        exists only on the website.
+        Um veículo ligado à Twice mantém-se associado ao produto existente. Um veículo apenas do
+        site existe apenas no website.
       </p>
     </div>
   );
