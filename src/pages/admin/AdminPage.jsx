@@ -2,7 +2,6 @@ import { Helmet } from "react-helmet-async";
 import { FaExclamationTriangle } from "react-icons/fa";
 
 import SaveActionBar from "./components/SaveActionBar.jsx";
-import AdvancedSettingsSection from "./sections/AdvancedSettingsSection.jsx";
 import BasicDetailsSection from "./sections/BasicDetailsSection.jsx";
 import CreateNewVehicleCard from "./sections/CreateNewVehicleCard.jsx";
 import EditExistingVehicleCard from "./sections/EditExistingVehicleCard.jsx";
@@ -43,9 +42,6 @@ function AdminPage({ adminUser, onLogout }) {
     handleDraftChange,
     handleToggleDraftField,
     handleBadgeToggle,
-    handleStringListChange,
-    handleAddStringListItem,
-    handleRemoveStringListItem,
     handleObjectListChange,
     handleAddObjectListItem,
     handleRemoveObjectListItem,
@@ -182,13 +178,6 @@ function AdminPage({ adminUser, onLogout }) {
                     onRemoveCommonDataObjectListItem={handleRemoveCommonDataObjectListItem}
                   />
 
-                  <AdvancedSettingsSection
-                    draft={draft}
-                    onDraftChange={handleDraftChange}
-                    onAddStringListItem={handleAddStringListItem}
-                    onStringListChange={handleStringListChange}
-                    onRemoveStringListItem={handleRemoveStringListItem}
-                  />
                 </div>
               </section>
 

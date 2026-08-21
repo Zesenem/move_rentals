@@ -1,5 +1,5 @@
 import { FaPlus, FaTrash } from "react-icons/fa";
-import { inputClassName } from "../constants.js";
+import { inputClassName, TECHNICAL_FEATURE_OPTIONS } from "../constants.js";
 import InlineActionButton from "./InlineActionButton.jsx";
 
 function FeatureEditor({
@@ -26,6 +26,7 @@ function FeatureEditor({
             <input
               className={inputClassName}
               value={item.label}
+              list="technical-feature-options"
               placeholder="Título"
               onChange={(event) => onChange(index, "label", event.target.value)}
             />
@@ -48,6 +49,12 @@ function FeatureEditor({
           {emptyMessage}
         </p>
       )}
+
+      <datalist id="technical-feature-options">
+        {TECHNICAL_FEATURE_OPTIONS.map((option) => (
+          <option key={option} value={option} />
+        ))}
+      </datalist>
 
       <InlineActionButton icon={FaPlus} label={addLabel} onClick={onAdd} />
     </div>

@@ -2,7 +2,7 @@ export const inputClassName =
   "min-h-[52px] w-full min-w-0 rounded-xl border border-graphite/60 bg-phantom px-4 py-3 text-sm text-steel outline-none transition-colors focus:border-cloud sm:text-base";
 export const textareaClassName = `${inputClassName} min-h-[140px] resize-y`;
 export const sectionCardClassName =
-  "min-w-0 rounded-2xl border border-graphite/50 bg-phantom/40 p-5 shadow-sm lg:p-6";
+  "min-w-0 rounded-2xl border border-graphite/60 bg-arsenic/70 p-5 shadow-lg shadow-phantom/20 lg:p-6";
 export const addButtonClassName =
   "inline-flex min-h-[48px] w-full max-w-full items-center justify-center gap-2 rounded-xl border border-cloud/40 bg-cloud/10 px-4 py-3 text-center text-sm font-semibold leading-snug text-cloud transition-colors hover:bg-cloud/20 whitespace-normal break-words sm:w-auto";
 export const removeButtonClassName =
@@ -66,6 +66,24 @@ export const LIST_ICON_OPTIONS = [
   { value: "airport", label: "Aeroporto" },
   { value: "delivery", label: "Entrega" },
   { value: "toll", label: "Portagens" },
+];
+
+export const TECHNICAL_FEATURE_OPTIONS = [
+  "Engine Type",
+  "Power",
+  "Torque",
+  "Transmission",
+  "Fuel Consumption",
+  "Fuel Type",
+  "Fuel Tank",
+  "Seat Height",
+  "Weight (Wet)",
+  "Top Speed",
+  "Drivetrain",
+  "Range",
+  "Battery Capacity",
+  "Charging Time",
+  "Dimensions",
 ];
 
 export const EMPTY_QUICK_GLANCE_ITEM = { label: "", icon: "engine" };

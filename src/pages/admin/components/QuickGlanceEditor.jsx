@@ -13,7 +13,7 @@ function QuickGlanceEditor({
 }) {
   return (
     <div className="space-y-3">
-      <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite xl:grid xl:grid-cols-[minmax(0,1fr)_minmax(180px,220px)_50px]">
+      <div className="hidden gap-3 px-1 text-xs font-bold uppercase tracking-[0.16em] text-graphite xl:grid xl:grid-cols-[minmax(0,1fr)_52px_50px]">
         <span>Texto apresentado ao cliente</span>
         <span>Ícone</span>
         <span className="sr-only">Remover linha</span>
@@ -22,7 +22,7 @@ function QuickGlanceEditor({
         items.map((item, index) => (
           <div
             key={`quick-glance-${index}`}
-            className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(180px,220px)_50px]"
+            className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_52px_50px]"
           >
             <input
               className={inputClassName}
