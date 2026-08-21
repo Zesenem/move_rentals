@@ -5,8 +5,18 @@ const SITE_NAME = "Move Rentals";
 const DEFAULT_IMAGE = `${SITE_URL}/images/og-image.png`;
 
 // Central place for canonical/OG/Twitter tags so every page gets consistent SEO metadata.
-function Seo({ title, description, path = "/", image = DEFAULT_IMAGE, noIndex = false }) {
+function Seo({
+  title,
+  description,
+  path = "/",
+  image = DEFAULT_IMAGE,
+  noIndex = false,
+  structuredData,
+}) {
   const url = `${SITE_URL}${path}`;
+  const jsonLd = structuredData
+    ? JSON.stringify(structuredData).replace(/</g, "\\u003c")
+    : null;
 
   return (
     <Helmet>
@@ -26,6 +36,8 @@ function Seo({ title, description, path = "/", image = DEFAULT_IMAGE, noIndex = 
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       {image && <meta name="twitter:image" content={image} />}
+
+      {jsonLd && <script type="application/ld+json">{jsonLd}</script>}
     </Helmet>
   );
 }

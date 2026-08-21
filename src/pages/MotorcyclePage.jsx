@@ -5,7 +5,7 @@ import { fetchProductBySlug } from "../services/twice.js";
 import AccordionItem from "../components/AccordionItem";
 import ImageCarousel from "../components/ImageCarousel";
 import Button from "../components/Button";
-import Seo from "../components/Seo";
+import Seo, { SITE_URL } from "../components/Seo";
 import { trackWhatsAppClick } from "../services/analytics.js";
 import { buildWhatsAppUrl } from "../utils/whatsapp.js";
 import { iconMap } from "../utils/iconMap.jsx";
@@ -20,6 +20,73 @@ const formatDisplayValue = (value) => {
 };
 
 const getListIcon = (icon) => iconMap[icon] || iconMap["default-check"];
+
+const getVehicleStructuredData = (bike, path) => {
+  const url = `${SITE_URL}${path}`;
+  const images = (bike.image_urls || []).filter((image) => typeof image === "string" && image);
+  const specifications = (bike.technical_features || [])
+    .filter((feature) => feature?.label && feature?.value)
+    .map((feature) => ({
+      "@type": "PropertyValue",
+      name: feature.label,
+      value: feature.value,
+    }));
+  const hasDailyPrice = typeof bike.price_per_day === "number" && bike.price_per_day > 0;
+
+  const vehicle = {
+    "@type": "Vehicle",
+    "@id": `${url}#vehicle`,
+    name: bike.name,
+    description: bike.description,
+    url,
+    ...(images.length > 0 && { image: images }),
+    ...(specifications.length > 0 && { additionalProperty: specifications }),
+  };
+
+  if (hasDailyPrice) {
+    vehicle.offers = {
+      "@type": "Offer",
+      url,
+      price: bike.price_per_day,
+      priceCurrency: "EUR",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: bike.price_per_day,
+        priceCurrency: "EUR",
+        unitText: "DAY",
+      },
+      seller: {
+        "@type": "Organization",
+        name: "Move Rentals",
+        url: SITE_URL,
+      },
+    };
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Home",
+            item: `${SITE_URL}/`,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: bike.name,
+            item: url,
+          },
+        ],
+      },
+      vehicle,
+    ],
+  };
+};
 
 const SpecsTable = ({ features }) => {
   if (!features || features.length === 0) {
@@ -153,6 +220,8 @@ function MotorcyclePage() {
     : commonData?.requirements || [];
   const importantNotes = bike?.important_notes || [];
   const hasDeposit = bike?.security_deposit !== undefined && bike?.security_deposit !== null;
+  const vehiclePath = `/motorcycle/${encodeURIComponent(slug)}`;
+  const vehicleStructuredData = getVehicleStructuredData(bike, vehiclePath);
   const titleAndDescription = (
     <div>
       <h1 className="text-4xl font-extrabold text-cloud tracking-tight">{bike?.name}</h1>
@@ -190,8 +259,9 @@ function MotorcyclePage() {
       <Seo
         title={bike?.name ? `${bike.name} | Move Rentals` : "Vehicle Details | Move Rentals"}
         description={bike?.description || "Find details and book your vehicle rental in Lisbon."}
-        path={`/motorcycle/${slug}`}
+        path={vehiclePath}
         image={bike?.image_urls?.[0]}
+        structuredData={vehicleStructuredData}
       />
       <div className="container mx-auto px-4 py-12">
         <Link to="/" className="text-steel hover:text-cloud mb-8 inline-block font-semibold">
@@ -203,7 +273,7 @@ function MotorcyclePage() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-x-12 gap-y-10">
           <div className="md:col-span-3">
             <div className="w-full aspect-video mb-12">
-              <ImageCarousel images={bike?.image_urls} />
+              <ImageCarousel images={bike?.image_urls} vehicleName={bike?.name} />
             </div>
 
             <div className="mb-8 md:hidden">{whatsappCallToAction}</div>

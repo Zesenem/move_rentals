@@ -35,7 +35,6 @@ const fetchLiveVehicles = async () => {
   const apiId = process.env.TWICE_API_ID;
   const apiSecret = process.env.TWICE_API_SECRET;
 
-  // A sitemap with the static pages is still useful if credentials are unavailable.
   if (!apiId || !apiSecret) return [];
 
   const credentials = Buffer.from(`${apiId}:${apiSecret}`).toString("base64");
@@ -109,7 +108,6 @@ export const handler = async (event) => {
     return isPublicVehicle(vehicle) ? [`/motorcycle/${encodeURIComponent(vehicle.slug)}`] : [];
   });
 
-  // These are intentional listings that exist only in the fleet metadata, not Twice.
   for (const vehicle of staticVehicles) {
     if (vehicle.source === "static" && !matchedStaticVehicles.has(vehicle)) {
       const slug = vehicle.slug || slugify(vehicle.name);
@@ -120,7 +118,8 @@ export const handler = async (event) => {
   }
 
   const paths = [...new Set([...STATIC_PATHS, ...vehiclePaths])];
-  const body = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+  const body =
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
     `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
     paths.map((path) => `  <url><loc>${escapeXml(`${SITE_URL}${path}`)}</loc></url>`).join("\n") +
     `\n</urlset>\n`;
