@@ -210,7 +210,7 @@ function TermsPage() {
               <p>Move LX Unipessoal LDA</p>
               <p>Rua Carlos Reis, nº 63, Lisbon</p>
               <p>📧 move@move-rentals.com</p>
-              <p>📞 +351 920 016 796</p>
+              <p>📞 +351 920 016 794</p>
             </section>
 
             <p className="!mt-12 text-sm text-graphite">Last updated: July 18, 2025</p>
