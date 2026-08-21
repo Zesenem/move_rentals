@@ -13,6 +13,8 @@ import { HelmetProvider } from "react-helmet-async";
 import * as Sentry from "@sentry/react";
 
 import App from "./App.jsx";
+import ErrorFallback from "./components/ErrorFallback.jsx";
+import RouteErrorBoundary from "./components/RouteErrorBoundary.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import MotorcyclePage from "./pages/MotorcyclePage.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
@@ -43,13 +45,21 @@ Sentry.init({
 });
 
 // --- TanStack Query Client ---
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      retry: 1,
+    },
+  },
+});
 
 // --- React Router ---
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <RouteErrorBoundary />,
     children: [
       { index: true, element: <HomePage /> },
       { path: "motorcycle/:slug", element: <MotorcyclePage /> },
@@ -65,10 +75,12 @@ const router = createBrowserRouter([
 // --- App Rendering ---
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    </HelmetProvider>
-  </React.StrictMode>
+    <Sentry.ErrorBoundary fallback={ErrorFallback}>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <RouterProvider router={router} />
+        </QueryClientProvider>
+      </HelmetProvider>
+    </Sentry.ErrorBoundary>
+  </React.StrictMode>,
 );

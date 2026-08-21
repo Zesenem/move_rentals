@@ -1,30 +1,21 @@
-import {
-  createAdminAccessResponse,
-  getAdminAccessState,
-} from "./utils/admin-access.mjs";
+import { createAdminAccessResponse, getAdminAccessState } from "./utils/admin-access.mjs";
 
-export const handler = async (event, context) => {
-  if (event.httpMethod !== "GET") {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method not allowed." }),
-    };
+export default async (req) => {
+  if (req.method !== "GET") {
+    return Response.json({ error: "Method not allowed." }, { status: 405 });
   }
 
-  const accessState = getAdminAccessState(context);
+  const accessState = await getAdminAccessState();
 
   if (accessState.status !== "authorized") {
     return createAdminAccessResponse(accessState);
   }
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({
-      user: {
-        id: accessState.user.id,
-        email: accessState.user.email,
-        roles: accessState.user.roles || accessState.user.app_metadata?.roles || [],
-      },
-    }),
-  };
+  return Response.json({
+    user: {
+      id: accessState.user.id,
+      email: accessState.user.email,
+      roles: accessState.user.roles || [],
+    },
+  });
 };

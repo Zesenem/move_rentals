@@ -1,58 +1,29 @@
-import netlifyIdentity from "netlify-identity-widget";
+import {
+  acceptInvite,
+  handleAuthCallback,
+  login,
+  logout,
+  requestPasswordRecovery,
+  updateUser,
+} from "@netlify/identity";
 
 const ADMIN_SESSION_URL = "/.netlify/functions/get-admin-session";
 
-let hasInitializedIdentity = false;
+export const loginAdmin = (email, password) => login(email, password);
 
-export const initAdminIdentity = () => {
-  if (hasInitializedIdentity || typeof window === "undefined") {
-    return netlifyIdentity;
-  }
+export const logoutAdmin = () => logout();
 
-  netlifyIdentity.init({
-    locale: "en",
-  });
+export const processAdminAuthCallback = () => handleAuthCallback();
 
-  hasInitializedIdentity = true;
-  return netlifyIdentity;
-};
+export const requestAdminPasswordRecovery = (email) => requestPasswordRecovery(email);
 
-export const onAdminIdentityEvent = (eventName, handler) => {
-  netlifyIdentity.on(eventName, handler);
+export const acceptAdminInvite = (token, password) => acceptInvite(token, password);
 
-  return () => {
-    netlifyIdentity.off(eventName, handler);
-  };
-};
+export const setAdminPassword = (password) => updateUser({ password });
 
-export const openAdminLogin = () => {
-  initAdminIdentity().open("login");
-};
-
-export const logoutAdmin = async () => {
-  await initAdminIdentity().logout();
-};
-
-export const getAdminToken = async () => {
-  const identity = initAdminIdentity();
-  const currentUser = identity.currentUser();
-
-  if (!currentUser) {
-    return null;
-  }
-
-  return await identity.refresh();
-};
-
+// The session's cookie is sent automatically for this same-origin request.
 export const fetchAdminSession = async () => {
-  const token = await getAdminToken();
-  const headers = token
-    ? {
-        Authorization: `Bearer ${token}`,
-      }
-    : {};
-
-  const response = await fetch(ADMIN_SESSION_URL, { headers });
+  const response = await fetch(ADMIN_SESSION_URL);
   const payload = await response.json().catch(() => ({}));
 
   if (response.ok) {

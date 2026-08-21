@@ -27,44 +27,35 @@ const validateFleetMetadata = (payload) => {
   return null;
 };
 
-export const handler = async (event, context) => {
-  if (!["POST", "PUT"].includes(event.httpMethod)) {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: "Method not allowed." }),
-    };
+export default async (req) => {
+  if (!["POST", "PUT"].includes(req.method)) {
+    return Response.json({ error: "Method not allowed." }, { status: 405 });
   }
 
-  const accessState = getAdminAccessState(context);
+  const accessState = await getAdminAccessState();
 
   if (accessState.status !== "authorized") {
     return createAdminAccessResponse(accessState);
   }
 
   try {
-    const payload = JSON.parse(event.body || "{}");
+    const payload = await req.json();
     const validationError = validateFleetMetadata(payload);
 
     if (validationError) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ error: validationError }),
-      };
+      return Response.json({ error: validationError }, { status: 400 });
     }
 
-    const metadata = await writeFleetMetadata(event, payload);
+    const metadata = await writeFleetMetadata(payload);
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        data: metadata,
-        message: "Fleet metadata saved successfully.",
-      }),
-    };
+    return Response.json({
+      data: metadata,
+      message: "Fleet metadata saved successfully.",
+    });
   } catch (error) {
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: error.message || "Could not save fleet metadata." }),
-    };
+    return Response.json(
+      { error: error.message || "Could not save fleet metadata." },
+      { status: 500 },
+    );
   }
 };

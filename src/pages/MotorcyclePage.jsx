@@ -1,12 +1,13 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Helmet } from "react-helmet-async";
 import { fetchProductBySlug } from "../services/twice.js";
 
 import AccordionItem from "../components/AccordionItem";
 import ImageCarousel from "../components/ImageCarousel";
 import Button from "../components/Button";
+import Seo from "../components/Seo";
 import { trackWhatsAppClick } from "../services/analytics.js";
+import { buildWhatsAppUrl } from "../utils/whatsapp.js";
 import { iconMap } from "../utils/iconMap.jsx";
 import { FaExclamationTriangle, FaWhatsapp } from "react-icons/fa";
 
@@ -130,6 +131,11 @@ function MotorcyclePage() {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-20 text-center">
+        <Seo
+          title="Vehicle Not Found | Move Rentals"
+          description="This vehicle could not be found."
+          noIndex
+        />
         <FaExclamationTriangle className="text-red-500 text-5xl mx-auto mb-4" />
         <h2 className="text-2xl font-bold text-cloud mb-2">Could Not Load Details</h2>
         <p className="text-space">{error.message}</p>
@@ -139,9 +145,8 @@ function MotorcyclePage() {
 
   const { bike, commonData } = data || {};
 
-  const whatsappNumber = "351920016794";
   const whatsappMessage = `Hello! I'm interested in renting the ${bike?.name}. Could you provide more information?`;
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+  const whatsappUrl = buildWhatsAppUrl(whatsappMessage);
   const includedItems = Array.isArray(bike?.included) ? bike.included : commonData?.included || [];
   const requirementItems = Array.isArray(bike?.requirements)
     ? bike.requirements
@@ -182,15 +187,12 @@ function MotorcyclePage() {
 
   return (
     <>
-      <Helmet>
-        <title>
-          {bike?.name ? `${bike.name} | Move Rentals` : "Vehicle Details | Move Rentals"}
-        </title>
-        <meta
-          name="description"
-          content={bike?.description || "Find details and book your vehicle rental in Lisbon."}
-        />
-      </Helmet>
+      <Seo
+        title={bike?.name ? `${bike.name} | Move Rentals` : "Vehicle Details | Move Rentals"}
+        description={bike?.description || "Find details and book your vehicle rental in Lisbon."}
+        path={`/motorcycle/${slug}`}
+        image={bike?.image_urls?.[0]}
+      />
       <div className="container mx-auto px-4 py-12">
         <Link to="/" className="text-steel hover:text-cloud mb-8 inline-block font-semibold">
           &larr; Back to Our Fleet

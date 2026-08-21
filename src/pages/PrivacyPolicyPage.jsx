@@ -1,15 +1,13 @@
-import { Helmet } from "react-helmet-async";
+import Seo from "../components/Seo";
 
 function PrivacyPolicyPage() {
   return (
     <>
-      <Helmet>
-        <title>Privacy Policy | Move Rentals</title>
-        <meta
-          name="description"
-          content="Learn how Move Rentals collects, uses, and protects your personal data."
-        />
-      </Helmet>
+      <Seo
+        title="Privacy Policy | Move Rentals"
+        description="Learn how Move Rentals collects, uses, and protects your personal data."
+        path="/privacy-policy"
+      />
       <div className="container mx-auto px-4 py-12">
         <div className="prose prose-invert mx-auto max-w-4xl">
           <h1 className="text-4xl font-extrabold text-cloud mb-8">Privacy Policy</h1>

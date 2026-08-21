@@ -1,17 +1,15 @@
-import { Helmet } from "react-helmet-async";
 import Hero from "../components/Hero";
 import MotorcycleList from "../components/MotorcycleList";
+import Seo from "../components/Seo";
 
 function HomePage() {
   return (
     <>
-      <Helmet>
-        <title>Move Rentals | Scooter, Motorcycle & Car Rentals in Lisbon</title>
-        <meta
-          name="description"
-          content="Rent a scooter, motorcycle, or selected car from Move Rentals. Find the right ride for your time in Lisbon."
-        />
-      </Helmet>
+      <Seo
+        title="Move Rentals | Scooter, Motorcycle & Car Rentals in Lisbon"
+        description="Rent a scooter, motorcycle, or selected car from Move Rentals. Find the right ride for your time in Lisbon."
+        path="/"
+      />
       <Hero />
       <MotorcycleList />
     </>

@@ -1,3 +1,5 @@
+import { getUser } from "@netlify/identity";
+
 const normalizeEmail = (value = "") => value.trim().toLowerCase();
 
 const getAllowedEmails = () =>
@@ -6,20 +8,8 @@ const getAllowedEmails = () =>
     .map(normalizeEmail)
     .filter(Boolean);
 
-const getUserRoles = (user = {}) => {
-  if (Array.isArray(user.roles)) {
-    return user.roles;
-  }
-
-  if (Array.isArray(user.app_metadata?.roles)) {
-    return user.app_metadata.roles;
-  }
-
-  return [];
-};
-
-export const getAdminAccessState = (context) => {
-  const user = context?.clientContext?.user || null;
+export const getAdminAccessState = async () => {
+  const user = await getUser();
 
   if (!user) {
     return {
@@ -32,7 +22,7 @@ export const getAdminAccessState = (context) => {
 
   const allowedEmails = getAllowedEmails();
   const normalizedEmail = normalizeEmail(user.email);
-  const roles = getUserRoles(user);
+  const roles = user.roles || [];
   const isRoleAllowed = roles.includes("admin");
   const isEmailAllowed = allowedEmails.includes(normalizedEmail);
 
@@ -53,7 +43,5 @@ export const getAdminAccessState = (context) => {
   };
 };
 
-export const createAdminAccessResponse = (accessState) => ({
-  statusCode: accessState.statusCode,
-  body: JSON.stringify({ error: accessState.message }),
-});
+export const createAdminAccessResponse = (accessState) =>
+  Response.json({ error: accessState.message }, { status: accessState.statusCode });

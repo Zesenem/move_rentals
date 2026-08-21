@@ -34,9 +34,10 @@ function App() {
 
   useEffect(() => {
     const hash = window.location.hash || "";
-    const hasIdentityInviteToken = hash.includes("invite_token=");
+    const hasIdentityAuthToken =
+      /(invite_token|recovery_token|confirmation_token|email_change_token)=/.test(hash);
 
-    if (!hasIdentityInviteToken || location.pathname === "/admin") {
+    if (!hasIdentityAuthToken || location.pathname === "/admin") {
       return;
     }
 
@@ -45,7 +46,7 @@ function App() {
         pathname: "/admin",
         hash,
       },
-      { replace: true }
+      { replace: true },
     );
   }, [location.pathname, navigate]);
 

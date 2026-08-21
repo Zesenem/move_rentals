@@ -2,10 +2,11 @@ import { Link } from "react-router-dom";
 import { FaWhatsapp, FaInstagram, FaEnvelope } from "react-icons/fa";
 import OpeningHours from "./OpeningHours";
 import { trackWhatsAppClick } from "../services/analytics.js";
+import { buildWhatsAppUrl } from "../utils/whatsapp.js";
 
 const contactInfo = {
   email: "move@move-rentals.com",
-  whatsappUrl: "https://wa.me/351920016794",
+  whatsappUrl: buildWhatsAppUrl(),
   instagramUrl: "https://www.instagram.com/move.rentals/",
 };
 

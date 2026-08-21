@@ -1,7 +1,8 @@
-import { Helmet } from "react-helmet-async";
 import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaClock } from "react-icons/fa";
 import OpeningHours from "../components/OpeningHours";
+import Seo from "../components/Seo";
 import { trackWhatsAppClick } from "../services/analytics.js";
+import { WHATSAPP_DISPLAY_PHONE, buildWhatsAppUrl } from "../utils/whatsapp.js";
 
 const ContactInfoCard = ({ icon, title, children }) => {
   const IconComponent = icon;
@@ -18,11 +19,9 @@ const ContactInfoCard = ({ icon, title, children }) => {
 
 const contactInfo = {
   address: "Rua da Beneficencia 44D, Lisboa, Portugal",
-  phone: "+351 920 016 794",
+  phone: WHATSAPP_DISPLAY_PHONE,
   email: "move@move-rentals.com",
-  get whatsappUrl() {
-    return `https://wa.me/${this.phone.replace(/\s/g, "")}`;
-  },
+  whatsappUrl: buildWhatsAppUrl(),
   get directionsUrl() {
     return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(this.address)}`;
   },
@@ -97,13 +96,11 @@ function ContactPage() {
 
   return (
     <>
-      <Helmet>
-        <title>Contact Us | Move Rentals</title>
-        <meta
-          name="description"
-          content="Get in touch with Move Rentals. Find our address, contact details, and location in Lisbon."
-        />
-      </Helmet>
+      <Seo
+        title="Contact Us | Move Rentals"
+        description="Get in touch with Move Rentals. Find our address, contact details, and location in Lisbon."
+        path="/contact"
+      />
       <div className="container mx-auto px-4 py-12">
         <div className="mx-auto max-w-4xl">
           <h1 className="mb-8 text-center text-4xl font-extrabold text-cloud sm:text-5xl">

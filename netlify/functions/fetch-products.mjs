@@ -18,16 +18,35 @@ export const handler = async () => {
     "x-rentle-version": "2023-02-01",
   };
 
+  // The API paginates results (10 per page by default) via a `pageToken` cursor.
+  const MAX_PAGES = 20;
+
   try {
-    const response = await fetch(`${API_BASE_URL}/products?categories=${MOTORCYCLE_CATEGORY_ID}`, {
-      headers: twiceHeaders,
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      return { statusCode: response.status, body: JSON.stringify(errorData) };
-    }
-    const data = await response.json();
-    return { statusCode: 200, body: JSON.stringify(data) };
+    const allProducts = [];
+    let pageToken;
+    let pageCount = 0;
+
+    do {
+      const url = new URL(`${API_BASE_URL}/products`);
+      url.searchParams.set("categories", MOTORCYCLE_CATEGORY_ID);
+      if (pageToken) {
+        url.searchParams.set("pageToken", pageToken);
+      }
+
+      const response = await fetch(url, { headers: twiceHeaders });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { statusCode: response.status, body: JSON.stringify(errorData) };
+      }
+
+      const page = await response.json();
+      allProducts.push(...(page.data || []));
+      pageToken = page.nextPageToken || null;
+      pageCount += 1;
+    } while (pageToken && pageCount < MAX_PAGES);
+
+    return { statusCode: 200, body: JSON.stringify({ data: allProducts }) };
   } catch (error) {
     return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
   }

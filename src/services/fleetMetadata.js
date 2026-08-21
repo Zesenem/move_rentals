@@ -46,19 +46,12 @@ export const fetchVehicleMetadataEntries = async () => {
   return metadata.motorcycles_static_data || [];
 };
 
-export const saveFleetMetadata = async (metadata, options = {}) => {
-  const headers = {
-    "Content-Type": "application/json",
-  };
-
-  if (options.authToken) {
-    headers.Authorization = `Bearer ${options.authToken}`;
-  }
-
+// The session's cookie is sent automatically for this same-origin request.
+export const saveFleetMetadata = async (metadata) => {
   try {
     const response = await fetch(SAVE_FLEET_METADATA_URL, {
       method: "POST",
-      headers,
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(metadata),
     });
 

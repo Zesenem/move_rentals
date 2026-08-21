@@ -1,15 +1,13 @@
-import { Helmet } from "react-helmet-async";
+import Seo from "../components/Seo";
 
 function TermsPage() {
   return (
     <>
-      <Helmet>
-        <title>Terms of Service | Move Rentals</title>
-        <meta
-          name="description"
-          content="Read the Terms of Service for renting a scooter or motorcycle from Move Rentals in Lisbon."
-        />
-      </Helmet>
+      <Seo
+        title="Terms of Service | Move Rentals"
+        description="Read the Terms of Service for renting a scooter or motorcycle from Move Rentals in Lisbon."
+        path="/terms-and-conditions"
+      />
       <div className="container mx-auto px-4 py-12">
         <div className="prose prose-invert mx-auto max-w-4xl">
           <div className="text-center mb-10">
