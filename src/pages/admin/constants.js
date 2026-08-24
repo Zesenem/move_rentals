@@ -31,6 +31,7 @@ export const BADGE_OPTIONS = [
   { value: "Electric", label: "Elétrico" },
   { value: "Anchor", label: "Âncora" },
   { value: "Nautical Licence", label: "Carta náutica" },
+  { value: "Luggage Space", label: "Bagagem" },
   { value: "Best Seller", label: "Mais popular" },
   { value: "Best Value", label: "Melhor preço" },
 ];

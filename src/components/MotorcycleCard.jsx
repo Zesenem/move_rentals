@@ -12,13 +12,13 @@ import {
   FaTachometerAlt,
 } from "react-icons/fa";
 import { GiCaptainHatProfile } from "react-icons/gi";
-import { PiSteeringWheelFill, PiGasCanFill } from "react-icons/pi";
+import { PiGasCanFill, PiIdentificationBadgeFill } from "react-icons/pi";
 import Button from "./Button";
 
 const glanceIconMap = {
   engine: <FaTachometerAlt />,
   power: <FaBolt />,
-  license: <PiSteeringWheelFill />,
+  license: <PiIdentificationBadgeFill />,
   gas: <PiGasCanFill />,
   mileage: <FaRoad />,
   transmission: <FaCogs />,
@@ -36,6 +36,7 @@ const badgeMap = {
   Electric: { icon: FaBolt, color: "bg-cyan-500" },
   Anchor: { icon: FaAnchor, color: "bg-sky-500" },
   "Nautical Licence": { icon: GiCaptainHatProfile, color: "bg-teal-500" },
+  "Luggage Space": { icon: FaSuitcase, color: "bg-orange-500" },
   GPS: {
     icon: function GPSIcon(props) {
       return (

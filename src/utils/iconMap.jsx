@@ -17,6 +17,7 @@ import {
 } from "react-icons/fa";
 import {
   PiSteeringWheelFill,
+  PiIdentificationBadgeFill,
   PiMotorcycleFill,
   PiPantsFill,
   PiPercentFill,
@@ -43,7 +44,7 @@ export const iconMap = {
   storage: createIcon(FaSuitcase),
   forfait: createIcon(FaHandshake),
   "id-card": createIcon(FaIdCard),
-  license: createIcon(PiSteeringWheelFill),
+  license: createIcon(PiIdentificationBadgeFill),
   "credit-card": createIcon(FaCreditCard),
   experience: createIcon(PiMotorcycleFill),
   helmet: createIcon(GiFullMotorcycleHelmet, "text-status-available"),

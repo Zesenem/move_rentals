@@ -1,10 +1,25 @@
 import { BADGE_OPTIONS } from "../constants.js";
-import { FaAnchor } from "react-icons/fa";
+import {
+  FaAnchor,
+  FaBolt,
+  FaGem,
+  FaLeaf,
+  FaMapMarkerAlt,
+  FaStar,
+  FaSuitcase,
+} from "react-icons/fa";
 import { GiCaptainHatProfile } from "react-icons/gi";
 
 const badgeIconMap = {
+  ECO: FaLeaf,
+  Premium: FaGem,
+  GPS: FaMapMarkerAlt,
+  Electric: FaBolt,
   Anchor: FaAnchor,
   "Nautical Licence": GiCaptainHatProfile,
+  "Luggage Space": FaSuitcase,
+  "Best Seller": FaStar,
+  "Best Value": FaStar,
 };
 
 function BadgeSelector({ value, onToggle }) {

@@ -2,7 +2,7 @@ const REMOTE_FLEET_METADATA_URL = "/.netlify/functions/get-fleet-metadata";
 const SAVE_FLEET_METADATA_URL = "/.netlify/functions/save-fleet-metadata";
 const LOCAL_FLEET_METADATA_URL = "/db.json";
 
-export const fetchLocalFleetMetadata = async () => {
+const fetchLocalFleetMetadata = async () => {
   const response = await fetch(LOCAL_FLEET_METADATA_URL);
 
   if (!response.ok) {
