@@ -199,18 +199,22 @@
       ]
     },
     {
+      "id": "JQlOqXkLsBfgyz7jN5iI",
+      "seed_import": "2026-q3-fleet-expansion",
       "name": "Honda PCX 125",
       "match_names": ["Honda PCX 125 2026"],
       "description": "The Honda PCX 125 combines premium comfort, modern styling and outstanding efficiency, making it one of the best scooters for exploring Lisbon. Smooth, easy to handle and equipped with generous under-seat storage, it is equally suited to daily city riding and longer urban journeys.",
       "badges": [],
       "quick_glance": [
         { "label": "125 cc", "icon": "engine" },
-        { "label": "12.5 cv", "icon": "power" },
         { "label": "A1 / B", "icon": "license" },
-        { "label": "30.4 L", "icon": "storage" }
+        { "label": "8.1 L", "icon": "gas" }
       ],
       "technical_features": [
-        { "label": "Engine Type", "value": "4-stroke, single-cylinder, liquid-cooled, SOHC, 4-valve eSP+" },
+        {
+          "label": "Engine Type",
+          "value": "4-stroke, single-cylinder, liquid-cooled, SOHC, 4-valve eSP+"
+        },
         { "label": "Displacement", "value": "125 cc" },
         { "label": "Power", "value": "9.2 kW (12.5 PS) @ 8,750 rpm" },
         { "label": "Torque", "value": "11.7 Nm @ 6,500 rpm" },
@@ -225,13 +229,13 @@
       ]
     },
     {
+      "seed_import": "2026-q3-fleet-expansion",
       "name": "Yamaha NMAX 125 Gen 3",
       "match_names": ["Yamaha NMAX 125 Gen 3 2026"],
       "description": "The latest-generation Yamaha NMAX 125 brings sporty MAX styling, excellent comfort and everyday practicality together in one compact scooter. Its smooth automatic engine, comfortable riding position and modern technology make it an ideal choice for discovering Lisbon efficiently and in style.",
       "badges": [],
       "quick_glance": [
         { "label": "125 cc", "icon": "engine" },
-        { "label": "12.2 cv", "icon": "power" },
         { "label": "A1 / B", "icon": "license" },
         { "label": "7.1 L", "icon": "gas" }
       ],
@@ -252,13 +256,13 @@
       ]
     },
     {
+      "seed_import": "2026-q3-fleet-expansion",
       "name": "CFMOTO 450MT",
       "match_names": ["CF Moto 450MT", "CF Moto 450"],
       "description": "The CFMOTO 450MT is a versatile adventure motorcycle built for riders who want to go beyond the city. Comfortable on the road and highly capable on rougher terrain, its lightweight chassis, long-travel suspension and 21-inch front wheel make it a great choice for touring, mountain roads and adventure riding across Portugal.",
       "badges": [],
       "quick_glance": [
         { "label": "449 cc", "icon": "engine" },
-        { "label": "42 hp", "icon": "power" },
         { "label": "A2", "icon": "license" },
         { "label": "17.5 L", "icon": "gas" }
       ],
@@ -285,6 +289,7 @@
       ]
     },
     {
+      "seed_import": "2026-q3-fleet-expansion",
       "name": "Sea-Doo GTI 130",
       "match_names": ["Seadoo GTI 130", "Sea Doo GTI 130"],
       "description": "The Sea-Doo GTI 130 is the perfect all-round personal watercraft for a fun and comfortable day on the water. Stable, easy to control and fuel efficient, it offers enough performance for exciting rides while remaining approachable for recreational use, cruising and water sports.",
@@ -292,8 +297,7 @@
       "quick_glance": [
         { "label": "1,630 cc", "icon": "engine" },
         { "label": "130 hp", "icon": "power" },
-        { "label": "Nautical licence*", "icon": "license" },
-        { "label": "152.8 L", "icon": "storage" }
+        { "label": "Nautical licence*", "icon": "license" }
       ],
       "security_deposit": 1700,
       "minimum_rental": { "hours": 3, "price": 300, "fuel_included": false },
@@ -327,6 +331,7 @@
       ]
     },
     {
+      "seed_import": "2026-q3-fleet-expansion",
       "name": "Sea-Doo GTI SE 170",
       "match_names": ["Sea-Doo GTI 170", "Seadoo GTI 170", "Sea Doo GTI SE 170"],
       "description": "The Sea-Doo GTI SE 170 takes the versatility and stability of the GTI platform and adds significantly more performance. With 170 hp, excellent comfort and a spacious swim platform, it is ideal for riders looking for stronger acceleration, longer adventures and water-sports activities.",
@@ -334,8 +339,7 @@
       "quick_glance": [
         { "label": "1,630 cc", "icon": "engine" },
         { "label": "170 hp", "icon": "power" },
-        { "label": "Nautical licence*", "icon": "license" },
-        { "label": "152.8 L", "icon": "storage" }
+        { "label": "Nautical licence*", "icon": "license" }
       ],
       "security_deposit": 1900,
       "minimum_rental": { "hours": 3, "price": 375, "fuel_included": false },
@@ -371,6 +375,7 @@
       ]
     },
     {
+      "seed_import": "2026-q3-fleet-expansion",
       "name": "Sea-Doo GTR 230",
       "match_names": ["Seadoo GTR 230", "Sea Doo GTR 230"],
       "status": "on-demand",
@@ -380,8 +385,7 @@
       "quick_glance": [
         { "label": "1,630 cc", "icon": "engine" },
         { "label": "230 hp", "icon": "power" },
-        { "label": "Nautical licence*", "icon": "license" },
-        { "label": "152.8 L", "icon": "storage" }
+        { "label": "Nautical licence*", "icon": "license" }
       ],
       "security_deposit": 2500,
       "minimum_rental": { "hours": 3, "price": 600, "fuel_included": false },

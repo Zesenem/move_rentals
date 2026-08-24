@@ -8,6 +8,7 @@ import EditExistingVehicleCard from "./sections/EditExistingVehicleCard.jsx";
 import FleetCardSection from "./sections/FleetCardSection.jsx";
 import PreviewPanel from "./sections/PreviewPanel.jsx";
 import RentalRulesSection from "./sections/RentalRulesSection.jsx";
+import SeedVehicleImportCard from "./sections/SeedVehicleImportCard.jsx";
 import SharedDefaultsSection from "./sections/SharedDefaultsSection.jsx";
 import SummaryStats from "./sections/SummaryStats.jsx";
 import VehicleDetailPageSection from "./sections/VehicleDetailPageSection.jsx";
@@ -39,6 +40,9 @@ function AdminPage({ adminUser, onLogout }) {
     selectedLiveVehicle,
     selectedNewLiveVehicle,
     selectedVehiclePreview,
+    pendingSeedVehicles,
+    isLoadingLocalSeedMetadata,
+    isLocalSeedMetadataError,
     handleDraftChange,
     handleToggleDraftField,
     handleBadgeToggle,
@@ -54,6 +58,7 @@ function AdminPage({ adminUser, onLogout }) {
     handleResetChanges,
     handleSaveChanges,
     handleDeleteSelectedEntry,
+    handleImportSeedVehicles,
   } = useFleetMetadataEditor();
 
   return (
@@ -143,6 +148,16 @@ function AdminPage({ adminUser, onLogout }) {
                       onStartNewStaticEntry={handleStartNewStaticEntry}
                       isCreatingNew={isCreatingNew}
                       onCancelNewEntry={handleCancelNewEntry}
+                    />
+                  </div>
+
+                  <div className="2xl:col-span-2">
+                    <SeedVehicleImportCard
+                      pendingVehicles={pendingSeedVehicles}
+                      isLoading={isLoadingLocalSeedMetadata}
+                      hasError={isLocalSeedMetadataError}
+                      isSaving={saveMutation.isPending}
+                      onImport={handleImportSeedVehicles}
                     />
                   </div>
 

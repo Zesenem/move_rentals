@@ -3,7 +3,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { matchesVehicleMetadata } from "../../services/fleetMatching.js";
 import { fetchProducts } from "../../services/twice.js";
-import { fetchFleetMetadata, saveFleetMetadata } from "../../services/fleetMetadata.js";
+import {
+  fetchFleetMetadata,
+  fetchLocalFleetMetadata,
+  saveFleetMetadata,
+} from "../../services/fleetMetadata.js";
 import { PREVIEW_EDITABLE_KEYS } from "./constants.js";
 import {
   buildUpdatedCommonData,
@@ -15,6 +19,8 @@ import {
   getEntryKey,
   hasVehicleEntryConflict,
 } from "./metadataHelpers.js";
+
+const SEED_IMPORT_ID = "2026-q3-fleet-expansion";
 
 // Encapsulates all fleet metadata editor state so AdminPage only handles layout.
 function useFleetMetadataEditor() {
@@ -48,7 +54,31 @@ function useFleetMetadataEditor() {
     queryFn: fetchFleetMetadata,
   });
 
+  const {
+    data: localSeedMetadata,
+    isLoading: isLoadingLocalSeedMetadata,
+    isError: isLocalSeedMetadataError,
+  } = useQuery({
+    queryKey: ["admin", "local-fleet-metadata"],
+    queryFn: fetchLocalFleetMetadata,
+    staleTime: Infinity,
+  });
+
   const metadataEntries = useMemo(() => metadata?.motorcycles_static_data || [], [metadata]);
+  const pendingSeedVehicles = useMemo(() => {
+    const seedVehicles = (localSeedMetadata?.motorcycles_static_data || []).filter(
+      (vehicle) => vehicle.seed_import === SEED_IMPORT_ID,
+    );
+
+    return seedVehicles.filter(
+      (seedVehicle) =>
+        !metadataEntries.some(
+          (existingVehicle) =>
+            matchesVehicleMetadata(seedVehicle, existingVehicle) ||
+            matchesVehicleMetadata(existingVehicle, seedVehicle),
+        ),
+    );
+  }, [localSeedMetadata, metadataEntries]);
   const isLoading = isLoadingVehicles || isLoadingMetadata;
   const error = vehiclesError || metadataError;
 
@@ -438,6 +468,37 @@ function useFleetMetadataEditor() {
     }
   };
 
+  const handleImportSeedVehicles = async () => {
+    if (!metadata || !pendingSeedVehicles.length) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Importar ${pendingSeedVehicles.length} novos veículos preparados? Os dados já guardados não serão alterados.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setFormError("");
+    setSaveMessage("");
+
+    try {
+      const nextMetadata = {
+        ...metadata,
+        motorcycles_static_data: [...metadataEntries, ...pendingSeedVehicles],
+      };
+
+      await saveMutation.mutateAsync(nextMetadata);
+      setSaveMessage(
+        `${pendingSeedVehicles.length} novos veículos foram importados para a administração.`,
+      );
+    } catch (importError) {
+      setFormError(importError.message || "Não foi possível importar os veículos preparados.");
+    }
+  };
+
   const handleDeleteSelectedEntry = async () => {
     if (!metadata || isCreatingNew || !selectedMetadataEntry || selectedMetadataIndex < 0) {
       return;
@@ -502,6 +563,9 @@ function useFleetMetadataEditor() {
     selectedLiveVehicle,
     selectedNewLiveVehicle,
     selectedVehiclePreview,
+    pendingSeedVehicles,
+    isLoadingLocalSeedMetadata,
+    isLocalSeedMetadataError,
     handleDraftChange,
     handleToggleDraftField,
     handleBadgeToggle,
@@ -520,6 +584,7 @@ function useFleetMetadataEditor() {
     handleResetChanges,
     handleSaveChanges,
     handleDeleteSelectedEntry,
+    handleImportSeedVehicles,
   };
 }
 

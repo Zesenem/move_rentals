@@ -73,7 +73,8 @@ export const sanitizeQuickGlance = (items) =>
       label: item.label.trim(),
       icon: item.icon || "engine",
     }))
-    .filter((item) => item.label);
+    .filter((item) => item.label)
+    .slice(0, 3);
 
 export const sanitizeTechnicalFeatures = (items) =>
   items

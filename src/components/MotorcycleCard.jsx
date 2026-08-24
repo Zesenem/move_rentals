@@ -69,8 +69,8 @@ const statusConfig = {
 };
 
 const QuickGlance = ({ stats }) => (
-  <div className="my-4 grid grid-cols-2 gap-x-3 gap-y-2 text-space">
-    {stats?.map((stat) => (
+  <div className="my-4 flex items-center gap-x-4 text-space">
+    {stats?.slice(0, 3).map((stat) => (
       <div key={stat.label} className="flex min-w-0 items-center gap-2 text-sm">
         {glanceIconMap[stat.icon]}
         <span className="truncate">{stat.label}</span>
