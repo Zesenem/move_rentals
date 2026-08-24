@@ -3,7 +3,7 @@ import FieldGroup from "../components/FieldGroup.jsx";
 import SectionHeading from "../components/SectionHeading.jsx";
 import { inputClassName, sectionCardClassName, textareaClassName } from "../constants.js";
 
-function BasicDetailsSection({ draft, onDraftChange }) {
+function BasicDetailsSection({ draft, onDraftChange, onToggleDraftField }) {
   return (
     <div className={sectionCardClassName}>
       <SectionHeading
@@ -42,6 +42,39 @@ function BasicDetailsSection({ draft, onDraftChange }) {
             placeholder="Escreva a pequena descrição que os clientes devem ler na página do veículo."
             onChange={onDraftChange("description")}
           />
+        </FieldGroup>
+      </div>
+
+      <div className="mt-6">
+        <FieldGroup
+          label="Aluguer mínimo opcional"
+          hint="Use apenas quando existir uma opção de curta duração, por exemplo 3 horas para jet skis."
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            <input
+              className={inputClassName}
+              inputMode="numeric"
+              value={draft.minimumRentalHours}
+              placeholder="Duração em horas, ex.: 3"
+              onChange={onDraftChange("minimumRentalHours")}
+            />
+            <input
+              className={inputClassName}
+              inputMode="decimal"
+              value={draft.minimumRentalPrice}
+              placeholder="Preço em EUR, ex.: 300"
+              onChange={onDraftChange("minimumRentalPrice")}
+            />
+          </div>
+          <label className="mt-4 flex items-center gap-3 text-sm text-steel">
+            <input
+              type="checkbox"
+              className="h-5 w-5 accent-cloud"
+              checked={draft.fuelNotIncluded}
+              onChange={onToggleDraftField("fuelNotIncluded")}
+            />
+            Combustível não incluído nestes preços
+          </label>
         </FieldGroup>
       </div>
     </div>

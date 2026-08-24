@@ -1,11 +1,18 @@
 import { BADGE_OPTIONS } from "../constants.js";
 import { FaAnchor } from "react-icons/fa";
+import { GiCaptainHatProfile } from "react-icons/gi";
+
+const badgeIconMap = {
+  Anchor: FaAnchor,
+  "Nautical Licence": GiCaptainHatProfile,
+};
 
 function BadgeSelector({ value, onToggle }) {
   return (
     <div className="flex flex-wrap gap-2">
       {BADGE_OPTIONS.map((badge) => {
         const isSelected = value.includes(badge.value);
+        const Icon = badgeIconMap[badge.value];
 
         return (
           <button
@@ -18,7 +25,7 @@ function BadgeSelector({ value, onToggle }) {
                 : "border-graphite/60 bg-phantom text-center leading-snug text-steel hover:border-cloud/50 hover:text-cloud"
             }`}
           >
-            {badge.value === "Anchor" && <FaAnchor aria-hidden="true" />}
+            {Icon && <Icon aria-hidden="true" />}
             {badge.label}
           </button>
         );

@@ -30,6 +30,7 @@ export const BADGE_OPTIONS = [
   { value: "GPS", label: "GPS" },
   { value: "Electric", label: "Elétrico" },
   { value: "Anchor", label: "Âncora" },
+  { value: "Nautical Licence", label: "Carta náutica" },
   { value: "Best Seller", label: "Mais popular" },
   { value: "Best Value", label: "Melhor preço" },
 ];
@@ -44,6 +45,7 @@ export const QUICK_GLANCE_ICON_OPTIONS = [
   { value: "drivetrain", label: "Tração" },
   { value: "speed", label: "Velocidade" },
   { value: "track", label: "Utilização em pista" },
+  { value: "storage", label: "Bagagem / arrumação" },
 ];
 
 export const LIST_ICON_OPTIONS = [
@@ -69,7 +71,9 @@ export const LIST_ICON_OPTIONS = [
 ];
 
 export const TECHNICAL_FEATURE_OPTIONS = [
+  "Engine",
   "Engine Type",
+  "Displacement",
   "Power",
   "Torque",
   "Transmission",
@@ -84,6 +88,15 @@ export const TECHNICAL_FEATURE_OPTIONS = [
   "Battery Capacity",
   "Charging Time",
   "Dimensions",
+  "Storage Capacity",
+  "Rider Capacity",
+  "Fuel Capacity",
+  "Length",
+  "Width",
+  "Height",
+  "Dry Weight",
+  "Hull",
+  "Brake & Reverse",
 ];
 
 export const EMPTY_QUICK_GLANCE_ITEM = { label: "", icon: "engine" };
@@ -99,6 +112,7 @@ export const PREVIEW_EDITABLE_KEYS = [
   "availability_label",
   "description",
   "security_deposit",
+  "minimum_rental",
   "badges",
   "match_names",
   "quick_glance",

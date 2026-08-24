@@ -8,8 +8,10 @@ import {
   FaLeaf,
   FaRoad,
   FaStar,
+  FaSuitcase,
   FaTachometerAlt,
 } from "react-icons/fa";
+import { GiCaptainHatProfile } from "react-icons/gi";
 import { PiSteeringWheelFill, PiGasCanFill } from "react-icons/pi";
 import Button from "./Button";
 
@@ -23,6 +25,7 @@ const glanceIconMap = {
   drivetrain: <FaRoad />,
   speed: <FaTachometerAlt />,
   track: <FaFlagCheckered />,
+  storage: <FaSuitcase />,
 };
 
 const badgeMap = {
@@ -32,6 +35,7 @@ const badgeMap = {
   Premium: { icon: FaGem, color: "bg-purple-500" },
   Electric: { icon: FaBolt, color: "bg-cyan-500" },
   Anchor: { icon: FaAnchor, color: "bg-sky-500" },
+  "Nautical Licence": { icon: GiCaptainHatProfile, color: "bg-teal-500" },
   GPS: {
     icon: function GPSIcon(props) {
       return (
@@ -65,11 +69,11 @@ const statusConfig = {
 };
 
 const QuickGlance = ({ stats }) => (
-  <div className="my-4 flex items-center space-x-4 text-space">
+  <div className="my-4 grid grid-cols-2 gap-x-3 gap-y-2 text-space">
     {stats?.map((stat) => (
-      <div key={stat.label} className="flex items-center gap-2 text-sm">
+      <div key={stat.label} className="flex min-w-0 items-center gap-2 text-sm">
         {glanceIconMap[stat.icon]}
-        <span>{stat.label}</span>
+        <span className="truncate">{stat.label}</span>
       </div>
     ))}
   </div>

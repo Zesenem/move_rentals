@@ -13,6 +13,7 @@ import {
   FaTachometerAlt,
   FaPlaneDeparture,
   FaHandshake,
+  FaSuitcase,
 } from "react-icons/fa";
 import {
   PiSteeringWheelFill,
@@ -39,6 +40,7 @@ export const iconMap = {
   drivetrain: createIcon(FaRoad),
   speed: createIcon(FaTachometerAlt),
   track: createIcon(FaFlagCheckered),
+  storage: createIcon(FaSuitcase),
   forfait: createIcon(FaHandshake),
   "id-card": createIcon(FaIdCard),
   license: createIcon(PiSteeringWheelFill),

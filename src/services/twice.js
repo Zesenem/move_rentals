@@ -10,6 +10,7 @@ const mergeVehicleData = (baseProduct, staticVehicle = {}) => ({
   slug: staticVehicle.slug || baseProduct.slug,
   name: staticVehicle.name || baseProduct.name,
   price_per_day: staticVehicle.price_per_day ?? baseProduct.price_per_day,
+  minimum_rental: staticVehicle.minimum_rental ?? baseProduct.minimum_rental ?? null,
   pricingTiers: staticVehicle.pricingTiers ?? baseProduct.pricingTiers ?? [],
   image_urls: staticVehicle.image_urls ?? baseProduct.image_urls ?? [],
   status: staticVehicle.status || baseProduct.status || "available",

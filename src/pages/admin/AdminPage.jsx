@@ -146,7 +146,11 @@ function AdminPage({ adminUser, onLogout }) {
                     />
                   </div>
 
-                  <BasicDetailsSection draft={draft} onDraftChange={handleDraftChange} />
+                  <BasicDetailsSection
+                    draft={draft}
+                    onDraftChange={handleDraftChange}
+                    onToggleDraftField={handleToggleDraftField}
+                  />
 
                   <FleetCardSection
                     draft={draft}

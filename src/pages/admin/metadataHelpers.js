@@ -23,6 +23,9 @@ export const createVehicleDraft = (vehicle = {}) => ({
     vehicle.security_deposit === undefined || vehicle.security_deposit === null
       ? ""
       : String(vehicle.security_deposit),
+  minimumRentalHours: vehicle.minimum_rental?.hours ? String(vehicle.minimum_rental.hours) : "",
+  minimumRentalPrice: vehicle.minimum_rental?.price ? String(vehicle.minimum_rental.price) : "",
+  fuelNotIncluded: vehicle.minimum_rental?.fuel_included === false,
   badges: cloneStringList(vehicle.badges),
   matchNames: cloneStringList(vehicle.match_names),
   quickGlance: cloneObjectList(vehicle.quick_glance, EMPTY_QUICK_GLANCE_ITEM),
@@ -154,6 +157,25 @@ export const buildUpdatedVehicleEntry = (currentVehicle, draft) => {
   setOptionalString(nextVehicle, "status", draft.status);
   setOptionalString(nextVehicle, "availability_label", draft.availabilityLabel);
   setOptionalString(nextVehicle, "description", draft.description);
+
+  const minimumRentalHours = Number(draft.minimumRentalHours);
+  const minimumRentalPrice = Number(draft.minimumRentalPrice);
+  const hasMinimumRentalHours = Number.isFinite(minimumRentalHours) && minimumRentalHours > 0;
+  const hasMinimumRentalPrice = Number.isFinite(minimumRentalPrice) && minimumRentalPrice > 0;
+
+  if (hasMinimumRentalHours !== hasMinimumRentalPrice) {
+    throw new Error("Indique a duração e o preço do aluguer mínimo, ou deixe ambos vazios.");
+  }
+
+  if (hasMinimumRentalHours && hasMinimumRentalPrice) {
+    nextVehicle.minimum_rental = {
+      hours: minimumRentalHours,
+      price: minimumRentalPrice,
+      fuel_included: !draft.fuelNotIncluded,
+    };
+  } else {
+    delete nextVehicle.minimum_rental;
+  }
 
   const badges = sanitizeStringList(draft.badges);
   const matchNames = sanitizeStringList(draft.matchNames);

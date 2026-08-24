@@ -221,18 +221,40 @@ function MotorcyclePage() {
   const importantNotes = bike?.important_notes || [];
   const hasDeposit = bike?.security_deposit !== undefined && bike?.security_deposit !== null;
   const hasDailyPrice = typeof bike?.price_per_day === "number" && bike.price_per_day > 0;
+  const minimumRental = bike?.minimum_rental;
+  const hasMinimumRental =
+    typeof minimumRental?.hours === "number" &&
+    minimumRental.hours > 0 &&
+    typeof minimumRental?.price === "number" &&
+    minimumRental.price > 0;
+  const isFuelNotIncluded = minimumRental?.fuel_included === false;
   const vehiclePath = `/motorcycle/${encodeURIComponent(slug)}`;
   const vehicleStructuredData = getVehicleStructuredData(bike, vehiclePath);
   const titleAndDescription = (
     <div>
       <h1 className="text-4xl font-extrabold text-cloud tracking-tight">{bike?.name}</h1>
       <p className="mt-4 text-space">{bike?.description}</p>
-      {hasDailyPrice && (
-        <div className="mt-5 flex items-baseline gap-1.5 border-l-2 border-emerald-400 pl-3">
-          <span className="text-3xl font-extrabold tracking-tight text-cloud">
-            &euro;{bike.price_per_day.toFixed(2)}
-          </span>
-          <span className="text-sm font-semibold text-space">/ day</span>
+      {(hasDailyPrice || hasMinimumRental) && (
+        <div className="mt-5 space-y-2 border-l-2 border-emerald-400 pl-3">
+          {hasDailyPrice && (
+            <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
+              <span className="text-3xl font-extrabold tracking-tight text-cloud">
+                &euro;{bike.price_per_day.toFixed(2)}
+              </span>
+              <span className="text-sm font-semibold text-space">/ day</span>
+              {isFuelNotIncluded && <span className="text-xs text-amber-300">Fuel not included</span>}
+            </div>
+          )}
+          {hasMinimumRental && (
+            <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 text-sm">
+              <span className="font-bold text-cloud">
+                &euro;{minimumRental.price.toFixed(2)}
+              </span>
+              <span className="font-semibold text-space">
+                / {minimumRental.hours} hour{minimumRental.hours === 1 ? "" : "s"} minimum
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>
