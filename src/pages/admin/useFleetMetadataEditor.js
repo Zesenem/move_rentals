@@ -22,6 +22,56 @@ import {
 
 const SEED_IMPORT_ID = "2026-q3-fleet-expansion";
 
+const isFilledString = (value) => typeof value === "string" && value.trim().length > 0;
+
+const mergeSeedVehicle = (seedVehicle, existingVehicle = {}, liveVehicle = null) => {
+  const mergedVehicle = { ...seedVehicle, ...existingVehicle };
+
+  ["id", "slug", "source", "name", "status", "availability_label", "description"].forEach((key) => {
+    if (!isFilledString(existingVehicle[key])) {
+      if (isFilledString(seedVehicle[key])) {
+        mergedVehicle[key] = seedVehicle[key];
+      } else if (isFilledString(liveVehicle?.[key])) {
+        mergedVehicle[key] = liveVehicle[key];
+      }
+    }
+  });
+
+  if (!mergedVehicle.id && liveVehicle?.id) {
+    mergedVehicle.id = liveVehicle.id;
+  }
+
+  if (!mergedVehicle.slug && liveVehicle?.slug) {
+    mergedVehicle.slug = liveVehicle.slug;
+  }
+
+  ["badges", "quick_glance", "technical_features", "important_notes"].forEach((key) => {
+    if (!Array.isArray(existingVehicle[key]) || existingVehicle[key].length === 0) {
+      mergedVehicle[key] = seedVehicle[key] || [];
+    }
+  });
+
+  ["included", "requirements"].forEach((key) => {
+    if (!Object.prototype.hasOwnProperty.call(existingVehicle, key)) {
+      mergedVehicle[key] = seedVehicle[key];
+    }
+  });
+
+  if (existingVehicle.security_deposit === undefined || existingVehicle.security_deposit === null) {
+    mergedVehicle.security_deposit = seedVehicle.security_deposit;
+  }
+
+  if (!existingVehicle.minimum_rental && seedVehicle.minimum_rental) {
+    mergedVehicle.minimum_rental = seedVehicle.minimum_rental;
+  }
+
+  mergedVehicle.match_names = [
+    ...new Set([...(seedVehicle.match_names || []), ...(existingVehicle.match_names || [])]),
+  ];
+
+  return mergedVehicle;
+};
+
 // Encapsulates all fleet metadata editor state so AdminPage only handles layout.
 function useFleetMetadataEditor() {
   const queryClient = useQueryClient();
@@ -65,20 +115,34 @@ function useFleetMetadataEditor() {
   });
 
   const metadataEntries = useMemo(() => metadata?.motorcycles_static_data || [], [metadata]);
-  const pendingSeedVehicles = useMemo(() => {
+  const seedImportPlans = useMemo(() => {
     const seedVehicles = (localSeedMetadata?.motorcycles_static_data || []).filter(
       (vehicle) => vehicle.seed_import === SEED_IMPORT_ID,
     );
 
-    return seedVehicles.filter(
-      (seedVehicle) =>
-        !metadataEntries.some(
+    return seedVehicles
+      .map((seedVehicle) => {
+        const liveVehicle = vehicles.find((vehicle) => matchesVehicleMetadata(seedVehicle, vehicle));
+        const relatedEntries = metadataEntries.filter(
           (existingVehicle) =>
             matchesVehicleMetadata(seedVehicle, existingVehicle) ||
-            matchesVehicleMetadata(existingVehicle, seedVehicle),
-        ),
-    );
-  }, [localSeedMetadata, metadataEntries]);
+            matchesVehicleMetadata(existingVehicle, seedVehicle) ||
+            (liveVehicle && matchesVehicleMetadata(existingVehicle, liveVehicle)),
+        );
+        const existingVehicle =
+          relatedEntries.find(
+            (entry) => liveVehicle && matchesVehicleMetadata(entry, liveVehicle),
+          ) || relatedEntries.find((entry) => entry.seed_import !== SEED_IMPORT_ID) || relatedEntries[0];
+        const nextVehicle = mergeSeedVehicle(seedVehicle, existingVehicle, liveVehicle);
+        const needsImport =
+          !existingVehicle ||
+          relatedEntries.length > 1 ||
+          JSON.stringify(existingVehicle) !== JSON.stringify(nextVehicle);
+
+        return { seedVehicle, relatedEntries, existingVehicle, nextVehicle, needsImport };
+      })
+      .filter((plan) => plan.needsImport);
+  }, [localSeedMetadata, metadataEntries, vehicles]);
   const isLoading = isLoadingVehicles || isLoadingMetadata;
   const error = vehiclesError || metadataError;
 
@@ -469,12 +533,12 @@ function useFleetMetadataEditor() {
   };
 
   const handleImportSeedVehicles = async () => {
-    if (!metadata || !pendingSeedVehicles.length) {
+    if (!metadata || !seedImportPlans.length) {
       return;
     }
 
     const confirmed = window.confirm(
-      `Importar ${pendingSeedVehicles.length} novos veículos preparados? Os dados já guardados não serão alterados.`,
+      `Completar a importação de ${seedImportPlans.length} veículos preparados? Os detalhes existentes só serão preenchidos quando estiverem vazios.`,
     );
 
     if (!confirmed) {
@@ -485,14 +549,32 @@ function useFleetMetadataEditor() {
     setSaveMessage("");
 
     try {
+      const duplicateEntries = new Set(
+        seedImportPlans.flatMap((plan) =>
+          plan.relatedEntries.filter((entry) => entry !== plan.existingVehicle),
+        ),
+      );
+      const updatedEntries = new Map(
+        seedImportPlans
+          .filter((plan) => plan.existingVehicle)
+          .map((plan) => [plan.existingVehicle, plan.nextVehicle]),
+      );
+      const newEntries = seedImportPlans
+        .filter((plan) => !plan.existingVehicle)
+        .map((plan) => plan.nextVehicle);
       const nextMetadata = {
         ...metadata,
-        motorcycles_static_data: [...metadataEntries, ...pendingSeedVehicles],
+        motorcycles_static_data: [
+          ...metadataEntries
+            .filter((entry) => !duplicateEntries.has(entry))
+            .map((entry) => updatedEntries.get(entry) || entry),
+          ...newEntries,
+        ],
       };
 
       await saveMutation.mutateAsync(nextMetadata);
       setSaveMessage(
-        `${pendingSeedVehicles.length} novos veículos foram importados para a administração.`,
+        `${seedImportPlans.length} veículos preparados foram atualizados na administração.`,
       );
     } catch (importError) {
       setFormError(importError.message || "Não foi possível importar os veículos preparados.");
@@ -563,7 +645,7 @@ function useFleetMetadataEditor() {
     selectedLiveVehicle,
     selectedNewLiveVehicle,
     selectedVehiclePreview,
-    pendingSeedVehicles,
+    seedImportPlans,
     isLoadingLocalSeedMetadata,
     isLocalSeedMetadataError,
     handleDraftChange,

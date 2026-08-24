@@ -40,7 +40,7 @@ function AdminPage({ adminUser, onLogout }) {
     selectedLiveVehicle,
     selectedNewLiveVehicle,
     selectedVehiclePreview,
-    pendingSeedVehicles,
+    seedImportPlans,
     isLoadingLocalSeedMetadata,
     isLocalSeedMetadataError,
     handleDraftChange,
@@ -153,7 +153,7 @@ function AdminPage({ adminUser, onLogout }) {
 
                   <div className="2xl:col-span-2">
                     <SeedVehicleImportCard
-                      pendingVehicles={pendingSeedVehicles}
+                      importPlans={seedImportPlans}
                       isLoading={isLoadingLocalSeedMetadata}
                       hasError={isLocalSeedMetadataError}
                       isSaving={saveMutation.isPending}
