@@ -6,7 +6,6 @@ import {
   FaLeaf,
   FaMapMarkerAlt,
   FaStar,
-  FaSuitcase,
 } from "react-icons/fa";
 import { GiCaptainHatProfile } from "react-icons/gi";
 
@@ -17,7 +16,6 @@ const badgeIconMap = {
   Electric: FaBolt,
   Anchor: FaAnchor,
   "Nautical Licence": GiCaptainHatProfile,
-  "Luggage Space": FaSuitcase,
   "Best Seller": FaStar,
   "Best Value": FaStar,
 };

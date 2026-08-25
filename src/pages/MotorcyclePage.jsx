@@ -9,6 +9,7 @@ import Seo, { SITE_URL } from "../components/Seo";
 import { trackWhatsAppClick } from "../services/analytics.js";
 import { buildWhatsAppUrl } from "../utils/whatsapp.js";
 import { iconMap } from "../utils/iconMap.jsx";
+import { getEffectiveRentalTerms } from "../utils/rentalTerms.js";
 import { FaExclamationTriangle, FaWhatsapp } from "react-icons/fa";
 
 const formatDisplayValue = (value) => {
@@ -221,20 +222,28 @@ function MotorcyclePage() {
   const importantNotes = bike?.important_notes || [];
   const hasDeposit = bike?.security_deposit !== undefined && bike?.security_deposit !== null;
   const hasDailyPrice = typeof bike?.price_per_day === "number" && bike.price_per_day > 0;
-  const minimumRental = bike?.minimum_rental;
-  const hasMinimumRental =
-    typeof minimumRental?.hours === "number" &&
-    minimumRental.hours > 0 &&
-    typeof minimumRental?.price === "number" &&
-    minimumRental.price > 0;
-  const isFuelNotIncluded = minimumRental?.fuel_included === false;
+  const rentalTerms = getEffectiveRentalTerms(bike);
+  const dailyRental = rentalTerms?.daily;
+  const hourlyRental = rentalTerms?.hourly;
+  const dailyRentalHours = Number(dailyRental?.hours);
+  const hourlyMinimumHours = Number(hourlyRental?.minimum_hours);
+  const hourlyPriceFrom = Number(hourlyRental?.price_from);
+  const hourlyPriceTo = Number(hourlyRental?.price_to);
+  const hasDailyRentalTerms = Number.isFinite(dailyRentalHours) && dailyRentalHours > 0;
+  const hasHourlyRentalTerms =
+    Number.isFinite(hourlyMinimumHours) &&
+    hourlyMinimumHours > 0 &&
+    Number.isFinite(hourlyPriceFrom) &&
+    hourlyPriceFrom > 0 &&
+    Number.isFinite(hourlyPriceTo) &&
+    hourlyPriceTo >= hourlyPriceFrom;
   const vehiclePath = `/motorcycle/${encodeURIComponent(slug)}`;
   const vehicleStructuredData = getVehicleStructuredData(bike, vehiclePath);
   const titleAndDescription = (
     <div>
       <h1 className="text-4xl font-extrabold text-cloud tracking-tight">{bike?.name}</h1>
       <p className="mt-4 text-space">{bike?.description}</p>
-      {(hasDailyPrice || hasMinimumRental) && (
+      {(hasDailyPrice || hasDailyRentalTerms || hasHourlyRentalTerms) && (
         <div className="mt-5 space-y-2 border-l-2 border-emerald-400 pl-3">
           {hasDailyPrice && (
             <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
@@ -242,17 +251,31 @@ function MotorcyclePage() {
                 &euro;{bike.price_per_day.toFixed(2)}
               </span>
               <span className="text-sm font-semibold text-space">/ day</span>
-              {isFuelNotIncluded && <span className="text-xs text-amber-300">Fuel not included</span>}
             </div>
           )}
-          {hasMinimumRental && (
-            <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 text-sm">
-              <span className="font-bold text-cloud">
-                &euro;{minimumRental.price.toFixed(2)}
+          {hasDailyRentalTerms && (
+            <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 text-sm text-space">
+              <span className="font-bold text-cloud">Daily hire</span>
+              {dailyRental.time_range && <span>{dailyRental.time_range}</span>}
+              <span>({dailyRentalHours} hours)</span>
+              {dailyRental.fuel_included === false && (
+                <span className="text-amber-300">Fuel not included</span>
+              )}
+              {hasDeposit && <span>Security deposit required</span>}
+            </div>
+          )}
+          {hasHourlyRentalTerms && (
+            <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1 text-sm text-space">
+              <span className="font-bold text-cloud">Hourly hire</span>
+              <span>
+                &euro;{hourlyPriceFrom}–&euro;{hourlyPriceTo} / hour
               </span>
-              <span className="font-semibold text-space">
-                / {minimumRental.hours} hour{minimumRental.hours === 1 ? "" : "s"} minimum
-              </span>
+              <span>{hourlyMinimumHours}-hour minimum</span>
+              {hourlyRental.fuel_included === true && (
+                <span className="text-emerald-300">Fuel included</span>
+              )}
+              {hourlyRental.security_deposit_required === false && <span>No security deposit</span>}
+              {hourlyRental.availability_note && <span>{hourlyRental.availability_note}</span>}
             </div>
           )}
         </div>

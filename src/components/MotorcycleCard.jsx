@@ -14,10 +14,11 @@ import {
 import { GiCaptainHatProfile } from "react-icons/gi";
 import { PiGasCanFill, PiIdentificationBadgeFill } from "react-icons/pi";
 import Button from "./Button";
+import HorsepowerIcon from "./icons/HorsepowerIcon.jsx";
 
 const glanceIconMap = {
   engine: <FaTachometerAlt />,
-  power: <FaBolt />,
+  power: <HorsepowerIcon />,
   license: <PiIdentificationBadgeFill />,
   gas: <PiGasCanFill />,
   mileage: <FaRoad />,
@@ -34,9 +35,8 @@ const badgeMap = {
   "Best Value": { icon: FaStar, color: "bg-yellow-500" },
   Premium: { icon: FaGem, color: "bg-purple-500" },
   Electric: { icon: FaBolt, color: "bg-cyan-500" },
-  Anchor: { icon: FaAnchor, color: "bg-sky-500" },
+  Anchor: { icon: FaAnchor, color: "bg-sky-500", label: "Summer season" },
   "Nautical Licence": { icon: GiCaptainHatProfile, color: "bg-teal-500" },
-  "Luggage Space": { icon: FaSuitcase, color: "bg-orange-500" },
   GPS: {
     icon: function GPSIcon(props) {
       return (
@@ -69,16 +69,46 @@ const statusConfig = {
   },
 };
 
-const QuickGlance = ({ stats }) => (
-  <div className="my-4 flex items-center gap-x-4 text-space">
-    {stats?.slice(0, 3).map((stat) => (
-      <div key={stat.label} className="flex min-w-0 items-center gap-2 text-sm">
-        {glanceIconMap[stat.icon]}
-        <span className="truncate">{stat.label}</span>
+const getLuggageCapacityLabel = (capacity) => {
+  if (capacity === undefined || capacity === null || capacity === "") {
+    return null;
+  }
+
+  const numericCapacity = Number(capacity);
+
+  return Number.isFinite(numericCapacity) && numericCapacity >= 0 ? `${numericCapacity} L` : null;
+};
+
+const QuickGlance = ({ stats, luggageCapacity }) => {
+  const quickStats = stats?.slice(0, 4) || [];
+  const luggageLabel = getLuggageCapacityLabel(luggageCapacity);
+  const hasStandaloneLuggage = Boolean(luggageLabel) && quickStats.length >= 4;
+  const visibleStats =
+    luggageLabel && !hasStandaloneLuggage
+      ? [...quickStats, { label: luggageLabel, icon: "storage" }]
+      : quickStats;
+
+  return (
+    <>
+      <div className="my-4 grid grid-cols-2 gap-x-4 gap-y-3 text-space">
+        {visibleStats.map((stat) => (
+          <div key={`${stat.icon}-${stat.label}`} className="flex min-w-0 items-center gap-2 text-sm" title={stat.label}>
+            <span className="shrink-0" aria-hidden="true">
+              {glanceIconMap[stat.icon]}
+            </span>
+            <span className="truncate">{stat.label}</span>
+          </div>
+        ))}
       </div>
-    ))}
-  </div>
-);
+      {hasStandaloneLuggage && (
+        <div className="-mt-1 mb-4 flex items-center gap-2 text-sm font-semibold text-space" title="Luggage capacity">
+          <FaSuitcase aria-hidden="true" />
+          <span>{luggageLabel}</span>
+        </div>
+      )}
+    </>
+  );
+};
 
 const Badges = ({ badges }) => (
   <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
@@ -93,7 +123,7 @@ const Badges = ({ badges }) => (
         >
           <Icon className="h-4 w-4 flex-shrink-0" />
           <span className="whitespace-nowrap text-xs font-bold transition-all duration-300 ease-out max-w-0 opacity-0 group-hover:ml-1.5 group-hover:max-w-[100px] group-hover:opacity-100">
-            {badge}
+            {badgeInfo.label || badge}
           </span>
         </div>
       );
@@ -143,7 +173,7 @@ function MotorcycleCard({ bike, index }) {
         </div>
         <div className="flex flex-grow flex-col p-5">
           <h3 className="min-h-[56px] text-xl font-bold tracking-tight text-cloud">{bike.name}</h3>
-          <QuickGlance stats={bike.quick_glance} />
+          <QuickGlance stats={bike.quick_glance} luggageCapacity={bike.luggage_capacity_l} />
           <div className="mt-auto space-y-4 border-t border-graphite/30 pt-4">
             <div className="flex items-baseline text-cloud">
               <span className="text-3xl font-bold tracking-tight">

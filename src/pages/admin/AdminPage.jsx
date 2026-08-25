@@ -42,6 +42,7 @@ function AdminPage({ adminUser, onLogout }) {
     handleDraftChange,
     handleToggleDraftField,
     handleBadgeToggle,
+    handleLicenceCategoryToggle,
     handleObjectListChange,
     handleAddObjectListItem,
     handleRemoveObjectListItem,
@@ -150,6 +151,7 @@ function AdminPage({ adminUser, onLogout }) {
                     draft={draft}
                     onDraftChange={handleDraftChange}
                     onToggleDraftField={handleToggleDraftField}
+                    onLicenceCategoryToggle={handleLicenceCategoryToggle}
                   />
 
                   <FleetCardSection

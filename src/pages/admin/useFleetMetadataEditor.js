@@ -438,6 +438,15 @@ function useFleetMetadataEditor() {
     }
   };
 
+  const handleLicenceCategoryToggle = (licenceCategory) => {
+    updateDraft((currentDraft) => ({
+      ...currentDraft,
+      licenceCategories: currentDraft.licenceCategories.includes(licenceCategory)
+        ? currentDraft.licenceCategories.filter((category) => category !== licenceCategory)
+        : [...currentDraft.licenceCategories, licenceCategory],
+    }));
+  };
+
   const handleDeleteSelectedEntry = async () => {
     if (!metadata || isCreatingNew || !selectedMetadataEntry || selectedMetadataIndex < 0) {
       return;
@@ -505,6 +514,7 @@ function useFleetMetadataEditor() {
     handleDraftChange,
     handleToggleDraftField,
     handleBadgeToggle,
+    handleLicenceCategoryToggle,
     handleStringListChange,
     handleAddStringListItem,
     handleRemoveStringListItem,

@@ -9,7 +9,8 @@ function QuickGlanceEditor({
   onChange,
   onRemove,
   addLabel = "Adicionar informação rápida",
-  emptyMessage = "Adicione até três informações curtas para o cartão do veículo.",
+  emptyMessage = "Adicione até quatro informações curtas para o cartão do veículo.",
+  maxItems = 4,
 }) {
   return (
     <div className="space-y-3">
@@ -50,7 +51,11 @@ function QuickGlanceEditor({
         </p>
       )}
 
-      <InlineActionButton icon={FaPlus} label={addLabel} onClick={onAdd} />
+      {items.length < maxItems ? (
+        <InlineActionButton icon={FaPlus} label={addLabel} onClick={onAdd} />
+      ) : (
+        <p className="text-sm text-space">Limite de {maxItems} informações rápidas atingido.</p>
+      )}
     </div>
   );
 }

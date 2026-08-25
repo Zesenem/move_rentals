@@ -24,14 +24,29 @@ export const SOURCE_OPTIONS = [
   { value: "static", label: "Veículo apenas do site" },
 ];
 
+export const VEHICLE_TYPE_OPTIONS = [
+  { value: "", label: "Selecionar tipo" },
+  { value: "scooter", label: "Scooter" },
+  { value: "motorcycle", label: "Moto" },
+  { value: "car", label: "Carro" },
+  { value: "watercraft", label: "Veículo náutico" },
+];
+
+export const LICENCE_CATEGORY_OPTIONS = [
+  { value: "A1", label: "A1" },
+  { value: "A2", label: "A2" },
+  { value: "A", label: "A" },
+  { value: "B", label: "B" },
+  { value: "nautical", label: "Carta náutica" },
+];
+
 export const BADGE_OPTIONS = [
   { value: "ECO", label: "Económico" },
   { value: "Premium", label: "Premium" },
   { value: "GPS", label: "GPS" },
   { value: "Electric", label: "Elétrico" },
-  { value: "Anchor", label: "Âncora" },
+  { value: "Anchor", label: "Temporada de verão" },
   { value: "Nautical Licence", label: "Carta náutica" },
-  { value: "Luggage Space", label: "Bagagem" },
   { value: "Best Seller", label: "Mais popular" },
   { value: "Best Value", label: "Melhor preço" },
 ];
@@ -46,7 +61,6 @@ export const QUICK_GLANCE_ICON_OPTIONS = [
   { value: "drivetrain", label: "Tração" },
   { value: "speed", label: "Velocidade" },
   { value: "track", label: "Utilização em pista" },
-  { value: "storage", label: "Bagagem / arrumação" },
 ];
 
 export const LIST_ICON_OPTIONS = [
@@ -112,8 +126,12 @@ export const PREVIEW_EDITABLE_KEYS = [
   "status",
   "availability_label",
   "description",
+  "vehicle_type",
+  "licence_categories",
+  "displacement_cc",
+  "luggage_capacity_l",
   "security_deposit",
-  "minimum_rental",
+  "rental_terms",
   "badges",
   "match_names",
   "quick_glance",

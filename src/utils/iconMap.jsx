@@ -26,6 +26,7 @@ import {
 } from "react-icons/pi";
 import { GiFullMotorcycleHelmet, GiGloves, GiLeatherBoot } from "react-icons/gi";
 import { GrTag } from "react-icons/gr";
+import HorsepowerIcon from "../components/icons/HorsepowerIcon.jsx";
 
 const createIcon = (IconComponent, colorClass = "text-steel") => {
   const baseClasses = "flex-shrink-0 text-lg";
@@ -34,7 +35,7 @@ const createIcon = (IconComponent, colorClass = "text-steel") => {
 
 export const iconMap = {
   engine: createIcon(FaTachometerAlt),
-  power: createIcon(FaBolt),
+  power: createIcon(HorsepowerIcon),
   gas: createIcon(PiGasCanFill),
   mileage: createIcon(FaRoad),
   transmission: createIcon(FaCogs),

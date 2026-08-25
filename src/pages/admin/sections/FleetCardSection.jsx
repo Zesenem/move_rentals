@@ -30,12 +30,12 @@ function FleetCardSection({
       <div className="mt-6">
         <FieldGroup
           label="Informações rápidas"
-          hint="Mantenha até três factos curtos. Exemplo: 283 cv, categoria B, 534 km WLTP."
+          hint="Mantenha até quatro factos curtos. Exemplo: 125 cc, 12 cv, categoria B, 7.1 L."
         >
           <QuickGlanceEditor
             items={draft.quickGlance}
             addLabel="Adicionar informação rápida"
-            emptyMessage="Adicione até três informações curtas para o cartão do veículo."
+            emptyMessage="Adicione até quatro informações curtas para o cartão do veículo."
             onAdd={() => onAddObjectListItem("quickGlance", EMPTY_QUICK_GLANCE_ITEM)}
             onChange={(index, key, value) => onObjectListChange("quickGlance", index, key, value)}
             onRemove={(index) => onRemoveObjectListItem("quickGlance", index)}

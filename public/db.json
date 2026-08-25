@@ -136,6 +136,7 @@
         { "label": "A", "icon": "license" },
         { "label": "16.5 L", "icon": "gas" }
       ],
+      "luggage_capacity_l": 0,
       "security_deposit": 3500,
       "technical_features": [
         { "label": "Type", "value": "Sport motorcycle (superbike)" },
@@ -296,7 +297,17 @@
         { "label": "Nautical licence*", "icon": "license" }
       ],
       "security_deposit": 1700,
-      "minimum_rental": { "hours": 3, "price": 300, "fuel_included": false },
+      "rental_terms": {
+        "daily": { "hours": 7, "time_range": "10:00–17:00", "fuel_included": false },
+        "hourly": {
+          "minimum_hours": 3,
+          "price_from": 120,
+          "price_to": 180,
+          "fuel_included": true,
+          "security_deposit_required": false,
+          "availability_note": "Subject to availability and season."
+        }
+      },
       "technical_features": [
         { "label": "Engine", "value": "Rotax 1630 ACE" },
         { "label": "Displacement", "value": "1,630 cc" },
@@ -322,8 +333,8 @@
         { "item": "Appropriate personal-watercraft experience", "icon": "experience" }
       ],
       "important_notes": [
-        { "item": "Fuel is not included in the listed rates", "icon": "gas" },
-        { "item": "Minimum rental duration: 3 hours", "icon": "default-check" }
+        { "item": "Daily rental excludes fuel; hourly rental includes fuel", "icon": "gas" },
+        { "item": "Hourly rental minimum: 3 hours", "icon": "default-check" }
       ]
     },
     {
@@ -337,7 +348,17 @@
         { "label": "Nautical licence*", "icon": "license" }
       ],
       "security_deposit": 1900,
-      "minimum_rental": { "hours": 3, "price": 375, "fuel_included": false },
+      "rental_terms": {
+        "daily": { "hours": 7, "time_range": "10:00–17:00", "fuel_included": false },
+        "hourly": {
+          "minimum_hours": 3,
+          "price_from": 120,
+          "price_to": 180,
+          "fuel_included": true,
+          "security_deposit_required": false,
+          "availability_note": "Subject to availability and season."
+        }
+      },
       "technical_features": [
         { "label": "Engine", "value": "Rotax 1630 ACE" },
         { "label": "Displacement", "value": "1,630 cc" },
@@ -365,8 +386,8 @@
         { "item": "Appropriate personal-watercraft experience", "icon": "experience" }
       ],
       "important_notes": [
-        { "item": "Fuel is not included in the listed rates", "icon": "gas" },
-        { "item": "Minimum rental duration: 3 hours", "icon": "default-check" }
+        { "item": "Daily rental excludes fuel; hourly rental includes fuel", "icon": "gas" },
+        { "item": "Hourly rental minimum: 3 hours", "icon": "default-check" }
       ]
     },
     {
@@ -382,7 +403,17 @@
         { "label": "Nautical licence*", "icon": "license" }
       ],
       "security_deposit": 2500,
-      "minimum_rental": { "hours": 3, "price": 600, "fuel_included": false },
+      "rental_terms": {
+        "daily": { "hours": 7, "time_range": "10:00–17:00", "fuel_included": false },
+        "hourly": {
+          "minimum_hours": 3,
+          "price_from": 120,
+          "price_to": 180,
+          "fuel_included": true,
+          "security_deposit_required": false,
+          "availability_note": "Subject to availability and season."
+        }
+      },
       "technical_features": [
         { "label": "Engine", "value": "Supercharged Rotax 1630 ACE" },
         { "label": "Displacement", "value": "1,630 cc" },
@@ -413,8 +444,8 @@
         { "item": "Appropriate personal-watercraft experience", "icon": "experience" }
       ],
       "important_notes": [
-        { "item": "Fuel is not included in the listed rates", "icon": "gas" },
-        { "item": "Minimum rental duration: 3 hours", "icon": "default-check" },
+        { "item": "Daily rental excludes fuel; hourly rental includes fuel", "icon": "gas" },
+        { "item": "Hourly rental minimum: 3 hours", "icon": "default-check" },
         { "item": "Reservation subject to approval", "icon": "default-check" }
       ]
     }

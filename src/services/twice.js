@@ -4,27 +4,38 @@ import {
   matchesVehicleMetadata,
   slugify,
 } from "./fleetMatching.js";
+import { getEffectiveRentalTerms, removeLegacyJetSkiRentalNotes } from "../utils/rentalTerms.js";
 
-const mergeVehicleData = (baseProduct, staticVehicle = {}) => ({
-  ...baseProduct,
-  slug: staticVehicle.slug || baseProduct.slug,
-  name: staticVehicle.name || baseProduct.name,
-  price_per_day: staticVehicle.price_per_day ?? baseProduct.price_per_day,
-  minimum_rental: staticVehicle.minimum_rental ?? baseProduct.minimum_rental ?? null,
-  pricingTiers: staticVehicle.pricingTiers ?? baseProduct.pricingTiers ?? [],
-  image_urls: staticVehicle.image_urls ?? baseProduct.image_urls ?? [],
-  status: staticVehicle.status || baseProduct.status || "available",
-  availability_label: staticVehicle.availability_label || baseProduct.availability_label,
-  description: staticVehicle.description || baseProduct.description || "",
-  badges: staticVehicle.badges ?? baseProduct.badges ?? [],
-  quick_glance: staticVehicle.quick_glance ?? baseProduct.quick_glance ?? [],
-  security_deposit: staticVehicle.security_deposit ?? baseProduct.security_deposit ?? null,
-  technical_features:
-    staticVehicle.technical_features ?? baseProduct.technical_features ?? [],
-  included: staticVehicle.included ?? baseProduct.included,
-  requirements: staticVehicle.requirements ?? baseProduct.requirements,
-  important_notes: staticVehicle.important_notes ?? baseProduct.important_notes ?? [],
-});
+const mergeVehicleData = (baseProduct, staticVehicle = {}) => {
+  const name = staticVehicle.name || baseProduct.name;
+  const vehicle = { ...baseProduct, ...staticVehicle, name };
+  const importantNotes = staticVehicle.important_notes ?? baseProduct.important_notes ?? [];
+
+  return {
+    ...baseProduct,
+    slug: staticVehicle.slug || baseProduct.slug,
+    name,
+    price_per_day: staticVehicle.price_per_day ?? baseProduct.price_per_day,
+    vehicle_type: staticVehicle.vehicle_type ?? baseProduct.vehicle_type ?? "",
+    licence_categories: staticVehicle.licence_categories ?? baseProduct.licence_categories ?? [],
+    displacement_cc: staticVehicle.displacement_cc ?? baseProduct.displacement_cc ?? null,
+    luggage_capacity_l: staticVehicle.luggage_capacity_l ?? baseProduct.luggage_capacity_l ?? null,
+    rental_terms: getEffectiveRentalTerms(vehicle),
+    pricingTiers: staticVehicle.pricingTiers ?? baseProduct.pricingTiers ?? [],
+    image_urls: staticVehicle.image_urls ?? baseProduct.image_urls ?? [],
+    status: staticVehicle.status || baseProduct.status || "available",
+    availability_label: staticVehicle.availability_label || baseProduct.availability_label,
+    description: staticVehicle.description || baseProduct.description || "",
+    badges: staticVehicle.badges ?? baseProduct.badges ?? [],
+    quick_glance: staticVehicle.quick_glance ?? baseProduct.quick_glance ?? [],
+    security_deposit: staticVehicle.security_deposit ?? baseProduct.security_deposit ?? null,
+    technical_features:
+      staticVehicle.technical_features ?? baseProduct.technical_features ?? [],
+    included: staticVehicle.included ?? baseProduct.included,
+    requirements: staticVehicle.requirements ?? baseProduct.requirements,
+    important_notes: removeLegacyJetSkiRentalNotes(vehicle, importantNotes),
+  };
+};
 
 const createStaticOnlyVehicle = (staticVehicle) =>
   mergeVehicleData(
