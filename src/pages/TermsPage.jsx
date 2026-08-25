@@ -5,7 +5,7 @@ function TermsPage() {
     <>
       <Seo
         title="Terms of Service | Move Rentals"
-        description="Read the Terms of Service for renting a scooter or motorcycle from Move Rentals in Lisbon."
+        description="Read the Terms of Service for road-vehicle and personal-watercraft rentals from Move Rentals in Lisbon."
         path="/terms-and-conditions"
       />
       <div className="container mx-auto px-4 py-12">
@@ -16,7 +16,9 @@ function TermsPage() {
               Move LX Unipessoal LDA (Trading as Move Rentals)
             </p>
             <p className="text-sm text-graphite">
-              Head Office: Rua Carlos Reis, nº 63, Lisbon, Portugal
+              Registered office: Rua Carlos Reis, nº 63, Lisbon, Portugal
+              <br />
+              Customer collection garage: Rua da Beneficência 44D, 1600-031 Lisboa, Portugal
             </p>
           </div>
 
@@ -32,12 +34,18 @@ function TermsPage() {
 
             <section>
               <h2 className="text-2xl font-bold text-steel mb-3">2. Rental Requirements</h2>
-              <p>To rent a vehicle, the Client must:</p>
+              <p>To rent a vehicle or personal watercraft, the Client must:</p>
               <ul className="list-disc space-y-2 pl-5">
                 <li>Be at least 21 years old.</li>
-                <li>Hold a valid motorcycle driving license (category AM or A1/A2/A).</li>
+                <li>
+                  Hold a valid licence appropriate to the selected road vehicle (for example,
+                  AM, A1, A2, A or B where applicable).
+                </li>
+                <li>
+                  Hold a valid nautical licence appropriate to the selected personal watercraft.
+                </li>
                 <li>Provide valid identification (passport or citizen card).</li>
-                <li>Provide a valid form of payment and security deposit.</li>
+                <li>Provide a valid form of payment and any required security deposit.</li>
               </ul>
               <p>
                 Move Rentals reserves the right to refuse service to any client who does not meet
@@ -53,53 +61,90 @@ function TermsPage() {
                   Upon payment confirmation, the rental becomes non-refundable (see section 7).
                 </li>
                 <li>
-                  Security deposits are mandatory, variable per vehicle, and payable before rental
-                  begins.
+                  Security deposits are required only where stated for the selected vehicle and
+                  rental option, and are payable before the rental begins.
                 </li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-2xl font-bold text-steel mb-3">4. Vehicle Use</h2>
+              <h2 className="text-2xl font-bold text-steel mb-3">4. Vehicle and Watercraft Use</h2>
               <p>The Client agrees to:</p>
               <ul className="list-disc space-y-2 pl-5">
-                <li>Use the vehicle in accordance with local traffic laws.</li>
+                <li>
+                  Use the vehicle or watercraft in accordance with applicable traffic,
+                  navigation and safety rules.
+                </li>
                 <li>
                   Not drive under the influence of alcohol, drugs, or medication that impairs
                   driving.
                 </li>
                 <li>Not allow third parties to use the vehicle unless previously authorized.</li>
-                <li>Secure the vehicle when not in use (lock, key, alarm, etc.).</li>
-                <li>Refill fuel as needed and return the vehicle with a similar level.</li>
+                <li>Secure the vehicle or watercraft when not in use, where applicable.</li>
+                <li>
+                  Follow the fuel arrangements stated for the selected rental option and rental
+                  agreement.
+                </li>
               </ul>
               <p>Failure to comply may result in additional fees or loss of security deposit.</p>
             </section>
 
             <section>
+              <h2 className="text-2xl font-bold text-steel mb-3">
+                4A. Personal-Watercraft / Jet-Ski Rental Conditions
+              </h2>
+              <p>
+                The following conditions apply to personal-watercraft and jet-ski rentals, subject
+                to availability and confirmation by Move Rentals:
+              </p>
+              <ul className="list-disc space-y-2 pl-5">
+                <li>A valid nautical licence appropriate to the selected watercraft is required.</li>
+                <li>
+                  Daily hire normally runs from 10:00 to 17:00 (7 hours), excludes fuel and
+                  requires the security deposit stated for the selected watercraft.
+                </li>
+                <li>
+                  Hourly hire has a minimum duration of 3 hours, includes fuel and does not
+                  require a security deposit.
+                </li>
+                <li>
+                  Hourly rates range from €120 to €180 per hour, depending on season and
+                  availability.
+                </li>
+                <li>The final rate and availability are confirmed at the time of booking.</li>
+              </ul>
+            </section>
+
+            <section>
               <h2 className="text-2xl font-bold text-steel mb-3">5. Security Deposit</h2>
               <p>
-                A security deposit is required for each scooter rental and is taken as a
-                pre-authorization on a valid credit card. The amount may vary depending on the
-                scooter model. This deposit is fully refundable upon the safe and timely return of
-                the scooter and all included equipment in their original condition, free from
-                damage, loss, or any traffic-related fines.
+                Where a security deposit is required, it is taken as a pre-authorization on a
+                valid credit card. The amount varies by vehicle and rental option. This deposit is
+                fully refundable upon the safe and timely return of the vehicle or watercraft and
+                all included equipment in their original condition, free from damage, loss or
+                applicable fines.
               </p>
               <p>
-                Even if a reduced security deposit package is purchased, the renter remains legally
-                responsible for the full security deposit amount in the event of damage, loss, or
-                violations.
+                The hourly personal-watercraft option described in section 4A does not require a
+                security deposit. Where a reduced security-deposit package is purchased, the
+                renter remains legally responsible for the full security deposit amount in the event
+                of damage, loss or violations.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl font-bold text-steel mb-3">6. Insurance & Liability</h2>
-              <p>All rentals include:</p>
+              <p>Road-vehicle rentals include:</p>
               <ul className="list-disc space-y-2 pl-5">
                 <li>Mandatory third-party liability insurance (as per Portuguese law).</li>
                 <li>
                   Optional theft protection insurance, available at additional cost during booking.
                 </li>
               </ul>
+              <p>
+                The applicable insurance and liability arrangements for personal-watercraft hire
+                are confirmed in the individual rental agreement.
+              </p>
               <p>In case of accident:</p>
               <ul className="list-disc space-y-2 pl-5">
                 <li>
@@ -208,12 +253,13 @@ function TermsPage() {
             <section>
               <h2 className="text-2xl font-bold text-steel mb-3">14. Contact</h2>
               <p>Move LX Unipessoal LDA</p>
-              <p>Rua Carlos Reis, nº 63, Lisbon</p>
+              <p>Registered office: Rua Carlos Reis, nº 63, Lisbon</p>
+              <p>Customer collection garage: Rua da Beneficência 44D, 1600-031 Lisboa</p>
               <p>📧 move@move-rentals.com</p>
               <p>📞 +351 920 016 794</p>
             </section>
 
-            <p className="!mt-12 text-sm text-graphite">Last updated: July 18, 2025</p>
+            <p className="!mt-12 text-sm text-graphite">Last updated: August 25, 2026</p>
           </div>
         </div>
       </div>

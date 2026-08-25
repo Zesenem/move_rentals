@@ -294,7 +294,7 @@
       "quick_glance": [
         { "label": "1,630 cc", "icon": "engine" },
         { "label": "130 hp", "icon": "power" },
-        { "label": "Nautical licence*", "icon": "license" }
+        { "label": "Nautical licence", "icon": "license" }
       ],
       "security_deposit": 1700,
       "rental_terms": {
@@ -345,7 +345,7 @@
       "quick_glance": [
         { "label": "1,630 cc", "icon": "engine" },
         { "label": "170 hp", "icon": "power" },
-        { "label": "Nautical licence*", "icon": "license" }
+        { "label": "Nautical licence", "icon": "license" }
       ],
       "security_deposit": 1900,
       "rental_terms": {
@@ -400,7 +400,7 @@
       "quick_glance": [
         { "label": "1,630 cc", "icon": "engine" },
         { "label": "230 hp", "icon": "power" },
-        { "label": "Nautical licence*", "icon": "license" }
+        { "label": "Nautical licence", "icon": "license" }
       ],
       "security_deposit": 2500,
       "rental_terms": {

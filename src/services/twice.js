@@ -60,7 +60,9 @@ function mapApiProductToAppProduct(apiProduct) {
     price_per_day: apiProduct.rentals?.basePrice ? apiProduct.rentals.basePrice / 100 : null,
     pricingTiers: apiProduct.rentals?.pricing || [],
     image_urls: apiProduct.images || [],
-    status: apiProduct.limitations?.visibleInListing ? "available" : "unavailable",
+    // Products are public unless Twice explicitly hides them. This matches the sitemap
+    // behaviour and prevents an older/missing limitations field from disabling a valid listing.
+    status: apiProduct.limitations?.visibleInListing === false ? "unavailable" : "available",
     description: apiProduct.description?.en || apiProduct.description?.def || "",
   };
 }

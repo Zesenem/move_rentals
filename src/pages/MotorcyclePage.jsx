@@ -120,7 +120,7 @@ const IncludedInRentalList = ({ items }) => (
   </ul>
 );
 
-const RequirementsList = ({ items, deposit }) => (
+const RequirementsList = ({ items, deposit, depositLabel = "Security Deposit" }) => (
   <>
     {items?.length > 0 && (
       <ul className="text-base space-y-2.5 text-steel">
@@ -134,7 +134,7 @@ const RequirementsList = ({ items, deposit }) => (
     )}
     {deposit !== undefined && deposit !== null && deposit !== "" && (
       <p className="mt-2 text-sm text-steel">
-        Security Deposit:{" "}
+        {depositLabel}:{" "}
         <span className="font-semibold text-cloud">{formatDisplayValue(deposit)}</span>
       </p>
     )}
@@ -237,6 +237,10 @@ function MotorcyclePage() {
     hourlyPriceFrom > 0 &&
     Number.isFinite(hourlyPriceTo) &&
     hourlyPriceTo >= hourlyPriceFrom;
+  const depositLabel =
+    hourlyRental?.security_deposit_required === false
+      ? "Daily-hire security deposit"
+      : "Security Deposit";
   const vehiclePath = `/motorcycle/${encodeURIComponent(slug)}`;
   const vehicleStructuredData = getVehicleStructuredData(bike, vehiclePath);
   const titleAndDescription = (
@@ -340,7 +344,11 @@ function MotorcyclePage() {
               )}
               {(requirementItems.length > 0 || hasDeposit) && (
                 <AccordionItem title="Requirements">
-                  <RequirementsList items={requirementItems} deposit={bike?.security_deposit} />
+                  <RequirementsList
+                    items={requirementItems}
+                    deposit={bike?.security_deposit}
+                    depositLabel={depositLabel}
+                  />
                 </AccordionItem>
               )}
               {importantNotes.length > 0 && (
