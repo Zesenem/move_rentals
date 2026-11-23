@@ -61,7 +61,7 @@ const LoginForm = ({ onSubmit, onForgotPassword, isSubmitting, errorMessage }) =
       <button
         type="button"
         onClick={onForgotPassword}
-        className="block w-full text-center text-sm text-space hover:text-cloud"
+        className="block w-full text-center text-sm text-steel hover:text-cloud"
       >
         Esqueceu-se da palavra-passe?
       </button>
@@ -117,14 +117,14 @@ const LoginCard = ({
   errorMessage,
   recoveryStatusMessage,
 }) => (
-  <div className="container mx-auto px-4 py-16">
+  <div className="container mx-auto min-h-[calc(100vh-5rem)] px-4 py-16">
     <div className="mx-auto max-w-xl rounded-3xl border border-graphite/50 bg-arsenic p-8 shadow-xl">
       <div className="flex items-center gap-3 text-cloud">
         <div className="rounded-2xl bg-phantom p-3">
           <FaLock className="text-lg" />
         </div>
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-graphite">
+          <p className="text-sm font-semibold uppercase tracking-[0.24em] text-steel">
             Área protegida
           </p>
           <h1 className="mt-1 text-3xl font-extrabold">
@@ -133,7 +133,7 @@ const LoginCard = ({
         </div>
       </div>
 
-      <p className="mt-6 text-space">
+      <p className="mt-6 text-steel">
         {view === "recovery"
           ? "Enviaremos uma ligação por email para repor a palavra-passe."
           : "Inicie sessão com a conta de administrador para gerir os dados da frota. Esta página não é pública."}
@@ -182,7 +182,7 @@ const SetPasswordCard = ({ title, description, onSubmit, isSubmitting, errorMess
   };
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="container mx-auto min-h-[calc(100vh-5rem)] px-4 py-16">
       <div className="mx-auto max-w-xl rounded-3xl border border-graphite/50 bg-arsenic p-8 shadow-xl">
         <h1 className="text-3xl font-extrabold text-cloud">{title}</h1>
         <p className="mt-4 text-space">{description}</p>
@@ -345,7 +345,7 @@ function AdminWorkspacePage() {
       </Helmet>
 
       {!isCallbackProcessed && (
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto min-h-[calc(100vh-5rem)] px-4 py-16">
           <div className="rounded-3xl border border-graphite/50 bg-arsenic p-8 text-space shadow-xl">
             A preparar o início de sessão...
           </div>
@@ -373,7 +373,7 @@ function AdminWorkspacePage() {
       )}
 
       {isCallbackProcessed && !pendingCallback && sessionQuery.isLoading && (
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto min-h-[calc(100vh-5rem)] px-4 py-16">
           <div className="rounded-3xl border border-graphite/50 bg-arsenic p-8 text-space shadow-xl">
             A confirmar o acesso de administrador...
           </div>
@@ -381,7 +381,7 @@ function AdminWorkspacePage() {
       )}
 
       {isCallbackProcessed && !pendingCallback && sessionQuery.isError && (
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto min-h-[calc(100vh-5rem)] px-4 py-16">
           <div className="mx-auto max-w-xl rounded-3xl border border-red-500/40 bg-red-500/10 p-8 shadow-xl">
             <FaExclamationTriangle className="text-3xl text-red-300" />
             <h1 className="mt-4 text-2xl font-extrabold text-cloud">

@@ -2,6 +2,7 @@ import { FaTag } from "react-icons/fa";
 import BadgeSelector from "../components/BadgeSelector.jsx";
 import FieldGroup from "../components/FieldGroup.jsx";
 import QuickGlanceEditor from "../components/QuickGlanceEditor.jsx";
+import ImageUrlEditor from "../components/ImageUrlEditor.jsx";
 import SectionHeading from "../components/SectionHeading.jsx";
 import { EMPTY_QUICK_GLANCE_ITEM, sectionCardClassName } from "../constants.js";
 
@@ -11,6 +12,10 @@ function FleetCardSection({
   onAddObjectListItem,
   onObjectListChange,
   onRemoveObjectListItem,
+  onAddImage,
+  onImageChange,
+  onRemoveImage,
+  onMoveImage,
 }) {
   return (
     <div className={sectionCardClassName}>
@@ -26,6 +31,21 @@ function FleetCardSection({
       >
         <BadgeSelector value={draft.badges} onToggle={onBadgeToggle} />
       </FieldGroup>
+
+      <div className="mt-6">
+        <FieldGroup
+          label="Imagens do veículo"
+          hint="Deixe vazio para usar as imagens da Twice. Se adicionar URLs HTTPS, estas e a sua ordem substituem as imagens em direto."
+        >
+          <ImageUrlEditor
+            items={draft.imageUrls}
+            onAdd={onAddImage}
+            onChange={onImageChange}
+            onRemove={onRemoveImage}
+            onMove={onMoveImage}
+          />
+        </FieldGroup>
+      </div>
 
       <div className="mt-6">
         <FieldGroup

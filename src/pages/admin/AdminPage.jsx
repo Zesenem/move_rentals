@@ -8,6 +8,7 @@ import EditExistingVehicleCard from "./sections/EditExistingVehicleCard.jsx";
 import FleetCardSection from "./sections/FleetCardSection.jsx";
 import PreviewPanel from "./sections/PreviewPanel.jsx";
 import RentalRulesSection from "./sections/RentalRulesSection.jsx";
+import RevisionHistorySection from "./sections/RevisionHistorySection.jsx";
 import SharedDefaultsSection from "./sections/SharedDefaultsSection.jsx";
 import SummaryStats from "./sections/SummaryStats.jsx";
 import VehicleDetailPageSection from "./sections/VehicleDetailPageSection.jsx";
@@ -20,6 +21,7 @@ function AdminPage({ adminUser, onLogout }) {
     isLoading,
     isVehiclesError,
     isMetadataError,
+    isLoadingHistory,
     error,
     adminSummary,
     metadataEntries,
@@ -39,8 +41,13 @@ function AdminPage({ adminUser, onLogout }) {
     selectedLiveVehicle,
     selectedNewLiveVehicle,
     selectedVehiclePreview,
+    revisionHistory,
     handleDraftChange,
     handleToggleDraftField,
+    handleAddImage,
+    handleImageChange,
+    handleRemoveImage,
+    handleMoveImage,
     handleBadgeToggle,
     handleLicenceCategoryToggle,
     handleObjectListChange,
@@ -162,6 +169,10 @@ function AdminPage({ adminUser, onLogout }) {
                     onAddObjectListItem={handleAddObjectListItem}
                     onObjectListChange={handleObjectListChange}
                     onRemoveObjectListItem={handleRemoveObjectListItem}
+                    onAddImage={handleAddImage}
+                    onImageChange={handleImageChange}
+                    onRemoveImage={handleRemoveImage}
+                    onMoveImage={handleMoveImage}
                   />
 
                   <VehicleDetailPageSection
@@ -187,6 +198,13 @@ function AdminPage({ adminUser, onLogout }) {
                     onCommonDataFieldChange={handleCommonDataFieldChange}
                     onAddWeeklyKilometres={handleAddWeeklyKilometres}
                   />
+
+                  <div className="2xl:col-span-2">
+                    <RevisionHistorySection
+                      revisions={revisionHistory}
+                      isLoading={isLoadingHistory}
+                    />
+                  </div>
 
                 </div>
               </section>

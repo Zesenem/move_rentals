@@ -1,5 +1,6 @@
 const REMOTE_FLEET_METADATA_URL = "/.netlify/functions/get-fleet-metadata";
 const SAVE_FLEET_METADATA_URL = "/.netlify/functions/save-fleet-metadata";
+const FLEET_METADATA_HISTORY_URL = "/.netlify/functions/get-fleet-metadata-history";
 const LOCAL_FLEET_METADATA_URL = "/db.json";
 let metadataRequest = null;
 
@@ -57,7 +58,7 @@ export const saveFleetMetadata = async (metadata) => {
     const response = await fetch(SAVE_FLEET_METADATA_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(metadata),
+      body: JSON.stringify({ ...metadata, expected_revision: Number(metadata.revision) || 0 }),
     });
 
     const payload = await response.json().catch(() => ({}));
@@ -71,4 +72,15 @@ export const saveFleetMetadata = async (metadata) => {
     console.error("Failed to save fleet metadata:", error);
     throw error;
   }
+};
+
+export const fetchFleetMetadataHistory = async () => {
+  const response = await fetch(FLEET_METADATA_HISTORY_URL);
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(payload.error || "Could not fetch fleet metadata history.");
+  }
+
+  return payload.data || [];
 };

@@ -25,6 +25,7 @@ export const createVehicleDraft = (vehicle = {}) => {
     status: vehicle.status || "",
     availabilityLabel: vehicle.availability_label || "",
     description: vehicle.description || "",
+    imageUrls: cloneStringList(vehicle.image_urls),
     vehicleType: vehicle.vehicle_type || "",
     licenceCategories: cloneStringList(vehicle.licence_categories),
     displacementCc:
@@ -219,6 +220,24 @@ export const buildUpdatedVehicleEntry = (currentVehicle, draft) => {
   setOptionalString(nextVehicle, "availability_label", draft.availabilityLabel);
   setOptionalString(nextVehicle, "description", draft.description);
   setOptionalString(nextVehicle, "vehicle_type", draft.vehicleType);
+
+  const imageUrls = draft.imageUrls.map((url) => url.trim()).filter(Boolean);
+
+  for (const imageUrl of imageUrls) {
+    try {
+      if (new URL(imageUrl).protocol !== "https:") {
+        throw new Error("Image URLs must use HTTPS.");
+      }
+    } catch {
+      throw new Error("Introduza URLs de imagem HTTPS válidas ou remova as linhas vazias.");
+    }
+  }
+
+  if (imageUrls.length) {
+    nextVehicle.image_urls = imageUrls;
+  } else {
+    delete nextVehicle.image_urls;
+  }
 
   const licenceCategories = sanitizeStringList(draft.licenceCategories);
 

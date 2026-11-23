@@ -69,13 +69,32 @@ export default async (req) => {
       return Response.json({ error: validationError }, { status: 400 });
     }
 
-    const metadata = await writeFleetMetadata(payload);
+    const expectedRevision = Number(payload.expected_revision ?? payload.revision ?? 0);
+    if (!Number.isInteger(expectedRevision) || expectedRevision < 0) {
+      return Response.json({ error: "Expected revision must be a non-negative integer." }, { status: 400 });
+    }
+    const metadataPayload = { ...payload };
+    delete metadataPayload.expected_revision;
+    const metadata = await writeFleetMetadata(metadataPayload, {
+      expectedRevision,
+      userEmail: accessState.user?.email || "",
+    });
 
     return Response.json({
       data: metadata,
       message: "Fleet metadata saved successfully.",
     });
   } catch (error) {
+    if (error.code === "METADATA_CONFLICT") {
+      return Response.json(
+        {
+          error: "Another administrator saved newer changes. Reload the page before saving again.",
+          data: error.currentMetadata,
+        },
+        { status: 409 },
+      );
+    }
+
     return Response.json(
       { error: error.message || "Could not save fleet metadata." },
       { status: 500 },

@@ -3,7 +3,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { matchesVehicleMetadata } from "../../services/fleetMatching.js";
 import { fetchProducts } from "../../services/twice.js";
-import { fetchFleetMetadata, saveFleetMetadata } from "../../services/fleetMetadata.js";
+import {
+  fetchFleetMetadata,
+  fetchFleetMetadataHistory,
+  saveFleetMetadata,
+} from "../../services/fleetMetadata.js";
 import { PREVIEW_EDITABLE_KEYS } from "./constants.js";
 import {
   buildUpdatedCommonData,
@@ -192,10 +196,20 @@ function useFleetMetadataEditor() {
     },
     onSuccess: (savedMetadata) => {
       queryClient.setQueryData(["admin", "fleet-metadata"], savedMetadata);
+      queryClient.invalidateQueries({ queryKey: ["admin", "fleet-metadata-history"] });
       queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product-snapshot"] });
       queryClient.invalidateQueries({ queryKey: ["product"] });
     },
+  });
+
+  const {
+    data: revisionHistory = [],
+    isLoading: isLoadingHistory,
+  } = useQuery({
+    queryKey: ["admin", "fleet-metadata-history"],
+    queryFn: fetchFleetMetadataHistory,
   });
 
   const updateDraft = (updater) => {
@@ -226,6 +240,40 @@ function useFleetMetadataEditor() {
       ...currentDraft,
       [field]: checked,
     }));
+  };
+
+  const handleAddImage = () => {
+    updateDraft((currentDraft) => ({
+      ...currentDraft,
+      imageUrls: [...currentDraft.imageUrls, ""],
+    }));
+  };
+
+  const handleImageChange = (index, value) => {
+    updateDraft((currentDraft) => ({
+      ...currentDraft,
+      imageUrls: currentDraft.imageUrls.map((url, itemIndex) => (itemIndex === index ? value : url)),
+    }));
+  };
+
+  const handleRemoveImage = (index) => {
+    updateDraft((currentDraft) => ({
+      ...currentDraft,
+      imageUrls: currentDraft.imageUrls.filter((_, itemIndex) => itemIndex !== index),
+    }));
+  };
+
+  const handleMoveImage = (index, direction) => {
+    updateDraft((currentDraft) => {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= currentDraft.imageUrls.length) {
+        return currentDraft;
+      }
+
+      const imageUrls = [...currentDraft.imageUrls];
+      [imageUrls[index], imageUrls[targetIndex]] = [imageUrls[targetIndex], imageUrls[index]];
+      return { ...currentDraft, imageUrls };
+    });
   };
 
   const handleBadgeToggle = (badge) => {
@@ -519,6 +567,7 @@ function useFleetMetadataEditor() {
     isLoading,
     isVehiclesError,
     isMetadataError,
+    isLoadingHistory,
     error,
     adminSummary,
     metadataEntries,
@@ -538,8 +587,13 @@ function useFleetMetadataEditor() {
     selectedLiveVehicle,
     selectedNewLiveVehicle,
     selectedVehiclePreview,
+    revisionHistory,
     handleDraftChange,
     handleToggleDraftField,
+    handleAddImage,
+    handleImageChange,
+    handleRemoveImage,
+    handleMoveImage,
     handleBadgeToggle,
     handleLicenceCategoryToggle,
     handleStringListChange,
