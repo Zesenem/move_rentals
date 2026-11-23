@@ -182,7 +182,7 @@ function MotorcycleCard({ bike, index }) {
             }`}
             onLoad={(event) => {
               const image = event.currentTarget;
-              setUsesContainedFraming(image.naturalWidth / image.naturalHeight >= 1.45);
+              setUsesContainedFraming(image.naturalWidth / image.naturalHeight >= 1.95);
               image.style.opacity = "1";
             }}
             onError={(e) => {
