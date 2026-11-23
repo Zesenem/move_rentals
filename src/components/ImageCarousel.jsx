@@ -92,7 +92,7 @@ function ImageCarousel({ images, vehicleName }) {
             sizes="(min-width: 1024px) 720px, 100vw"
             loading="eager"
             decoding="async"
-            className="absolute inset-0 h-full w-full object-contain shadow-xl"
+            className="absolute inset-0 h-full w-full scale-[1.03] object-contain shadow-xl"
           />
           {vehicleImages.length > 1 && (
             <>
@@ -128,7 +128,7 @@ function ImageCarousel({ images, vehicleName }) {
                   sizes="(min-width: 768px) 128px, 18vw"
                   loading="lazy"
                   decoding="async"
-                  className="h-full w-full object-contain"
+                  className="h-full w-full scale-[1.04] object-contain"
                 />
               </button>
             ))}
