@@ -37,6 +37,9 @@
   path = "/motorcycle/*"
   function = "vehicle-seo"
 
+[images]
+  remote_images = ["https://firebasestorage.googleapis.com/*"]
+
 # This stays last: static files and the routes above take precedence.
 # It gives paths outside the app's public route patterns a real HTTP 404.
 [[redirects]]

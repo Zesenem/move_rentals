@@ -150,7 +150,7 @@ function MotorcycleList() {
   };
 
   return (
-    <section ref={fleetSectionRef} id="fleet-section" className="py-16 sm:py-24">
+    <section ref={fleetSectionRef} className="py-16 sm:py-24">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-4xl font-extrabold text-steel">Our Fleet</h2>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-space">

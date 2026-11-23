@@ -1,6 +1,6 @@
 import Hero from "../components/Hero";
 import MileageCounter from "../components/MileageCounter";
-import MotorcycleList from "../components/MotorcycleList";
+import LazyMotorcycleList from "../components/LazyMotorcycleList";
 import Seo from "../components/Seo";
 
 const showMileageCounter =
@@ -16,7 +16,7 @@ function HomePage() {
       />
       <Hero />
       {showMileageCounter && <MileageCounter />}
-      <MotorcycleList />
+      <LazyMotorcycleList />
     </>
   );
 }

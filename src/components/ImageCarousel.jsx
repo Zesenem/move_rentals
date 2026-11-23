@@ -1,5 +1,6 @@
 import { lazy, Suspense, useState, useMemo, useCallback } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { getResponsiveImageProps } from "../utils/images.js";
 
 const EMPTY_IMAGES = [];
 const Lightbox = lazy(async () => {
@@ -70,8 +71,14 @@ function ImageCarousel({ images, vehicleName }) {
           onClick={() => setOpen(true)}
         >
           <img
-            src={vehicleImages[currentIndex]}
+            {...getResponsiveImageProps(vehicleImages[currentIndex], {
+              widths: [640, 1200, 1600],
+              quality: 80,
+            })}
             alt={getImageAlt(displayName, currentIndex)}
+            width="1200"
+            height="675"
+            sizes="(min-width: 1024px) 720px, 100vw"
             loading="eager"
             decoding="async"
             className="absolute inset-0 h-full w-full object-cover shadow-xl"
@@ -95,8 +102,14 @@ function ImageCarousel({ images, vehicleName }) {
                 aria-label={`View ${displayName} image ${index + 1}`}
               >
                 <img
-                  src={src}
+                  {...getResponsiveImageProps(src, {
+                    widths: [160, 320],
+                    quality: 70,
+                  })}
                   alt=""
+                  width="160"
+                  height="90"
+                  sizes="(min-width: 768px) 128px, 18vw"
                   loading="lazy"
                   decoding="async"
                   className="h-full w-full object-cover"

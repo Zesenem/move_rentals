@@ -3,10 +3,9 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
-import * as Sentry from "@sentry/react";
 
 import App from "./App.jsx";
-import ErrorFallback from "./components/ErrorFallback.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import RouteErrorBoundary from "./components/RouteErrorBoundary.jsx";
 import HomePage from "./pages/HomePage.jsx";
 
@@ -27,11 +26,6 @@ const routeFallback = (
 );
 
 const withSuspense = (page) => <Suspense fallback={routeFallback}>{page}</Suspense>;
-
-Sentry.init({
-  dsn: "https://63e09e83dc19c7365dd42385009bc409@o4509673502736384.ingest.de.sentry.io/4509673504505936",
-  tunnel: "/.netlify/functions/sentry-proxy",
-});
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -64,12 +58,12 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <Sentry.ErrorBoundary fallback={ErrorFallback}>
+    <ErrorBoundary>
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <RouterProvider router={router} />
         </QueryClientProvider>
       </HelmetProvider>
-    </Sentry.ErrorBoundary>
+    </ErrorBoundary>
   </React.StrictMode>,
 );

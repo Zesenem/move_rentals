@@ -18,7 +18,7 @@ function ComingSoonCard() {
       />
       <div className="text-center sm:text-left">
         <h3 className="text-2xl font-bold text-steel">More Bikes On The Way</h3>
-        <p className="mt-1 text-space">
+        <p className="mt-1 text-steel">
           We're always expanding our fleet. Check back soon for new models!
         </p>
       </div>

@@ -111,10 +111,12 @@ function Footer() {
             <img
               src="/32x32.png"
               alt="Move Rentals Symbol"
+              width="32"
+              height="32"
               className="h-8 w-auto filter invert transition-opacity hover:opacity-80"
             />
           </Link>
-          <p className="order-first text-sm text-graphite sm:order-last">
+          <p className="order-first text-sm text-space sm:order-last">
             &copy; {currentYear} Move Rentals
           </p>
         </div>

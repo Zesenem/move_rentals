@@ -15,6 +15,7 @@ import { GiCaptainHatProfile } from "react-icons/gi";
 import { PiGasCanFill, PiIdentificationBadgeFill } from "react-icons/pi";
 import Button from "./Button";
 import HorsepowerIcon from "./icons/HorsepowerIcon.jsx";
+import { getResponsiveImageProps } from "../utils/images.js";
 
 const glanceIconMap = {
   engine: <FaTachometerAlt />,
@@ -57,7 +58,7 @@ const badgeMap = {
 const statusConfig = {
   available: {
     label: "Available",
-    className: "bg-status-bg-available text-status-available",
+    className: "bg-status-bg-available text-emerald-100",
   },
   unavailable: {
     label: "Unavailable",
@@ -90,7 +91,7 @@ const QuickGlance = ({ stats, luggageCapacity }) => {
 
   return (
     <>
-      <div className="my-4 grid grid-cols-2 gap-x-4 gap-y-3 text-space">
+      <div className="my-4 grid grid-cols-2 gap-x-4 gap-y-3 text-steel">
         {visibleStats.map((stat) => (
           <div key={`${stat.icon}-${stat.label}`} className="flex min-w-0 items-center gap-2 text-sm" title={stat.label}>
             <span className="shrink-0" aria-hidden="true">
@@ -101,7 +102,7 @@ const QuickGlance = ({ stats, luggageCapacity }) => {
         ))}
       </div>
       {hasStandaloneLuggage && (
-        <div className="-mt-1 mb-4 flex items-center gap-2 text-sm font-semibold text-space" title="Luggage capacity">
+        <div className="-mt-1 mb-4 flex items-center gap-2 text-sm font-semibold text-steel" title="Luggage capacity">
           <FaSuitcase aria-hidden="true" />
           <span>{luggageLabel}</span>
         </div>
@@ -142,6 +143,10 @@ function MotorcycleCard({ bike, index }) {
 
   const imageUrl =
     bike.image_urls?.[0] || `https://placehold.co/600x400/2A2D35/EDEFF7?text=${bike.name}`;
+  const imageProps = getResponsiveImageProps(imageUrl, {
+    widths: [384, 768],
+    quality: 78,
+  });
 
   const wrapperProps = {
     className: "card-animate block w-full max-w-sm",
@@ -160,8 +165,11 @@ function MotorcycleCard({ bike, index }) {
       >
         <div className="relative aspect-video overflow-hidden bg-phantom">
           <img
-            src={imageUrl}
+            {...imageProps}
             alt={bike.name}
+            width="1200"
+            height="675"
+            sizes="(min-width: 1024px) 384px, (min-width: 640px) 45vw, 100vw"
             loading="lazy"
             decoding="async"
             className="h-full w-full object-cover opacity-0 transition-opacity duration-500"
@@ -181,7 +189,7 @@ function MotorcycleCard({ bike, index }) {
               <span className="text-3xl font-bold tracking-tight">
                 {hasPrice ? `€${bike.price_per_day.toFixed(2)}` : "Price on request"}
               </span>
-              {hasPrice && <span className="ml-1 text-sm font-semibold text-space">/day</span>}
+              {hasPrice && <span className="ml-1 text-sm font-semibold text-steel">/day</span>}
             </div>
             <div className="flex items-center justify-between">
               <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusInfo.className}`}>

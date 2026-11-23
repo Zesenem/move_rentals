@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { isRouteErrorResponse, useNavigate, useRouteError } from "react-router-dom";
-import * as Sentry from "@sentry/react";
 import { FaExclamationTriangle } from "react-icons/fa";
+import { reportError } from "../services/monitoring.js";
 import Button from "./Button";
 
 function RouteErrorBoundary() {
@@ -11,7 +11,7 @@ function RouteErrorBoundary() {
 
   useEffect(() => {
     if (!isResponseError) {
-      Sentry.captureException(error);
+      reportError(error);
     }
   }, [error, isResponseError]);
 
