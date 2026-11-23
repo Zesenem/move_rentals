@@ -37,8 +37,17 @@
   path = "/motorcycle/*"
   function = "vehicle-seo"
 
+[[edge_functions]]
+  path = "/lisbon-rental-guide"
+  function = "guide-seo"
+
 [images]
   remote_images = ["https://firebasestorage.googleapis.com/*"]
+
+[[headers]]
+  for = "/.netlify/images"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, immutable"
 
 # This stays last: static files and the routes above take precedence.
 # It gives paths outside the app's public route patterns a real HTTP 404.

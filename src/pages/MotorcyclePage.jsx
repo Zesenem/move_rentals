@@ -211,7 +211,7 @@ function MotorcyclePage() {
     );
   }
 
-  const { bike, commonData } = data || {};
+  const { bike, commonData, isStale } = data || {};
 
   const whatsappMessage = `Hello! I'm interested in renting the ${bike?.name}. Could you provide more information?`;
   const whatsappUrl = buildWhatsAppUrl(whatsappMessage);
@@ -241,12 +241,15 @@ function MotorcyclePage() {
     hourlyRental?.security_deposit_required === false
       ? "Daily-hire security deposit"
       : "Security Deposit";
+  const vehicleDescription =
+    bike?.description ||
+    `Rent the ${bike?.name} in Lisbon and contact Move Rentals for current availability and rental conditions.`;
   const vehiclePath = `/motorcycle/${encodeURIComponent(slug)}`;
   const vehicleStructuredData = getVehicleStructuredData(bike, vehiclePath);
   const titleAndDescription = (
     <div>
       <h1 className="text-4xl font-extrabold text-cloud tracking-tight">{bike?.name}</h1>
-      <p className="mt-4 text-space">{bike?.description}</p>
+      <p className="mt-4 text-space">{vehicleDescription}</p>
       {(hasDailyPrice || hasDailyRentalTerms || hasHourlyRentalTerms) && (
         <div className="mt-5 space-y-2 border-l-2 border-emerald-400 pl-3">
           {hasDailyPrice && (
@@ -316,15 +319,39 @@ function MotorcyclePage() {
     <>
       <Seo
         title={bike?.name ? `${bike.name} | Move Rentals` : "Vehicle Details | Move Rentals"}
-        description={bike?.description || "Find details and book your vehicle rental in Lisbon."}
+        description={vehicleDescription}
         path={vehiclePath}
         image={bike?.image_urls?.[0]}
         structuredData={vehicleStructuredData}
       />
       <div className="container mx-auto px-4 py-12">
-        <Link to="/" className="text-steel hover:text-cloud mb-8 inline-block font-semibold">
-          &larr; Back to Our Fleet
-        </Link>
+        {isStale && (
+          <div
+            role="status"
+            className="mb-6 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100"
+          >
+            Live availability is temporarily unavailable. These are the most recent saved vehicle details.
+          </div>
+        )}
+        <nav aria-label="Breadcrumb" className="mb-8 text-sm">
+          <ol className="flex flex-wrap items-center gap-2 text-space">
+            <li>
+              <Link to="/" className="font-semibold hover:text-cloud">
+                Home
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li>
+              <Link to="/#fleet-section" className="font-semibold hover:text-cloud">
+                Our Fleet
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li aria-current="page" className="text-steel">
+              {bike?.name}
+            </li>
+          </ol>
+        </nav>
 
         <div className="mb-8 md:hidden">{titleAndDescription}</div>
 

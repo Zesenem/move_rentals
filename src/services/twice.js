@@ -6,6 +6,37 @@ import {
 } from "./fleetMatching.js";
 import { getEffectiveRentalTerms, removeLegacyJetSkiRentalNotes } from "../utils/rentalTerms.js";
 
+const FLEET_CACHE_KEY = "move-rentals-fleet-cache";
+const FLEET_CACHE_MAX_AGE = 7 * 24 * 60 * 60 * 1000;
+
+const readCachedFleet = () => {
+  try {
+    const cached = JSON.parse(window.localStorage.getItem(FLEET_CACHE_KEY));
+    if (
+      !cached?.savedAt ||
+      Date.now() - cached.savedAt > FLEET_CACHE_MAX_AGE ||
+      !Array.isArray(cached.products)
+    ) {
+      return null;
+    }
+
+    return cached;
+  } catch {
+    return null;
+  }
+};
+
+const cacheFleet = ({ products, commonData }) => {
+  try {
+    window.localStorage.setItem(
+      FLEET_CACHE_KEY,
+      JSON.stringify({ products, commonData, savedAt: Date.now() }),
+    );
+  } catch (error) {
+    console.warn("Could not cache the fleet snapshot:", error);
+  }
+};
+
 const mergeVehicleData = (baseProduct, staticVehicle = {}) => {
   const name = staticVehicle.name || baseProduct.name;
   const vehicle = { ...baseProduct, ...staticVehicle, name };
@@ -117,15 +148,33 @@ const fetchFleetData = async () => {
 
   const allVehicles = [...mergedLiveProducts, ...staticOnlyVehicles];
 
-  if (!allVehicles.length && liveProductsError) {
-    throw liveProductsError;
+  if (liveProductsError) {
+    const cachedFleet = readCachedFleet();
+
+    if (cachedFleet) {
+      console.warn("Using the last successful fleet snapshot because Twice is unavailable.");
+      return {
+        products: cachedFleet.products,
+        commonData: cachedFleet.commonData || staticData.common_data,
+        isStale: true,
+      };
+    }
+
+    if (!allVehicles.length) {
+      throw liveProductsError;
+    }
   }
 
-  return {
+  const snapshot = {
     products: allVehicles,
     commonData: staticData.common_data || { requirements: [], included: [] },
+    isStale: false,
   };
+  cacheFleet(snapshot);
+  return snapshot;
 };
+
+export const fetchProductsSnapshot = fetchFleetData;
 
 export const fetchProducts = async () => {
   const { products } = await fetchFleetData();
@@ -134,7 +183,7 @@ export const fetchProducts = async () => {
 
 export const fetchProductBySlug = async (slug) => {
   try {
-    const { products, commonData } = await fetchFleetData();
+    const { products, commonData, isStale } = await fetchFleetData();
     const bike = products.find((product) => product.slug === slug);
     if (!bike) {
       throw new Error("Vehicle not found by slug");
@@ -142,6 +191,7 @@ export const fetchProductBySlug = async (slug) => {
     return {
       bike,
       commonData,
+      isStale,
     };
   } catch (error) {
     console.error("Error in fetchProductBySlug:", error);

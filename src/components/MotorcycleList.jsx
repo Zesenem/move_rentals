@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaExclamationTriangle } from "react-icons/fa";
-import { fetchProducts } from "../services/twice.js";
+import { fetchProductsSnapshot } from "../services/twice.js";
 import {
   filterFleetVehicles,
   getActiveFleetFilterCount,
@@ -12,6 +12,8 @@ import FleetFilters from "./FleetFilters.jsx";
 import MotorcycleCard from "./MotorcycleCard";
 import ComingSoonCard from "./ComingSoonCard";
 import MotorcycleCardSkeleton from "./MotorcycleCardSkeleton.jsx";
+
+const EMPTY_MOTORCYCLES = [];
 
 function MotorcycleList() {
   const fleetSectionRef = useRef(null);
@@ -26,14 +28,15 @@ function MotorcycleList() {
     displacementRange: null,
   });
   const {
-    data: motorcycles = [],
+    data: fleetSnapshot,
     isLoading,
     isError,
     error,
   } = useQuery({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
+    queryKey: ["product-snapshot"],
+    queryFn: fetchProductsSnapshot,
   });
+  const motorcycles = fleetSnapshot?.products || EMPTY_MOTORCYCLES;
 
   useEffect(() => {
     if (!fleetSectionRef.current) {
@@ -156,6 +159,15 @@ function MotorcycleList() {
         <p className="mx-auto mt-4 max-w-2xl text-lg text-space">
           From city scooters to premium bikes and special vehicles, pick the ride that fits your plan.
         </p>
+
+        {fleetSnapshot?.isStale && (
+          <div
+            role="status"
+            className="mx-auto mt-6 max-w-2xl rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100"
+          >
+            Live availability is temporarily unavailable. We are showing the most recent saved fleet details.
+          </div>
+        )}
 
         {!isLoading && !isError && (
           <FleetFilters

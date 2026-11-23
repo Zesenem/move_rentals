@@ -21,10 +21,16 @@ export const handler = async (event) => {
 
     const url = `https://${sentryHost}/api/${projectId}/envelope/`;
 
-    await fetch(url, {
+    const sentryResponse = await fetch(url, {
       method: "POST",
       body: envelope,
+      signal: AbortSignal.timeout(5000),
     });
+
+    if (!sentryResponse.ok) {
+      console.error("Sentry rejected an envelope", { status: sentryResponse.status });
+      return { statusCode: 502, body: "Sentry rejected the event." };
+    }
 
     return { statusCode: 200 };
   } catch (error) {

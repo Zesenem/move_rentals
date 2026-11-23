@@ -8,7 +8,13 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:e2e": "playwright test",
+    "test:lighthouse": "lhci autorun",
+    "test:lighthouse:live": "lhci autorun --config=lighthouserc.live.json",
+    "test:lighthouse:live-admin": "lhci autorun --config=lighthouserc.live-admin.json",
+    "check:live-content": "node scripts/check-live-content.mjs",
+    "qa": "npm run lint && npm run build && npm run test:e2e"
   },
   "dependencies": {
     "@netlify/blobs": "^10.7.4",
@@ -24,6 +30,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
+    "@lhci/cli": "^0.16.1",
+    "@playwright/test": "^1.65.1",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.1",

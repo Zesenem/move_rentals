@@ -2,6 +2,7 @@ import { connectLambda, getStore } from "@netlify/blobs";
 
 export const FLEET_METADATA_STORE_NAME = "fleet-metadata";
 export const FLEET_METADATA_KEY = "current";
+export const FLEET_METADATA_HISTORY_KEY = "history";
 
 // Lambda-compatible (v1) functions need connectLambda to bridge the blobs context.
 export const readFleetMetadata = async (event) => {

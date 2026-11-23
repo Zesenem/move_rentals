@@ -6,6 +6,8 @@ const loadSentry = () => {
       Sentry.init({
         dsn: "https://63e09e83dc19c7365dd42385009bc409@o4509673502736384.ingest.de.sentry.io/4509673504505936",
         tunnel: "/.netlify/functions/sentry-proxy",
+        release: globalThis.__MOVE_RELEASE__,
+        environment: import.meta.env.PROD ? "production" : "development",
       });
       return Sentry;
     });
