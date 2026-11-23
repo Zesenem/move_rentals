@@ -1,13 +1,6 @@
-import React, { lazy, Suspense, useEffect } from "react";
+import React, { lazy, Suspense } from "react";
 import ReactDOM from "react-dom/client";
-import {
-  createBrowserRouter,
-  RouterProvider,
-  useLocation,
-  useNavigationType,
-  createRoutesFromChildren,
-  matchRoutes,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HelmetProvider } from "react-helmet-async";
 import * as Sentry from "@sentry/react";
@@ -16,39 +9,28 @@ import App from "./App.jsx";
 import ErrorFallback from "./components/ErrorFallback.jsx";
 import RouteErrorBoundary from "./components/RouteErrorBoundary.jsx";
 import HomePage from "./pages/HomePage.jsx";
-import MotorcyclePage from "./pages/MotorcyclePage.jsx";
-import NotFoundPage from "./pages/NotFoundPage.jsx";
-import TermsPage from "./pages/TermsPage.jsx";
-import PrivacyPolicyPage from "./pages/PrivacyPolicyPage.jsx";
-import ContactPage from "./pages/ContactPage.jsx";
 
 import "./index.css";
 
 const AdminWorkspacePage = lazy(() => import("./pages/AdminWorkspacePage.jsx"));
+const ContactPage = lazy(() => import("./pages/ContactPage.jsx"));
+const MotorcyclePage = lazy(() => import("./pages/MotorcyclePage.jsx"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage.jsx"));
+const PrivacyPolicyPage = lazy(() => import("./pages/PrivacyPolicyPage.jsx"));
+const TermsPage = lazy(() => import("./pages/TermsPage.jsx"));
 
-const adminRouteFallback = (
+const routeFallback = (
   <div className="container mx-auto flex min-h-[70vh] items-center justify-center px-4 py-16">
     <div className="h-10 w-10 animate-spin rounded-full border-4 border-graphite border-t-cloud" />
-    <span className="sr-only">Loading admin workspace</span>
+    <span className="sr-only">Loading page</span>
   </div>
 );
 
+const withSuspense = (page) => <Suspense fallback={routeFallback}>{page}</Suspense>;
+
 Sentry.init({
   dsn: "https://63e09e83dc19c7365dd42385009bc409@o4509673502736384.ingest.de.sentry.io/4509673504505936",
-  integrations: [
-    Sentry.reactRouterV6BrowserTracingIntegration({
-      useEffect: useEffect,
-      useLocation: useLocation,
-      useNavigationType: useNavigationType,
-      createRoutesFromChildren: createRoutesFromChildren,
-      matchRoutes: matchRoutes,
-    }),
-    Sentry.replayIntegration(),
-  ],
   tunnel: "/.netlify/functions/sentry-proxy",
-  tracesSampleRate: 1.0,
-  replaysSessionSampleRate: 0.1,
-  replaysOnErrorSampleRate: 1.0,
 });
 
 const queryClient = new QueryClient({
@@ -67,19 +49,15 @@ const router = createBrowserRouter([
     errorElement: <RouteErrorBoundary />,
     children: [
       { index: true, element: <HomePage /> },
-      { path: "motorcycle/:slug", element: <MotorcyclePage /> },
-      { path: "terms-and-conditions", element: <TermsPage /> },
-      { path: "privacy-policy", element: <PrivacyPolicyPage /> },
-      { path: "contact", element: <ContactPage /> },
+      { path: "motorcycle/:slug", element: withSuspense(<MotorcyclePage />) },
+      { path: "terms-and-conditions", element: withSuspense(<TermsPage />) },
+      { path: "privacy-policy", element: withSuspense(<PrivacyPolicyPage />) },
+      { path: "contact", element: withSuspense(<ContactPage />) },
       {
         path: "admin",
-        element: (
-          <Suspense fallback={adminRouteFallback}>
-            <AdminWorkspacePage />
-          </Suspense>
-        ),
+        element: withSuspense(<AdminWorkspacePage />),
       },
-      { path: "*", element: <NotFoundPage /> },
+      { path: "*", element: withSuspense(<NotFoundPage />) },
     ],
   },
 ]);

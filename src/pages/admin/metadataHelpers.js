@@ -96,6 +96,17 @@ export const createStaticVehicleMetadataTemplate = () => ({
 export const createCommonDataDraft = (commonData = {}) => ({
   requirements: cloneObjectList(commonData.requirements, EMPTY_LIST_ITEM),
   included: cloneObjectList(commonData.included, EMPTY_LIST_ITEM),
+  kilometresDriven:
+    commonData.kilometres_driven === undefined || commonData.kilometres_driven === null
+      ? "0"
+      : String(commonData.kilometres_driven),
+  weeklyEstimate:
+    commonData.kilometres_weekly_estimate === undefined ||
+    commonData.kilometres_weekly_estimate === null
+      ? "500"
+      : String(commonData.kilometres_weekly_estimate),
+  weeklyKilometres: "",
+  projectionStartedAt: commonData.kilometres_projection_started_at || "",
 });
 
 export const sanitizeStringList = (items) => items.map((item) => item.trim()).filter(Boolean);
@@ -125,10 +136,26 @@ export const sanitizeIconListItems = (items) =>
     }))
     .filter((item) => item.item);
 
-export const buildUpdatedCommonData = (draft) => ({
-  requirements: sanitizeIconListItems(draft.requirements),
-  included: sanitizeIconListItems(draft.included),
-});
+export const buildUpdatedCommonData = (draft) => {
+  const kilometresDriven = Number(draft.kilometresDriven);
+  const weeklyEstimate = Number(draft.weeklyEstimate);
+
+  if (!Number.isFinite(kilometresDriven) || kilometresDriven < 0) {
+    throw new Error("Indique um total de quilómetros válido.");
+  }
+
+  if (!Number.isFinite(weeklyEstimate) || weeklyEstimate < 0) {
+    throw new Error("Indique uma estimativa semanal de quilómetros válida.");
+  }
+
+  return {
+    requirements: sanitizeIconListItems(draft.requirements),
+    included: sanitizeIconListItems(draft.included),
+    kilometres_driven: Math.round(kilometresDriven),
+    kilometres_weekly_estimate: Math.round(weeklyEstimate),
+    kilometres_projection_started_at: draft.projectionStartedAt || new Date().toISOString(),
+  };
+};
 
 export const parseSecurityDeposit = (value) => {
   const trimmedValue = value.trim();

@@ -1,5 +1,8 @@
 {
   "common_data": {
+    "kilometres_driven": 0,
+    "kilometres_weekly_estimate": 500,
+    "kilometres_projection_started_at": "2026-11-23T00:00:00.000Z",
     "requirements": [
       { "item": "Identity card or Valid Passport", "icon": "id-card" },
       { "item": "Driving license: category A1 or B if driver is 25+ years old", "icon": "license" },

@@ -20,6 +20,29 @@ const validateFleetMetadata = (payload) => {
     return "Payload.common_data.included must be an array.";
   }
 
+  if (
+    payload.common_data.kilometres_driven !== undefined &&
+    (!Number.isFinite(payload.common_data.kilometres_driven) ||
+      payload.common_data.kilometres_driven < 0)
+  ) {
+    return "Payload.common_data.kilometres_driven must be a non-negative number.";
+  }
+
+  if (
+    payload.common_data.kilometres_weekly_estimate !== undefined &&
+    (!Number.isFinite(payload.common_data.kilometres_weekly_estimate) ||
+      payload.common_data.kilometres_weekly_estimate < 0)
+  ) {
+    return "Payload.common_data.kilometres_weekly_estimate must be a non-negative number.";
+  }
+
+  if (
+    payload.common_data.kilometres_projection_started_at !== undefined &&
+    !Number.isFinite(Date.parse(payload.common_data.kilometres_projection_started_at))
+  ) {
+    return "Payload.common_data.kilometres_projection_started_at must be a valid date.";
+  }
+
   if (!Array.isArray(payload.motorcycles_static_data)) {
     return "Payload.motorcycles_static_data must be an array.";
   }

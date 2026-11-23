@@ -9,7 +9,6 @@ function RouteErrorBoundary() {
   const navigate = useNavigate();
   const isResponseError = isRouteErrorResponse(error);
 
-  // Route-level errors bypass Sentry's ErrorBoundary, so report them manually.
   useEffect(() => {
     if (!isResponseError) {
       Sentry.captureException(error);

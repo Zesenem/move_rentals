@@ -107,9 +107,9 @@ function PrivacyPolicyPage() {
               <p>
                 We use cookies to help improve your experience on our website. A cookie is a small
                 piece of data that our website stores on your computer. We use "strictly necessary"
-                cookies for essential functions like managing your shopping cart. For all other
-                cookies, such as those used for analytics and session recording, we will ask for
-                your explicit consent via a consent banner.
+                cookies for essential site functions. Analytics cookies from our Google Tag
+                Manager setup are not loaded unless you explicitly accept analytics. You can change
+                that choice at any time using the Cookies control at the bottom of the page.
               </p>
             </section>
 
@@ -124,7 +124,7 @@ function PrivacyPolicyPage() {
               </p>
             </section>
 
-            <p className="!mt-12 text-sm text-graphite">Last updated: July 16, 2025</p>
+            <p className="!mt-12 text-sm text-graphite">Last updated: November 23, 2026</p>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 const REMOTE_FLEET_METADATA_URL = "/.netlify/functions/get-fleet-metadata";
 const SAVE_FLEET_METADATA_URL = "/.netlify/functions/save-fleet-metadata";
 const LOCAL_FLEET_METADATA_URL = "/db.json";
+let metadataRequest = null;
 
 const fetchLocalFleetMetadata = async () => {
   const response = await fetch(LOCAL_FLEET_METADATA_URL);
@@ -13,6 +14,20 @@ const fetchLocalFleetMetadata = async () => {
 };
 
 export const fetchFleetMetadata = async () => {
+  if (metadataRequest) {
+    return metadataRequest;
+  }
+
+  metadataRequest = fetchFleetMetadataFromSource();
+
+  try {
+    return await metadataRequest;
+  } finally {
+    metadataRequest = null;
+  }
+};
+
+const fetchFleetMetadataFromSource = async () => {
   try {
     const response = await fetch(REMOTE_FLEET_METADATA_URL);
 
@@ -34,16 +49,6 @@ export const fetchFleetMetadata = async () => {
     console.error("Failed to fetch local fleet metadata:", error);
     throw error;
   }
-};
-
-export const fetchCommonFleetData = async () => {
-  const metadata = await fetchFleetMetadata();
-  return metadata.common_data || { requirements: [], included: [] };
-};
-
-export const fetchVehicleMetadataEntries = async () => {
-  const metadata = await fetchFleetMetadata();
-  return metadata.motorcycles_static_data || [];
 };
 
 // The session's cookie is sent automatically for this same-origin request.

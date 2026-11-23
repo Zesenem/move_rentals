@@ -1,6 +1,10 @@
 import Hero from "../components/Hero";
+import MileageCounter from "../components/MileageCounter";
 import MotorcycleList from "../components/MotorcycleList";
 import Seo from "../components/Seo";
+
+const showMileageCounter =
+  import.meta.env.DEV || import.meta.env.VITE_SHOW_MILEAGE_COUNTER === "true";
 
 function HomePage() {
   return (
@@ -11,6 +15,7 @@ function HomePage() {
         path="/"
       />
       <Hero />
+      {showMileageCounter && <MileageCounter />}
       <MotorcycleList />
     </>
   );

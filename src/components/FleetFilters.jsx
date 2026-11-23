@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useEffect, useId } from "react";
 import { FaChevronLeft, FaFilter, FaTimes, FaUndo } from "react-icons/fa";
 
 const formatEuro = (value) => `€${Math.round(value)}`;
@@ -114,9 +114,10 @@ function FilterControls({ options, filters, onToggle, onRangeChange, onClear, re
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full text-space transition-colors hover:bg-phantom hover:text-cloud"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-graphite/60 px-3 py-2 text-sm font-bold text-steel transition-colors hover:border-cloud hover:text-cloud"
             aria-label="Close filters"
           >
+            <span>Close</span>
             <FaTimes />
           </button>
         )}
@@ -158,14 +159,25 @@ function FilterControls({ options, filters, onToggle, onRangeChange, onClear, re
         />
       </div>
 
-      <button
-        type="button"
-        onClick={onClear}
-        className="mt-5 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-graphite/60 px-4 py-2 text-sm font-bold text-steel transition-colors hover:border-cloud hover:text-cloud"
-      >
-        <FaUndo className="text-xs" />
-        Clear filters
-      </button>
+      <div className={onClose ? "mt-5 grid grid-cols-2 gap-3" : "mt-5"}>
+        <button
+          type="button"
+          onClick={onClear}
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-graphite/60 px-4 py-2 text-sm font-bold text-steel transition-colors hover:border-cloud hover:text-cloud"
+        >
+          <FaUndo className="text-xs" />
+          Clear filters
+        </button>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-cloud px-4 py-2 text-sm font-extrabold text-phantom transition-colors hover:bg-cloud/90"
+          >
+            Show {resultCount} {resultCount === 1 ? "vehicle" : "vehicles"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -180,6 +192,27 @@ function FleetFilters({
   activeFilterCount,
   ...filterProps
 }) {
+  useEffect(() => {
+    if (!isMobileOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        onMobileClose();
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isMobileOpen, onMobileClose]);
+
   return (
     <>
       <div
@@ -189,7 +222,7 @@ function FleetFilters({
             : "pointer-events-none -translate-x-full opacity-0"
         }`}
         aria-hidden={!isDesktopVisible}
-        inert={!isDesktopVisible ? "" : undefined}
+        inert={!isDesktopVisible}
       >
         <div
           className={`relative w-[22.5rem] transition-transform duration-300 ease-out ${
@@ -202,11 +235,14 @@ function FleetFilters({
           <button
             type="button"
             onClick={onDesktopToggle}
-            className="absolute top-1/2 right-0 flex h-14 w-14 -translate-y-1/2 items-center justify-center rounded-r-2xl border border-l-0 border-graphite/60 bg-arsenic text-cloud shadow-xl transition-colors hover:bg-phantom"
+            className="absolute top-1/2 right-0 flex h-28 w-14 -translate-y-1/2 flex-col items-center justify-center gap-2 rounded-r-2xl border border-l-0 border-graphite/60 bg-arsenic text-cloud shadow-xl transition-colors hover:bg-phantom"
             aria-label={isDesktopOpen ? "Collapse fleet filters" : "Open fleet filters"}
             aria-expanded={isDesktopOpen}
           >
             {isDesktopOpen ? <FaChevronLeft /> : <FaFilter />}
+            <span className="text-[10px] font-extrabold uppercase tracking-[0.16em] [writing-mode:vertical-rl]">
+              Filters
+            </span>
             {activeFilterCount > 0 && (
               <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-cloud px-1 text-[10px] font-extrabold text-phantom">
                 {activeFilterCount}
@@ -220,22 +256,28 @@ function FleetFilters({
         <button
           type="button"
           onClick={onMobileOpen}
-          className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-graphite/70 bg-arsenic px-4 py-2 text-sm font-bold text-cloud transition-colors hover:border-cloud"
+          className="inline-flex min-h-12 items-center gap-2 rounded-full border border-cloud/50 bg-arsenic px-5 py-2.5 text-sm font-extrabold text-cloud shadow-lg shadow-phantom/30 transition-colors hover:border-cloud"
         >
           <FaFilter />
-          Filter fleet{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+          Find your ride
+          {activeFilterCount > 0 && (
+            <span className="rounded-full bg-cloud px-2 py-0.5 text-xs text-phantom">
+              {activeFilterCount}
+            </span>
+          )}
         </button>
       </div>
 
       {isMobileOpen && (
-        <div className="fixed inset-0 z-50 flex items-end bg-brand-black/60 p-3 lg:hidden" role="dialog" aria-modal="true" aria-label="Fleet filters">
+        <div className="fixed inset-0 z-50 flex items-end bg-brand-black/70 lg:hidden" role="dialog" aria-modal="true" aria-label="Fleet filters">
           <button
             type="button"
             className="absolute inset-0 cursor-default"
             aria-label="Close filters"
             onClick={onMobileClose}
           />
-          <aside className="relative max-h-[86vh] w-full rounded-2xl border border-graphite/60 bg-arsenic p-5 shadow-2xl">
+          <aside className="relative max-h-[78dvh] w-full rounded-t-3xl border border-b-0 border-graphite/60 bg-arsenic p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-2xl">
+            <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-steel/50" aria-hidden="true" />
             <FilterControls {...filterProps} onClose={onMobileClose} />
           </aside>
         </div>

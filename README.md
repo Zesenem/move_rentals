@@ -49,6 +49,7 @@ Set these in the Netlify site's environment variables (and in a local `.env` for
 | `TWICE_API_ID`         | `fetch-products` function | Twice Commerce API basic-auth ID                                                      |
 | `TWICE_API_SECRET`     | `fetch-products` function | Twice Commerce API basic-auth secret                                                  |
 | `ADMIN_ALLOWED_EMAILS` | `admin-access` util       | Comma-separated emails allowed into `/admin` in addition to the `admin` Identity role |
+| `VITE_SHOW_MILEAGE_COUNTER` | Homepage build | Set to `true` when the live kilometre counter is ready to publish. It is shown automatically in local development. |
 
 Netlify Identity itself doesn't need an env var — it's enabled per-site in the Netlify
 dashboard (Project configuration > Identity).

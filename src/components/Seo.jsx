@@ -4,7 +4,6 @@ export const SITE_URL = "https://move-rentals.com";
 const SITE_NAME = "Move Rentals";
 const DEFAULT_IMAGE = `${SITE_URL}/images/og-image.png`;
 
-// Central place for canonical/OG/Twitter tags so every page gets consistent SEO metadata.
 function Seo({
   title,
   description,
@@ -14,9 +13,7 @@ function Seo({
   structuredData,
 }) {
   const url = `${SITE_URL}${path}`;
-  const jsonLd = structuredData
-    ? JSON.stringify(structuredData).replace(/</g, "\\u003c")
-    : null;
+  const jsonLd = structuredData ? JSON.stringify(structuredData).replace(/</g, "\\u003c") : null;
 
   return (
     <Helmet>

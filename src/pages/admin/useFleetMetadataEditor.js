@@ -16,7 +16,6 @@ import {
   hasVehicleEntryConflict,
 } from "./metadataHelpers.js";
 
-// Encapsulates all fleet metadata editor state so AdminPage only handles layout.
 function useFleetMetadataEditor() {
   const queryClient = useQueryClient();
   const [selectedEntryKey, setSelectedEntryKey] = useState("");
@@ -374,6 +373,36 @@ function useFleetMetadataEditor() {
     setSaveMessage("");
   };
 
+  const handleCommonDataFieldChange = (field) => (event) => {
+    const { value } = event.target;
+    updateCommonDataDraft((currentDraft) => ({ ...currentDraft, [field]: value }));
+  };
+
+  const handleAddWeeklyKilometres = () => {
+    const weeklyKilometres = Number(commonDataDraft.weeklyKilometres);
+    const currentKilometres = Number(commonDataDraft.kilometresDriven);
+
+    if (!Number.isFinite(weeklyKilometres) || weeklyKilometres <= 0) {
+      setFormError("Indique os quilómetros desta semana antes de adicionar ao total.");
+      return;
+    }
+
+    if (!Number.isFinite(currentKilometres) || currentKilometres < 0) {
+      setFormError("O total de quilómetros atual não é válido.");
+      return;
+    }
+
+    updateCommonDataDraft((currentDraft) => ({
+      ...currentDraft,
+      kilometresDriven: String(Math.round(currentKilometres + weeklyKilometres)),
+      weeklyKilometres: "",
+      projectionStartedAt: new Date().toISOString(),
+    }));
+    setSaveMessage(
+      "Quilómetros reais adicionados e estimativa reiniciada. Guarde as alterações para publicar.",
+    );
+  };
+
   const handleSaveChanges = async () => {
     if (!metadata) {
       return;
@@ -398,9 +427,7 @@ function useFleetMetadataEditor() {
         });
 
         if (conflictingEntryIndex >= 0) {
-          throw new Error(
-            "Já existe outro registo com o mesmo ID, slug ou nome de veículo.",
-          );
+          throw new Error("Já existe outro registo com o mesmo ID, slug ou nome de veículo.");
         }
 
         nextEntries = isCreatingNew
@@ -524,6 +551,8 @@ function useFleetMetadataEditor() {
     handleCommonDataObjectListChange,
     handleAddCommonDataObjectListItem,
     handleRemoveCommonDataObjectListItem,
+    handleCommonDataFieldChange,
+    handleAddWeeklyKilometres,
     handleStartNewLiveEntry,
     handleStartNewStaticEntry,
     handleCancelNewEntry,

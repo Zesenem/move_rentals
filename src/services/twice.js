@@ -67,26 +67,34 @@ function mapApiProductToAppProduct(apiProduct) {
   };
 }
 
-export const fetchProducts = async () => {
-  const staticData = await fetchFleetMetadata();
-  const staticVehicles = staticData.motorcycles_static_data || [];
+const fetchFleetData = async () => {
+  const metadataPromise = fetchFleetMetadata();
+  const liveProductsPromise = fetch("/.netlify/functions/fetch-products")
+    .then(async (response) => {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || "Failed to fetch products.");
+      }
 
+      const paginatedResponse = await response.json();
+      return paginatedResponse.data.map(mapApiProductToAppProduct);
+    })
+    .catch((error) => {
+      console.error("Error fetching live products:", error);
+      return { products: [], error };
+    });
+  const [staticData, liveProductsResult] = await Promise.all([
+    metadataPromise,
+    liveProductsPromise,
+  ]);
+  const staticVehicles = staticData.motorcycles_static_data || [];
   let liveProducts = [];
   let liveProductsError = null;
 
-  try {
-    const apiResponse = await fetch(`/.netlify/functions/fetch-products`);
-
-    if (!apiResponse.ok) {
-      const errorData = await apiResponse.json();
-      throw new Error(errorData.error?.message || "Failed to fetch products.");
-    }
-
-    const paginatedResponse = await apiResponse.json();
-    liveProducts = paginatedResponse.data.map(mapApiProductToAppProduct);
-  } catch (error) {
-    liveProductsError = error;
-    console.error("Error fetching live products:", error);
+  if (Array.isArray(liveProductsResult)) {
+    liveProducts = liveProductsResult;
+  } else {
+    liveProductsError = liveProductsResult.error;
   }
 
   const matchedStaticKeys = new Set();
@@ -113,20 +121,27 @@ export const fetchProducts = async () => {
     throw liveProductsError;
   }
 
-  return allVehicles;
+  return {
+    products: allVehicles,
+    commonData: staticData.common_data || { requirements: [], included: [] },
+  };
+};
+
+export const fetchProducts = async () => {
+  const { products } = await fetchFleetData();
+  return products;
 };
 
 export const fetchProductBySlug = async (slug) => {
   try {
-    const allProducts = await fetchProducts();
-    const bike = allProducts.find((p) => p.slug === slug);
+    const { products, commonData } = await fetchFleetData();
+    const bike = products.find((product) => product.slug === slug);
     if (!bike) {
       throw new Error("Vehicle not found by slug");
     }
-    const staticData = await fetchFleetMetadata();
     return {
-      bike: bike,
-      commonData: staticData.common_data,
+      bike,
+      commonData,
     };
   } catch (error) {
     console.error("Error in fetchProductBySlug:", error);

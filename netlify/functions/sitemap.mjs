@@ -1,4 +1,5 @@
 import { readFleetMetadata } from "./utils/fleet-metadata-store.mjs";
+import { fetchTwiceProducts } from "./utils/twice-products.mjs";
 
 const SITE_URL = "https://move-rentals.com";
 const STATIC_PATHS = ["/", "/contact", "/terms-and-conditions", "/privacy-policy"];
@@ -32,44 +33,13 @@ const isPublicVehicle = (vehicle) =>
   vehicle.slug && vehicle.status !== "unavailable" && vehicle.status !== "coming-soon";
 
 const fetchLiveVehicles = async () => {
-  const apiId = process.env.TWICE_API_ID;
-  const apiSecret = process.env.TWICE_API_SECRET;
-
-  if (!apiId || !apiSecret) return [];
-
-  const credentials = Buffer.from(`${apiId}:${apiSecret}`).toString("base64");
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Basic ${credentials}`,
-    "x-rentle-version": "2023-02-01",
-  };
-  const categoryId = "Enlv0F1KBYYbOb5HdzJH";
-  const vehicles = [];
-  let pageToken;
-  let pageCount = 0;
-
-  do {
-    const url = new URL("https://api.twicecommerce.com/admin/products");
-    url.searchParams.set("categories", categoryId);
-    if (pageToken) url.searchParams.set("pageToken", pageToken);
-
-    const response = await fetch(url, { headers });
-    if (!response.ok) throw new Error(`Twice API returned ${response.status}.`);
-
-    const page = await response.json();
-    vehicles.push(
-      ...(page.data || []).map((product) => ({
-        id: product.id,
-        slug: product.slug || product.id,
-        name: product.name?.en || product.name?.def || "",
-        status: product.limitations?.visibleInListing === false ? "unavailable" : "available",
-      })),
-    );
-    pageToken = page.nextPageToken || null;
-    pageCount += 1;
-  } while (pageToken && pageCount < 20);
-
-  return vehicles;
+  const products = await fetchTwiceProducts({ requireCredentials: false });
+  return products.map((product) => ({
+    id: product.id,
+    slug: product.slug || product.id,
+    name: product.name?.en || product.name?.def || "",
+    status: product.limitations?.visibleInListing === false ? "unavailable" : "available",
+  }));
 };
 
 const escapeXml = (value) =>

@@ -162,6 +162,8 @@ function MotorcycleCard({ bike, index }) {
           <img
             src={imageUrl}
             alt={bike.name}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover opacity-0 transition-opacity duration-500"
             onLoad={(e) => (e.target.style.opacity = "1")}
             onError={(e) => {

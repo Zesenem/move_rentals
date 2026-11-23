@@ -15,7 +15,6 @@ import MotorcycleCardSkeleton from "./MotorcycleCardSkeleton.jsx";
 
 function MotorcycleList() {
   const fleetSectionRef = useRef(null);
-  const hasAutoOpenedFilters = useRef(false);
   const [isFleetVisible, setIsFleetVisible] = useState(false);
   const [isDesktopFiltersOpen, setIsDesktopFiltersOpen] = useState(false);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
@@ -49,13 +48,6 @@ function MotorcycleList() {
     observer.observe(fleetSectionRef.current);
     return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    if (isFleetVisible && !hasAutoOpenedFilters.current) {
-      setIsDesktopFiltersOpen(true);
-      hasAutoOpenedFilters.current = true;
-    }
-  }, [isFleetVisible]);
 
   const filterOptions = useMemo(() => getFleetFilterOptions(motorcycles), [motorcycles]);
   const isFilterActive = hasActiveFleetFilters(filters, filterOptions);

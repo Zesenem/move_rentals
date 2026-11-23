@@ -69,19 +69,13 @@ function ImageCarousel({ images, vehicleName }) {
           className="group relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg"
           onClick={() => setOpen(true)}
         >
-          {vehicleImages.map((src, index) => (
-            <img
-              key={src}
-              src={src}
-              alt={getImageAlt(displayName, index)}
-              loading="lazy"
-              className={`
-                absolute inset-0 h-full w-full object-cover shadow-xl 
-                transition-opacity duration-500 ease-in-out
-                ${index === currentIndex ? "opacity-100" : "opacity-0"}
-              `}
-            />
-          ))}
+          <img
+            src={vehicleImages[currentIndex]}
+            alt={getImageAlt(displayName, currentIndex)}
+            loading="eager"
+            decoding="async"
+            className="absolute inset-0 h-full w-full object-cover shadow-xl"
+          />
           <CarouselArrow direction="left" onClick={goToPrevious} />
           <CarouselArrow direction="right" onClick={goToNext} />
         </div>
@@ -98,9 +92,16 @@ function ImageCarousel({ images, vehicleName }) {
                       : "border-transparent opacity-60 hover:opacity-100"
                   }
                 `}
-                style={{ backgroundImage: `url(${src})` }}
                 aria-label={`View ${displayName} image ${index + 1}`}
-              />
+              >
+                <img
+                  src={src}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="h-full w-full object-cover"
+                />
+              </button>
             ))}
           </div>
         )}

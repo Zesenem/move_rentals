@@ -49,6 +49,8 @@ function AdminPage({ adminUser, onLogout }) {
     handleCommonDataObjectListChange,
     handleAddCommonDataObjectListItem,
     handleRemoveCommonDataObjectListItem,
+    handleCommonDataFieldChange,
+    handleAddWeeklyKilometres,
     handleStartNewLiveEntry,
     handleStartNewStaticEntry,
     handleCancelNewEntry,
@@ -182,6 +184,8 @@ function AdminPage({ adminUser, onLogout }) {
                     onAddCommonDataObjectListItem={handleAddCommonDataObjectListItem}
                     onCommonDataObjectListChange={handleCommonDataObjectListChange}
                     onRemoveCommonDataObjectListItem={handleRemoveCommonDataObjectListItem}
+                    onCommonDataFieldChange={handleCommonDataFieldChange}
+                    onAddWeeklyKilometres={handleAddWeeklyKilometres}
                   />
 
                 </div>
