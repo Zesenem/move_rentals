@@ -13,6 +13,7 @@ const contactInfo = {
 const quickLinks = [
   { name: "Our Fleet", to: "/" },
   { name: "Contact Us", to: "/contact" },
+  { name: "Lisbon Rental Guide", to: "/lisbon-rental-guide" },
   { name: "Terms & Conditions", to: "/terms-and-conditions" },
   { name: "Privacy Policy", to: "/privacy-policy" },
 ];

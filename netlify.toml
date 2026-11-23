@@ -14,6 +14,11 @@
   status = 200
 
 [[redirects]]
+  from = "/lisbon-rental-guide"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
   from = "/terms-and-conditions"
   to = "/index.html"
   status = 200

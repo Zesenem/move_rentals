@@ -8,6 +8,7 @@ import App from "./App.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import RouteErrorBoundary from "./components/RouteErrorBoundary.jsx";
 import HomePage from "./pages/HomePage.jsx";
+import LisbonRentalGuidePage from "./pages/LisbonRentalGuidePage.jsx";
 
 import "./index.css";
 
@@ -47,6 +48,7 @@ const router = createBrowserRouter([
       { path: "terms-and-conditions", element: withSuspense(<TermsPage />) },
       { path: "privacy-policy", element: withSuspense(<PrivacyPolicyPage />) },
       { path: "contact", element: withSuspense(<ContactPage />) },
+      { path: "lisbon-rental-guide", element: <LisbonRentalGuidePage /> },
       {
         path: "admin",
         element: withSuspense(<AdminWorkspacePage />),

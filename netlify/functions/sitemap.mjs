@@ -2,7 +2,13 @@ import { readFleetMetadata } from "./utils/fleet-metadata-store.mjs";
 import { fetchTwiceProducts } from "./utils/twice-products.mjs";
 
 const SITE_URL = "https://move-rentals.com";
-const STATIC_PATHS = ["/", "/contact", "/terms-and-conditions", "/privacy-policy"];
+const STATIC_PATHS = [
+  "/",
+  "/contact",
+  "/lisbon-rental-guide",
+  "/terms-and-conditions",
+  "/privacy-policy",
+];
 
 const slugify = (value = "") =>
   value
