@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FaBolt,
@@ -133,6 +134,7 @@ const Badges = ({ badges }) => (
 );
 
 function MotorcycleCard({ bike, index }) {
+  const [usesContainedFraming, setUsesContainedFraming] = useState(true);
   const hasPrice = typeof bike.price_per_day === "number" && bike.price_per_day > 0;
   const isClickable = bike.status !== "unavailable" && bike.status !== "coming-soon";
   const statusInfo = statusConfig[bike.status] || statusConfig.available;
@@ -173,8 +175,16 @@ function MotorcycleCard({ bike, index }) {
             sizes="(min-width: 1024px) 384px, (min-width: 640px) 45vw, 100vw"
             loading="lazy"
             decoding="async"
-            className="h-full w-full scale-[1.06] object-contain opacity-0 transition-opacity duration-500"
-            onLoad={(e) => (e.target.style.opacity = "1")}
+            className={`h-full w-full opacity-0 transition-opacity duration-500 ${
+              usesContainedFraming
+                ? "scale-[1.06] object-contain"
+                : "scale-[1.02] object-cover"
+            }`}
+            onLoad={(event) => {
+              const image = event.currentTarget;
+              setUsesContainedFraming(image.naturalWidth / image.naturalHeight >= 1.55);
+              image.style.opacity = "1";
+            }}
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = `https://placehold.co/600x400/2A2D35/EDEFF7?text=Image+Not+Found`;
