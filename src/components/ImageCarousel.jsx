@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, useMemo, useCallback, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { getResponsiveImageProps } from "../utils/images.js";
+import { getOptimizedImageUrl, getResponsiveImageProps } from "../utils/images.js";
 
 const EMPTY_IMAGES = [];
 const Lightbox = lazy(async () => {
@@ -50,6 +50,26 @@ function ImageCarousel({ images, vehicleName }) {
   useEffect(() => {
     setCurrentIndex((index) => Math.min(index, Math.max(vehicleImages.length - 1, 0)));
   }, [vehicleImages.length]);
+
+  useEffect(() => {
+    if (vehicleImages.length < 2) {
+      return;
+    }
+
+    const nextIndexes = [1, 2]
+      .map((offset) => (currentIndex + offset) % vehicleImages.length)
+      .filter((index) => index !== currentIndex);
+
+    for (const index of nextIndexes) {
+      const image = new Image();
+      image.decoding = "async";
+      image.src = getOptimizedImageUrl(vehicleImages[index], {
+        width: 1200,
+        quality: 80,
+        fit: "contain",
+      });
+    }
+  }, [currentIndex, vehicleImages]);
 
   const goToPrevious = useCallback(
     (e) => {
