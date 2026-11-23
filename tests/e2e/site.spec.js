@@ -27,6 +27,15 @@ test("opens a vehicle detail route", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Contact on WhatsApp" })).toBeVisible();
 });
 
+test("shows single-image vehicle pages without broken carousel controls", async ({ page }) => {
+  await page.goto("/motorcycle/yamaha-rayzr-125");
+
+  const mainImage = page.getByRole("img", { name: /Yamaha RayZR 125 rental in Lisbon/ });
+  await expect(mainImage).toHaveClass(/object-contain/);
+  await expect(page.getByRole("button", { name: "Previous Image" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Next Image" })).toHaveCount(0);
+});
+
 test("opens the Lisbon rental guide", async ({ page }) => {
   await page.goto("/lisbon-rental-guide");
 

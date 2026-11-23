@@ -146,6 +146,7 @@ function MotorcycleCard({ bike, index }) {
   const imageProps = getResponsiveImageProps(imageUrl, {
     widths: [384, 768],
     quality: 78,
+    fit: "contain",
   });
 
   const wrapperProps = {
@@ -172,7 +173,7 @@ function MotorcycleCard({ bike, index }) {
             sizes="(min-width: 1024px) 384px, (min-width: 640px) 45vw, 100vw"
             loading="lazy"
             decoding="async"
-            className="h-full w-full object-cover opacity-0 transition-opacity duration-500"
+            className="h-full w-full object-contain opacity-0 transition-opacity duration-500"
             onLoad={(e) => (e.target.style.opacity = "1")}
             onError={(e) => {
               e.target.onerror = null;

@@ -12,11 +12,16 @@ jobs:
   live-quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
+      - name: Checkout repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          git init
+          git remote add origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git fetch --no-tags --depth=1 origin "${GITHUB_REF}"
+          git checkout --force FETCH_HEAD
+      - name: Verify Node.js runtime
+        run: node --version
       - run: npm ci
       - run: npm run check:live-content
       - run: npm run test:lighthouse:live

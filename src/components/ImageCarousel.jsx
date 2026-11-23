@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useMemo, useCallback } from "react";
+import { lazy, Suspense, useState, useMemo, useCallback, useEffect } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { getResponsiveImageProps } from "../utils/images.js";
 
@@ -30,7 +30,13 @@ const CarouselArrow = ({ direction, onClick }) => {
 function ImageCarousel({ images, vehicleName }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [open, setOpen] = useState(false);
-  const vehicleImages = Array.isArray(images) ? images : EMPTY_IMAGES;
+  const vehicleImages = useMemo(
+    () =>
+      Array.isArray(images)
+        ? [...new Set(images.filter((image) => typeof image === "string" && image.trim()))]
+        : EMPTY_IMAGES,
+    [images],
+  );
   const displayName =
     typeof vehicleName === "string" && vehicleName.trim()
       ? vehicleName.trim()
@@ -40,6 +46,10 @@ function ImageCarousel({ images, vehicleName }) {
     () => vehicleImages.map((src, index) => ({ src, alt: getImageAlt(displayName, index) })),
     [vehicleImages, displayName]
   );
+
+  useEffect(() => {
+    setCurrentIndex((index) => Math.min(index, Math.max(vehicleImages.length - 1, 0)));
+  }, [vehicleImages.length]);
 
   const goToPrevious = useCallback(
     (e) => {
@@ -74,6 +84,7 @@ function ImageCarousel({ images, vehicleName }) {
             {...getResponsiveImageProps(vehicleImages[currentIndex], {
               widths: [640, 1200, 1600],
               quality: 80,
+              fit: "contain",
             })}
             alt={getImageAlt(displayName, currentIndex)}
             width="1200"
@@ -81,10 +92,14 @@ function ImageCarousel({ images, vehicleName }) {
             sizes="(min-width: 1024px) 720px, 100vw"
             loading="eager"
             decoding="async"
-            className="absolute inset-0 h-full w-full object-cover shadow-xl"
+            className="absolute inset-0 h-full w-full object-contain shadow-xl"
           />
-          <CarouselArrow direction="left" onClick={goToPrevious} />
-          <CarouselArrow direction="right" onClick={goToNext} />
+          {vehicleImages.length > 1 && (
+            <>
+              <CarouselArrow direction="left" onClick={goToPrevious} />
+              <CarouselArrow direction="right" onClick={goToNext} />
+            </>
+          )}
         </div>
         {vehicleImages.length > 1 && (
           <div className="grid grid-cols-5 gap-3">
@@ -105,6 +120,7 @@ function ImageCarousel({ images, vehicleName }) {
                   {...getResponsiveImageProps(src, {
                     widths: [160, 320],
                     quality: 70,
+                    fit: "contain",
                   })}
                   alt=""
                   width="160"
@@ -112,7 +128,7 @@ function ImageCarousel({ images, vehicleName }) {
                   sizes="(min-width: 768px) 128px, 18vw"
                   loading="lazy"
                   decoding="async"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-contain"
                 />
               </button>
             ))}
